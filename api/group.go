@@ -28,6 +28,14 @@ func (h GroupHandler) AddRoutes(e *gin.Engine) {
 	e.DELETE(GroupRoot, h.Delete)
 }
 
+// Get godoc
+// @summary Get a stakeholder group by ID.
+// @description Get a stakeholder group by ID.
+// @tags get
+// @produce json
+// @success 200 {object} models.StakeholderGroup
+// @router /controls/stakeholder-group/:id [get]
+// @param id path string true "Stakeholder Group ID"
 func (h GroupHandler) Get(ctx *gin.Context) {
 	model := models.Group{}
 	id := ctx.Param(ID)
@@ -49,6 +57,13 @@ func (h GroupHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// List godoc
+// @summary List all stakeholder groups.
+// @description List all stakeholder groups.
+// @tags get
+// @produce json
+// @success 200 {object} models.StakeholderGroup
+// @router /controls/stakeholder-group [get]
 func (h GroupHandler) List(ctx *gin.Context) {
 	var list []models.Group
 	result := h.DB.Find(&list)
@@ -63,6 +78,15 @@ func (h GroupHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
+// Create godoc
+// @summary Create a stakeholder group.
+// @description Create a stakeholder group.
+// @tags create
+// @accept json
+// @produce json
+// @success 200 {object} models.StakeholderGroup
+// @router /controls/stakeholder-group [post]
+// @param stakeholder_group body models.StakeholderGroup true "Stakeholder Group data"
 func (h GroupHandler) Create(ctx *gin.Context) {
 	model := models.Group{}
 	err := ctx.BindJSON(&model)
@@ -85,6 +109,13 @@ func (h GroupHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// Delete godoc
+// @summary Delete a stakeholder group.
+// @description Delete a stakeholder group.
+// @tags delete
+// @success 200 {object} models.StakeholderGroup
+// @router /controls/stakeholder-group/:id [delete]
+// @param id path string true "Stakeholder Group ID"
 func (h GroupHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
@@ -104,6 +135,16 @@ func (h GroupHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
+// Update godoc
+// @summary Update a stakeholder group.
+// @description Update a stakeholder group.
+// @tags update
+// @accept json
+// @produce json
+// @success 200 {object} models.StakeholderGroup
+// @router /controls/stakeholder-group/:id [put]
+// @param id path string true "Stakeholder Group ID"
+// @param stakeholder_group body models.StakeholderGroup true "Stakeholder Group data"
 func (h GroupHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 

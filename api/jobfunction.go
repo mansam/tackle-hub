@@ -28,6 +28,14 @@ func (h JobFunctionHandler) AddRoutes(e *gin.Engine) {
 	e.DELETE(JobFunctionRoot, h.Delete)
 }
 
+// Get godoc
+// @summary Get a job function by ID.
+// @description Get a job function by ID.
+// @tags get
+// @produce json
+// @success 200 {object} models.JobFunction
+// @router /controls/job-function/:id [get]
+// @param id path string true "Job Function ID"
 func (h JobFunctionHandler) Get(ctx *gin.Context) {
 	model := models.JobFunction{}
 	id := ctx.Param(ID)
@@ -49,6 +57,13 @@ func (h JobFunctionHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// List godoc
+// @summary List all job functions.
+// @description List all job functions.
+// @tags get
+// @produce json
+// @success 200 {object} models.JobFunction
+// @router /controls/job-function [get]
 func (h JobFunctionHandler) List(ctx *gin.Context) {
 	var list []models.JobFunction
 	result := h.DB.Find(&list)
@@ -63,6 +78,15 @@ func (h JobFunctionHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
+// Create godoc
+// @summary Create a job function.
+// @description Create a job function.
+// @tags create
+// @accept json
+// @produce json
+// @success 200 {object} models.JobFunction
+// @router /controls/job-function [post]
+// @param job_function body models.JobFunction true "Job Function data"
 func (h JobFunctionHandler) Create(ctx *gin.Context) {
 	model := models.JobFunction{}
 	err := ctx.BindJSON(&model)
@@ -85,6 +109,13 @@ func (h JobFunctionHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// Delete godoc
+// @summary Delete a job function.
+// @description Delete a job function.
+// @tags delete
+// @success 200 {object} models.JobFunction
+// @router /controls/job-function/:id [delete]
+// @param id path string true "Job Function ID"
 func (h JobFunctionHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
@@ -104,6 +135,16 @@ func (h JobFunctionHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
+// Update godoc
+// @summary Update a job function.
+// @description Update a job function.
+// @tags update
+// @accept json
+// @produce json
+// @success 200 {object} models.JobFunction
+// @router /controls/job-function/:id [put]
+// @param id path string true "Job Function ID"
+// @param job_function body models.JobFunction true "Job Function data"
 func (h JobFunctionHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 

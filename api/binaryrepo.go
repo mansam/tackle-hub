@@ -28,6 +28,14 @@ func (h BinaryRepoHandler) AddRoutes(e *gin.Engine) {
 	e.DELETE(BinaryRepoRoot, h.Delete)
 }
 
+// Get godoc
+// @summary Get a binary repository by ID.
+// @description Get a binary repository by ID.
+// @tags get
+// @produce json
+// @success 200 {object} models.BinaryRepository
+// @router /application-inventory/binary-repository/:id [get]
+// @param id path string true "Binary Repository ID"
 func (h BinaryRepoHandler) Get(ctx *gin.Context) {
 	binaryRepo := models.BinaryRepo{}
 	id := ctx.Param(ID)
@@ -49,6 +57,13 @@ func (h BinaryRepoHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, binaryRepo)
 }
 
+// List godoc
+// @summary List all binary repositories.
+// @description List all binary repositories.
+// @tags get
+// @produce json
+// @success 200 {object} models.BinaryRepository
+// @router /application-inventory/binary-repository [get]
 func (h BinaryRepoHandler) List(ctx *gin.Context) {
 	var binaryRepos []models.BinaryRepo
 	result := h.DB.Find(&binaryRepos)
@@ -63,6 +78,15 @@ func (h BinaryRepoHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, binaryRepos)
 }
 
+// Create godoc
+// @summary Create a binary repository.
+// @description Create a binary repository.
+// @tags create
+// @accept json
+// @produce json
+// @success 200 {object} models.BinaryRepository
+// @router /application-inventory/binary-repository [post]
+// @param binary_repository body models.BinaryRepository true "Binary Repository data"
 func (h BinaryRepoHandler) Create(ctx *gin.Context) {
 	binaryRepo := models.BinaryRepo{}
 	err := ctx.BindJSON(&binaryRepo)
@@ -85,6 +109,13 @@ func (h BinaryRepoHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, binaryRepo)
 }
 
+// Delete godoc
+// @summary Delete a binary repository.
+// @description Delete a binary repository.
+// @tags delete
+// @success 200 {object} models.BinaryRepository
+// @router /application-inventory/binary-repository/:id [delete]
+// @param id path string true "Binary Repository ID"
 func (h BinaryRepoHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
@@ -104,6 +135,16 @@ func (h BinaryRepoHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
+// Update godoc
+// @summary Update a binary repository.
+// @description Update a binary repository.
+// @tags update
+// @accept json
+// @produce json
+// @success 200 {object} models.BinaryRepository
+// @router /application-inventory/binary-repository/:id [put]
+// @param id path string true "Binary Repository ID"
+// @param binary_repository body models.BinaryRepository true "Binary Repository data"
 func (h BinaryRepoHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 

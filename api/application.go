@@ -35,6 +35,7 @@ func (h ApplicationHandler) AddRoutes(e *gin.Engine) {
 // @produce json
 // @success 200 {object} models.Application
 // @router /application-inventory/application/:id [get]
+// @param id path string true "Application ID"
 func (h ApplicationHandler) Get(ctx *gin.Context) {
 	model := models.Application{}
 	id := ctx.Param(ID)
@@ -113,7 +114,7 @@ func (h ApplicationHandler) Create(ctx *gin.Context) {
 // @tags delete
 // @success 200 {object} models.Application
 // @router /application-inventory/application/:id [delete]
-// @param id path integer true "Application id"
+// @param id path string true "Application id"
 func (h ApplicationHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
@@ -141,7 +142,7 @@ func (h ApplicationHandler) Delete(ctx *gin.Context) {
 // @produce json
 // @success 200 {object} models.Application
 // @router /application-inventory/application/:id [put]
-// @param id path integer true "Application id"
+// @param id path string true "Application id"
 // @param application body models.Application true "Application data"
 func (h ApplicationHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)

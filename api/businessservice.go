@@ -28,6 +28,14 @@ func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 	e.DELETE(BusinessServiceRoot, h.Delete)
 }
 
+// Get godoc
+// @summary Get a business service by ID.
+// @description Get a business service by ID.
+// @tags get
+// @produce json
+// @success 200 {object} models.BusinessService
+// @router /controls/business-service/:id [get]
+// @param id path string true "Business Service ID"
 func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 	model := models.BusinessService{}
 	id := ctx.Param(ID)
@@ -49,6 +57,13 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// List godoc
+// @summary List all business services.
+// @description List all business services.
+// @tags list
+// @produce json
+// @success 200 {object} models.BusinessService
+// @router /controls/business-service [get]
 func (h BusinessServiceHandler) List(ctx *gin.Context) {
 	var list []models.BusinessService
 	result := h.DB.Find(&list)
@@ -63,6 +78,15 @@ func (h BusinessServiceHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
+// Create godoc
+// @summary Create a business service.
+// @description Create a business service.
+// @tags create
+// @accept json
+// @produce json
+// @success 200 {object} models.BusinessService
+// @router /controls/business-service [post]
+// @param business_service body models.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 	model := models.BusinessService{}
 	err := ctx.BindJSON(&model)
@@ -85,6 +109,13 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// Delete godoc
+// @summary Delete a business service.
+// @description Delete a business service.
+// @tags delete
+// @success 200 {object} models.BusinessService
+// @router /controls/business-service/:id [delete]
+// @param id path string true "Business service ID"
 func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
@@ -104,6 +135,16 @@ func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
+// Update godoc
+// @summary Update a business service.
+// @description Update a business service.
+// @tags update
+// @accept json
+// @produce json
+// @success 200 {object} models.BusinessService
+// @router /controls/business-service/:id [put]
+// @param id path string true "Business service ID"
+// @param business_service body models.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 

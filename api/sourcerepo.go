@@ -28,6 +28,14 @@ func (h SourceRepoHandler) AddRoutes(e *gin.Engine) {
 	e.DELETE(SourceRepoRoot, h.Delete)
 }
 
+// Get godoc
+// @summary Get a source repository by ID.
+// @description Get a source repository by ID.
+// @tags get
+// @produce json
+// @success 200 {object} models.SourceRepository
+// @router /application-inventory/source-repository/:id [get]
+// @param id path string true "Source Repository ID"
 func (h SourceRepoHandler) Get(ctx *gin.Context) {
 	model := models.SourceRepo{}
 	id := ctx.Param(ID)
@@ -49,6 +57,13 @@ func (h SourceRepoHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// List godoc
+// @summary List all source repositories.
+// @description List all source repositories.
+// @tags get
+// @produce json
+// @success 200 {object} models.SourceRepository
+// @router /application-inventory/source-repository [get]
 func (h SourceRepoHandler) List(ctx *gin.Context) {
 	var list []models.SourceRepo
 	result := h.DB.Find(&list)
@@ -63,6 +78,15 @@ func (h SourceRepoHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
+// Create godoc
+// @summary Create a source repository.
+// @description Create a source repository.
+// @tags create
+// @accept json
+// @produce json
+// @success 200 {object} models.SourceRepository
+// @router /application-inventory/source-repository [post]
+// @param source_repository body models.SourceRepository true "Source Repository data"
 func (h SourceRepoHandler) Create(ctx *gin.Context) {
 	model := models.SourceRepo{}
 	err := ctx.BindJSON(&model)
@@ -85,6 +109,13 @@ func (h SourceRepoHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// Delete godoc
+// @summary Delete a source repository.
+// @description Delete a source repository.
+// @tags delete
+// @success 200 {object} models.SourceRepository
+// @router /application-inventory/source-repository/:id [delete]
+// @param id path string true "Source Repository ID"
 func (h SourceRepoHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
@@ -104,6 +135,16 @@ func (h SourceRepoHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
+// Update godoc
+// @summary Update a source repository.
+// @description Update a source repository.
+// @tags update
+// @accept json
+// @produce json
+// @success 200 {object} models.SourceRepository
+// @router /application-inventory/source-repository/:id [put]
+// @param id path string true "Source Repository ID"
+// @param source_repository body models.SourceRepository true "Source Repository data"
 func (h SourceRepoHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 

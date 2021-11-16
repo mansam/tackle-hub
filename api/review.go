@@ -28,6 +28,14 @@ func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 	e.DELETE(ReviewRoot, h.Delete)
 }
 
+// Get godoc
+// @summary Get a review by ID.
+// @description Get a review by ID.
+// @tags get
+// @produce json
+// @success 200 {object} models.Review
+// @router /application-inventory/review/:id [get]
+// @param id path string true "Review ID"
 func (h ReviewHandler) Get(ctx *gin.Context) {
 	model := models.Review{}
 	id := ctx.Param(ID)
@@ -49,6 +57,13 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// List godoc
+// @summary List all reviews.
+// @description List all reviews.
+// @tags get
+// @produce json
+// @success 200 {object} models.Review
+// @router /application-inventory/review [get]
 func (h ReviewHandler) List(ctx *gin.Context) {
 	var list []models.Review
 	result := h.DB.Find(&list)
@@ -63,6 +78,15 @@ func (h ReviewHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
+// Create godoc
+// @summary Create a review.
+// @description Create a review.
+// @tags create
+// @accept json
+// @produce json
+// @success 200 {object} models.Review
+// @router /application-inventory/review [post]
+// @param review body models.Review true "Review data"
 func (h ReviewHandler) Create(ctx *gin.Context) {
 	model := models.Review{}
 	err := ctx.BindJSON(&model)
@@ -85,6 +109,13 @@ func (h ReviewHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// Delete godoc
+// @summary Delete a review.
+// @description Delete a review.
+// @tags delete
+// @success 200 {object} models.Review
+// @router /application-inventory/review/:id [delete]
+// @param id path string true "Review ID"
 func (h ReviewHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
@@ -104,6 +135,16 @@ func (h ReviewHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
+// Update godoc
+// @summary Update a review.
+// @description Update a review.
+// @tags update
+// @accept json
+// @produce json
+// @success 200 {object} models.Review
+// @router /application-inventory/review/:id [put]
+// @param id path string true "Review ID"
+// @param review body models.Review true "Review data"
 func (h ReviewHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 

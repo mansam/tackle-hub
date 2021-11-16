@@ -28,6 +28,14 @@ func (h TagHandler) AddRoutes(e *gin.Engine) {
 	e.DELETE(TagRoot, h.Delete)
 }
 
+// Get godoc
+// @summary Get a tag by ID.
+// @description Get a tag by ID.
+// @tags get
+// @produce json
+// @success 200 {object} models.Tag
+// @router /controls/tag/:id [get]
+// @param id path string true "Tag ID"
 func (h TagHandler) Get(ctx *gin.Context) {
 	model := models.Tag{}
 	id := ctx.Param(ID)
@@ -49,6 +57,13 @@ func (h TagHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// List godoc
+// @summary List all tags.
+// @description List all tags.
+// @tags get
+// @produce json
+// @success 200 {object} models.Tag
+// @router /controls/tag [get]
 func (h TagHandler) List(ctx *gin.Context) {
 	var list []models.Tag
 	result := h.DB.Find(&list)
@@ -63,6 +78,15 @@ func (h TagHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
+// Create godoc
+// @summary Create a tag.
+// @description Create a tag.
+// @tags create
+// @accept json
+// @produce json
+// @success 200 {object} models.Tag
+// @router /controls/tag [post]
+// @param tag body models.Tag true "Tag data"
 func (h TagHandler) Create(ctx *gin.Context) {
 	model := models.Tag{}
 	err := ctx.BindJSON(&model)
@@ -85,6 +109,13 @@ func (h TagHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// Delete godoc
+// @summary Delete a tag.
+// @description Delete a tag.
+// @tags delete
+// @success 200 {object} models.Tag
+// @router /controls/tag/:id [delete]
+// @param id path string true "Tag ID"
 func (h TagHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
@@ -104,6 +135,16 @@ func (h TagHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
+// Update godoc
+// @summary Update a tag.
+// @description Update a tag.
+// @tags update
+// @accept json
+// @produce json
+// @success 200 {object} models.Tag
+// @router /controls/tag/:id [put]
+// @param id path string true "Tag ID"
+// @param tag body models.Tag true "Tag data"
 func (h TagHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
