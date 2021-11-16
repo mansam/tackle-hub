@@ -32,7 +32,20 @@ func Setup() {
 		log.Fatal(err)
 	}
 
-	err = DB.AutoMigrate(&models.Application{})
+	err = DB.AutoMigrate(
+		&models.Application{},
+		&models.BinaryRepo{},
+		&models.BusinessService{},
+		&models.Group{},
+		&models.JobFunction{},
+		&models.JobFunctionBinding{},
+		&models.Review{},
+		&models.Role{},
+		&models.RoleBinding{},
+		&models.SourceRepo{},
+		&models.Tag{},
+		&models.TagType{},
+		&models.User{})
 	if err != nil {
 		log.Fatal(err)
 	}
