@@ -66,7 +66,8 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 // @router /controls/business-service [get]
 func (h BusinessServiceHandler) List(ctx *gin.Context) {
 	var list []models.BusinessService
-	result := h.DB.Find(&list)
+	page := NewPagination(ctx)
+	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -118,7 +119,6 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 // @param id path string true "Business service ID"
 func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	result := h.DB.Delete(&models.BusinessService{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -147,7 +147,6 @@ func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 // @param business_service body models.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	updates := models.BusinessService{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {

@@ -66,7 +66,8 @@ func (h SourceRepoHandler) Get(ctx *gin.Context) {
 // @router /application-inventory/source-repository [get]
 func (h SourceRepoHandler) List(ctx *gin.Context) {
 	var list []models.SourceRepo
-	result := h.DB.Find(&list)
+	page := NewPagination(ctx)
+	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -118,7 +119,6 @@ func (h SourceRepoHandler) Create(ctx *gin.Context) {
 // @param id path string true "Source Repository ID"
 func (h SourceRepoHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	result := h.DB.Delete(&models.SourceRepo{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -147,7 +147,6 @@ func (h SourceRepoHandler) Delete(ctx *gin.Context) {
 // @param source_repository body models.SourceRepository true "Source Repository data"
 func (h SourceRepoHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	updates := models.SourceRepo{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {

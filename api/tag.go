@@ -66,7 +66,8 @@ func (h TagHandler) Get(ctx *gin.Context) {
 // @router /controls/tag [get]
 func (h TagHandler) List(ctx *gin.Context) {
 	var list []models.Tag
-	result := h.DB.Find(&list)
+	page := NewPagination(ctx)
+	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -118,7 +119,6 @@ func (h TagHandler) Create(ctx *gin.Context) {
 // @param id path string true "Tag ID"
 func (h TagHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	result := h.DB.Delete(&models.Tag{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -147,7 +147,6 @@ func (h TagHandler) Delete(ctx *gin.Context) {
 // @param tag body models.Tag true "Tag data"
 func (h TagHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	updates := models.Tag{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {

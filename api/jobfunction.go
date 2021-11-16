@@ -11,7 +11,7 @@ import (
 //
 // Routes
 const (
-	JobFunctionsRoot = ControlsRoot + "/job_functions"
+	JobFunctionsRoot = ControlsRoot + "/job-function"
 	JobFunctionRoot  = JobFunctionsRoot + "/:" + ID
 )
 
@@ -66,7 +66,8 @@ func (h JobFunctionHandler) Get(ctx *gin.Context) {
 // @router /controls/job-function [get]
 func (h JobFunctionHandler) List(ctx *gin.Context) {
 	var list []models.JobFunction
-	result := h.DB.Find(&list)
+	page := NewPagination(ctx)
+	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -118,7 +119,6 @@ func (h JobFunctionHandler) Create(ctx *gin.Context) {
 // @param id path string true "Job Function ID"
 func (h JobFunctionHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	result := h.DB.Delete(&models.JobFunction{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -147,7 +147,6 @@ func (h JobFunctionHandler) Delete(ctx *gin.Context) {
 // @param job_function body models.JobFunction true "Job Function data"
 func (h JobFunctionHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	updates := models.JobFunction{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {

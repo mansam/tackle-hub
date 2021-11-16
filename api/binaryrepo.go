@@ -37,9 +37,9 @@ func (h BinaryRepoHandler) AddRoutes(e *gin.Engine) {
 // @router /application-inventory/binary-repository/:id [get]
 // @param id path string true "Binary Repository ID"
 func (h BinaryRepoHandler) Get(ctx *gin.Context) {
-	binaryRepo := models.BinaryRepo{}
+	model := models.BinaryRepo{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&binaryRepo, "id = ?", id)
+	result := h.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -54,7 +54,7 @@ func (h BinaryRepoHandler) Get(ctx *gin.Context) {
 			return
 		}
 	}
-	ctx.JSON(http.StatusOK, binaryRepo)
+	ctx.JSON(http.StatusOK, model)
 }
 
 // List godoc
@@ -65,8 +65,9 @@ func (h BinaryRepoHandler) Get(ctx *gin.Context) {
 // @success 200 {object} models.BinaryRepository
 // @router /application-inventory/binary-repository [get]
 func (h BinaryRepoHandler) List(ctx *gin.Context) {
-	var binaryRepos []models.BinaryRepo
-	result := h.DB.Find(&binaryRepos)
+	var list []models.BinaryRepo
+	page := NewPagination(ctx)
+	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -75,7 +76,7 @@ func (h BinaryRepoHandler) List(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, binaryRepos)
+	ctx.JSON(http.StatusOK, list)
 }
 
 // Create godoc
@@ -88,8 +89,8 @@ func (h BinaryRepoHandler) List(ctx *gin.Context) {
 // @router /application-inventory/binary-repository [post]
 // @param binary_repository body models.BinaryRepository true "Binary Repository data"
 func (h BinaryRepoHandler) Create(ctx *gin.Context) {
-	binaryRepo := models.BinaryRepo{}
-	err := ctx.BindJSON(&binaryRepo)
+	model := models.BinaryRepo{}
+	err := ctx.BindJSON(&model)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": MsgBadRequest,
@@ -98,7 +99,7 @@ func (h BinaryRepoHandler) Create(ctx *gin.Context) {
 		return
 	}
 
-	result := h.DB.Create(&binaryRepo)
+	result := h.DB.Create(&model)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -106,7 +107,7 @@ func (h BinaryRepoHandler) Create(ctx *gin.Context) {
 		log.Error(result.Error, MsgInternalServerError)
 		return
 	}
-	ctx.JSON(http.StatusOK, binaryRepo)
+	ctx.JSON(http.StatusOK, model)
 }
 
 // Delete godoc
@@ -118,7 +119,6 @@ func (h BinaryRepoHandler) Create(ctx *gin.Context) {
 // @param id path string true "Binary Repository ID"
 func (h BinaryRepoHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	result := h.DB.Delete(&models.BinaryRepo{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -147,7 +147,6 @@ func (h BinaryRepoHandler) Delete(ctx *gin.Context) {
 // @param binary_repository body models.BinaryRepository true "Binary Repository data"
 func (h BinaryRepoHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	updates := models.BinaryRepo{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {

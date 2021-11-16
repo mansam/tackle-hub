@@ -66,7 +66,8 @@ func (h GroupHandler) Get(ctx *gin.Context) {
 // @router /controls/stakeholder-group [get]
 func (h GroupHandler) List(ctx *gin.Context) {
 	var list []models.Group
-	result := h.DB.Find(&list)
+	page := NewPagination(ctx)
+	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -118,7 +119,6 @@ func (h GroupHandler) Create(ctx *gin.Context) {
 // @param id path string true "Stakeholder Group ID"
 func (h GroupHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	result := h.DB.Delete(&models.Group{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -147,7 +147,6 @@ func (h GroupHandler) Delete(ctx *gin.Context) {
 // @param stakeholder_group body models.StakeholderGroup true "Stakeholder Group data"
 func (h GroupHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	updates := models.Group{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {

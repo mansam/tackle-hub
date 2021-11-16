@@ -66,7 +66,8 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 // @router /application-inventory/review [get]
 func (h ReviewHandler) List(ctx *gin.Context) {
 	var list []models.Review
-	result := h.DB.Find(&list)
+	page := NewPagination(ctx)
+	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -118,7 +119,6 @@ func (h ReviewHandler) Create(ctx *gin.Context) {
 // @param id path string true "Review ID"
 func (h ReviewHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	result := h.DB.Delete(&models.Review{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -147,7 +147,6 @@ func (h ReviewHandler) Delete(ctx *gin.Context) {
 // @param review body models.Review true "Review data"
 func (h ReviewHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	updates := models.Review{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {

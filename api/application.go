@@ -66,7 +66,8 @@ func (h ApplicationHandler) Get(ctx *gin.Context) {
 // @router /application-inventory/application [get]
 func (h ApplicationHandler) List(ctx *gin.Context) {
 	var list []models.Application
-	result := h.DB.Find(&list)
+	page := NewPagination(ctx)
+	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -117,7 +118,6 @@ func (h ApplicationHandler) Create(ctx *gin.Context) {
 // @param id path string true "Application id"
 func (h ApplicationHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	result := h.DB.Delete(&models.Application{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -146,7 +146,6 @@ func (h ApplicationHandler) Delete(ctx *gin.Context) {
 // @param application body models.Application true "Application data"
 func (h ApplicationHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-
 	updates := models.Application{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {

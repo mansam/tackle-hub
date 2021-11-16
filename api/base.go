@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/controller/pkg/logging"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 var log = logging.WithName("api")
@@ -26,6 +27,13 @@ const (
 	ID = "id"
 )
 
+// Pagination Defaults
+const (
+	Limit  = 20
+	Offset = 0
+	Sort   = "created_at asc"
+)
+
 type Handler interface {
 	AddRoutes(e *gin.Engine)
 	Get(ctx *gin.Context)
@@ -37,4 +45,30 @@ type Handler interface {
 
 type BaseHandler struct {
 	DB *gorm.DB
+}
+
+type Pagination struct {
+	Limit  int
+	Offset int
+	Sort   string
+}
+
+func NewPagination(ctx *gin.Context) Pagination {
+	limit, err := strconv.Atoi(ctx.Query("size"))
+	if err != nil {
+		limit = Limit
+	}
+	offset, err := strconv.Atoi(ctx.Query("page"))
+	if err != nil {
+		offset = Offset
+	}
+	sort := ctx.Query("sort")
+	if sort == "" {
+		sort = Sort
+	}
+	return Pagination{
+		Limit:  limit,
+		Offset: offset,
+		Sort:   sort,
+	}
 }
