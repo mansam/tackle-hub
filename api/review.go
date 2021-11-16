@@ -1,9 +1,8 @@
-package handlers
+package api
 
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/db"
 	"github.com/konveyor/tackle-hub/models"
 	"gorm.io/gorm"
 	"net/http"
@@ -12,25 +11,27 @@ import (
 //
 // Routes
 const (
-	TagTypesRoot = ControlsRoot + "/tag-type"
-	TagTypeRoot  = TagTypesRoot + "/:" + ID
+	ReviewsRoot = InventoryRoot + "/review"
+	ReviewRoot  = ReviewsRoot + "/:" + ID
 )
 
-type TagTypeHandler struct{}
-
-func (h *TagTypeHandler) AddRoutes(e *gin.Engine) {
-	e.GET(TagTypesRoot, h.List)
-	e.GET(TagTypesRoot+"/", h.List)
-	e.POST(TagTypesRoot, h.Create)
-	e.GET(TagTypeRoot, h.Get)
-	e.PUT(TagTypeRoot, h.Update)
-	e.DELETE(TagTypeRoot, h.Delete)
+type ReviewHandler struct {
+	BaseHandler
 }
 
-func (h *TagTypeHandler) Get(ctx *gin.Context) {
-	model := models.TagType{}
+func (h ReviewHandler) AddRoutes(e *gin.Engine) {
+	e.GET(ReviewsRoot, h.List)
+	e.GET(ReviewsRoot+"/", h.List)
+	e.POST(ReviewsRoot, h.Create)
+	e.GET(ReviewRoot, h.Get)
+	e.PUT(ReviewRoot, h.Update)
+	e.DELETE(ReviewRoot, h.Delete)
+}
+
+func (h ReviewHandler) Get(ctx *gin.Context) {
+	model := models.Review{}
 	id := ctx.Param(ID)
-	result := db.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -48,9 +49,9 @@ func (h *TagTypeHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
-func (h *TagTypeHandler) List(ctx *gin.Context) {
-	var list []models.TagType
-	result := db.DB.Find(&list)
+func (h ReviewHandler) List(ctx *gin.Context) {
+	var list []models.Review
+	result := h.DB.Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -62,8 +63,8 @@ func (h *TagTypeHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
-func (h *TagTypeHandler) Create(ctx *gin.Context) {
-	model := models.TagType{}
+func (h ReviewHandler) Create(ctx *gin.Context) {
+	model := models.Review{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -73,7 +74,7 @@ func (h *TagTypeHandler) Create(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Create(&model)
+	result := h.DB.Create(&model)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -84,10 +85,10 @@ func (h *TagTypeHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
-func (h *TagTypeHandler) Delete(ctx *gin.Context) {
+func (h ReviewHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
-	result := db.DB.Delete(&models.TagType{}, "id = ?", id)
+	result := h.DB.Delete(&models.Review{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.Status(http.StatusOK)
@@ -103,10 +104,10 @@ func (h *TagTypeHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *TagTypeHandler) Update(ctx *gin.Context) {
+func (h ReviewHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
-	updates := models.TagType{}
+	updates := models.Review{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -116,7 +117,7 @@ func (h *TagTypeHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Model(&models.TagType{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&models.Review{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{

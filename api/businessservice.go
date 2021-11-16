@@ -1,9 +1,8 @@
-package handlers
+package api
 
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/db"
 	"github.com/konveyor/tackle-hub/models"
 	"gorm.io/gorm"
 	"net/http"
@@ -12,25 +11,27 @@ import (
 //
 // Routes
 const (
-	TagsRoot = ControlsRoot + "/tag"
-	TagRoot  = TagsRoot + "/:" + ID
+	BusinessServicesRoot = ControlsRoot + "/business-service"
+	BusinessServiceRoot  = BusinessServicesRoot + "/:" + ID
 )
 
-type TagHandler struct{}
-
-func (h *TagHandler) AddRoutes(e *gin.Engine) {
-	e.GET(TagsRoot, h.List)
-	e.GET(TagsRoot+"/", h.List)
-	e.POST(TagsRoot, h.Create)
-	e.GET(TagRoot, h.Get)
-	e.PUT(TagRoot, h.Update)
-	e.DELETE(TagRoot, h.Delete)
+type BusinessServiceHandler struct {
+	BaseHandler
 }
 
-func (h *TagHandler) Get(ctx *gin.Context) {
-	model := models.Tag{}
+func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
+	e.GET(BusinessServicesRoot, h.List)
+	e.GET(BusinessServicesRoot+"/", h.List)
+	e.POST(BusinessServicesRoot, h.Create)
+	e.GET(BusinessServiceRoot, h.Get)
+	e.PUT(BusinessServiceRoot, h.Update)
+	e.DELETE(BusinessServiceRoot, h.Delete)
+}
+
+func (h BusinessServiceHandler) Get(ctx *gin.Context) {
+	model := models.BusinessService{}
 	id := ctx.Param(ID)
-	result := db.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -48,9 +49,9 @@ func (h *TagHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
-func (h *TagHandler) List(ctx *gin.Context) {
-	var list []models.Tag
-	result := db.DB.Find(&list)
+func (h BusinessServiceHandler) List(ctx *gin.Context) {
+	var list []models.BusinessService
+	result := h.DB.Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -62,8 +63,8 @@ func (h *TagHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
-func (h *TagHandler) Create(ctx *gin.Context) {
-	model := models.Tag{}
+func (h BusinessServiceHandler) Create(ctx *gin.Context) {
+	model := models.BusinessService{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -73,7 +74,7 @@ func (h *TagHandler) Create(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Create(&model)
+	result := h.DB.Create(&model)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -84,10 +85,10 @@ func (h *TagHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
-func (h *TagHandler) Delete(ctx *gin.Context) {
+func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
-	result := db.DB.Delete(&models.Tag{}, "id = ?", id)
+	result := h.DB.Delete(&models.BusinessService{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.Status(http.StatusOK)
@@ -103,10 +104,10 @@ func (h *TagHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *TagHandler) Update(ctx *gin.Context) {
+func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
-	updates := models.Tag{}
+	updates := models.BusinessService{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -116,7 +117,7 @@ func (h *TagHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Model(&models.Tag{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&models.BusinessService{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{

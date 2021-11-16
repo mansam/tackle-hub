@@ -1,11 +1,12 @@
-package handlers
+package api
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/controller/pkg/logging"
+	"gorm.io/gorm"
 )
 
-var log = logging.WithName("handlers")
+var log = logging.WithName("api")
 
 // Error messages
 const (
@@ -32,4 +33,8 @@ type Handler interface {
 	Create(ctx *gin.Context)
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
+}
+
+type BaseHandler struct {
+	DB *gorm.DB
 }

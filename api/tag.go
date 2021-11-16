@@ -1,9 +1,8 @@
-package handlers
+package api
 
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/db"
 	"github.com/konveyor/tackle-hub/models"
 	"gorm.io/gorm"
 	"net/http"
@@ -12,25 +11,27 @@ import (
 //
 // Routes
 const (
-	JobFunctionsRoot = ControlsRoot + "/job_functions"
-	JobFunctionRoot  = JobFunctionsRoot + "/:" + ID
+	TagsRoot = ControlsRoot + "/tag"
+	TagRoot  = TagsRoot + "/:" + ID
 )
 
-type JobFunctionHandler struct{}
-
-func (h *JobFunctionHandler) AddRoutes(e *gin.Engine) {
-	e.GET(JobFunctionsRoot, h.List)
-	e.GET(JobFunctionsRoot+"/", h.List)
-	e.POST(JobFunctionsRoot, h.Create)
-	e.GET(JobFunctionRoot, h.Get)
-	e.PUT(JobFunctionRoot, h.Update)
-	e.DELETE(JobFunctionRoot, h.Delete)
+type TagHandler struct {
+	BaseHandler
 }
 
-func (h *JobFunctionHandler) Get(ctx *gin.Context) {
-	model := models.JobFunction{}
+func (h TagHandler) AddRoutes(e *gin.Engine) {
+	e.GET(TagsRoot, h.List)
+	e.GET(TagsRoot+"/", h.List)
+	e.POST(TagsRoot, h.Create)
+	e.GET(TagRoot, h.Get)
+	e.PUT(TagRoot, h.Update)
+	e.DELETE(TagRoot, h.Delete)
+}
+
+func (h TagHandler) Get(ctx *gin.Context) {
+	model := models.Tag{}
 	id := ctx.Param(ID)
-	result := db.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -48,9 +49,9 @@ func (h *JobFunctionHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
-func (h *JobFunctionHandler) List(ctx *gin.Context) {
-	var list []models.JobFunction
-	result := db.DB.Find(&list)
+func (h TagHandler) List(ctx *gin.Context) {
+	var list []models.Tag
+	result := h.DB.Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -62,8 +63,8 @@ func (h *JobFunctionHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
-func (h *JobFunctionHandler) Create(ctx *gin.Context) {
-	model := models.JobFunction{}
+func (h TagHandler) Create(ctx *gin.Context) {
+	model := models.Tag{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -73,7 +74,7 @@ func (h *JobFunctionHandler) Create(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Create(&model)
+	result := h.DB.Create(&model)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -84,10 +85,10 @@ func (h *JobFunctionHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
-func (h *JobFunctionHandler) Delete(ctx *gin.Context) {
+func (h TagHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
-	result := db.DB.Delete(&models.JobFunction{}, "id = ?", id)
+	result := h.DB.Delete(&models.Tag{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.Status(http.StatusOK)
@@ -103,10 +104,10 @@ func (h *JobFunctionHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *JobFunctionHandler) Update(ctx *gin.Context) {
+func (h TagHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
-	updates := models.JobFunction{}
+	updates := models.Tag{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -116,7 +117,7 @@ func (h *JobFunctionHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Model(&models.JobFunction{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&models.Tag{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{

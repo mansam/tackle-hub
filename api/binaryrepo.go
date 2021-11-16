@@ -1,9 +1,8 @@
-package handlers
+package api
 
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/db"
 	"github.com/konveyor/tackle-hub/models"
 	"gorm.io/gorm"
 	"net/http"
@@ -12,25 +11,27 @@ import (
 //
 // Routes
 const (
-	BusinessServicesRoot = ControlsRoot + "/business-service"
-	BusinessServiceRoot  = BusinessServicesRoot + "/:" + ID
+	BinaryReposRoot = InventoryRoot + "/binary-repository"
+	BinaryRepoRoot  = BinaryReposRoot + "/:" + ID
 )
 
-type BusinessServiceHandler struct{}
-
-func (h *BusinessServiceHandler) AddRoutes(e *gin.Engine) {
-	e.GET(BusinessServicesRoot, h.List)
-	e.GET(BusinessServicesRoot+"/", h.List)
-	e.POST(BusinessServicesRoot, h.Create)
-	e.GET(BusinessServiceRoot, h.Get)
-	e.PUT(BusinessServiceRoot, h.Update)
-	e.DELETE(BusinessServiceRoot, h.Delete)
+type BinaryRepoHandler struct {
+	BaseHandler
 }
 
-func (h *BusinessServiceHandler) Get(ctx *gin.Context) {
-	model := models.BusinessService{}
+func (h BinaryRepoHandler) AddRoutes(e *gin.Engine) {
+	e.GET(BinaryReposRoot, h.List)
+	e.GET(BinaryReposRoot+"/", h.List)
+	e.POST(BinaryReposRoot, h.Create)
+	e.GET(BinaryRepoRoot, h.Get)
+	e.PUT(BinaryRepoRoot, h.Update)
+	e.DELETE(BinaryRepoRoot, h.Delete)
+}
+
+func (h BinaryRepoHandler) Get(ctx *gin.Context) {
+	binaryRepo := models.BinaryRepo{}
 	id := ctx.Param(ID)
-	result := db.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&binaryRepo, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -45,12 +46,12 @@ func (h *BusinessServiceHandler) Get(ctx *gin.Context) {
 			return
 		}
 	}
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, binaryRepo)
 }
 
-func (h *BusinessServiceHandler) List(ctx *gin.Context) {
-	var list []models.BusinessService
-	result := db.DB.Find(&list)
+func (h BinaryRepoHandler) List(ctx *gin.Context) {
+	var binaryRepos []models.BinaryRepo
+	result := h.DB.Find(&binaryRepos)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -59,12 +60,12 @@ func (h *BusinessServiceHandler) List(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, list)
+	ctx.JSON(http.StatusOK, binaryRepos)
 }
 
-func (h *BusinessServiceHandler) Create(ctx *gin.Context) {
-	model := models.BusinessService{}
-	err := ctx.BindJSON(&model)
+func (h BinaryRepoHandler) Create(ctx *gin.Context) {
+	binaryRepo := models.BinaryRepo{}
+	err := ctx.BindJSON(&binaryRepo)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": MsgBadRequest,
@@ -73,7 +74,7 @@ func (h *BusinessServiceHandler) Create(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Create(&model)
+	result := h.DB.Create(&binaryRepo)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -81,13 +82,13 @@ func (h *BusinessServiceHandler) Create(ctx *gin.Context) {
 		log.Error(result.Error, MsgInternalServerError)
 		return
 	}
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, binaryRepo)
 }
 
-func (h *BusinessServiceHandler) Delete(ctx *gin.Context) {
+func (h BinaryRepoHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
-	result := db.DB.Delete(&models.BusinessService{}, "id = ?", id)
+	result := h.DB.Delete(&models.BinaryRepo{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.Status(http.StatusOK)
@@ -103,10 +104,10 @@ func (h *BusinessServiceHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *BusinessServiceHandler) Update(ctx *gin.Context) {
+func (h BinaryRepoHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
-	updates := models.BusinessService{}
+	updates := models.BinaryRepo{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -116,7 +117,7 @@ func (h *BusinessServiceHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Model(&models.BusinessService{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&models.BinaryRepo{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{

@@ -1,9 +1,8 @@
-package handlers
+package api
 
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/db"
 	"github.com/konveyor/tackle-hub/models"
 	"gorm.io/gorm"
 	"net/http"
@@ -16,9 +15,11 @@ const (
 	ApplicationRoot  = ApplicationsRoot + "/:" + ID
 )
 
-type ApplicationHandler struct{}
+type ApplicationHandler struct {
+	BaseHandler
+}
 
-func (h *ApplicationHandler) AddRoutes(e *gin.Engine) {
+func (h ApplicationHandler) AddRoutes(e *gin.Engine) {
 	e.GET(ApplicationsRoot, h.List)
 	e.GET(ApplicationsRoot+"/", h.List)
 	e.POST(ApplicationsRoot, h.Create)
@@ -34,10 +35,10 @@ func (h *ApplicationHandler) AddRoutes(e *gin.Engine) {
 // @produce json
 // @success 200 {object} models.Application
 // @router /application-inventory/application/:id [get]
-func (h *ApplicationHandler) Get(ctx *gin.Context) {
+func (h ApplicationHandler) Get(ctx *gin.Context) {
 	model := models.Application{}
 	id := ctx.Param(ID)
-	result := db.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -62,9 +63,9 @@ func (h *ApplicationHandler) Get(ctx *gin.Context) {
 // @produce json
 // @success 200 {object} []models.Application
 // @router /application-inventory/application [get]
-func (h *ApplicationHandler) List(ctx *gin.Context) {
+func (h ApplicationHandler) List(ctx *gin.Context) {
 	var list []models.Application
-	result := db.DB.Find(&list)
+	result := h.DB.Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -84,7 +85,7 @@ func (h *ApplicationHandler) List(ctx *gin.Context) {
 // @success 200 {object} models.Application
 // @router /application-inventory/application [post]
 // @param application body models.Application true "Application data"
-func (h *ApplicationHandler) Create(ctx *gin.Context) {
+func (h ApplicationHandler) Create(ctx *gin.Context) {
 	model := models.Application{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
@@ -95,7 +96,7 @@ func (h *ApplicationHandler) Create(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Create(&model)
+	result := h.DB.Create(&model)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -113,10 +114,10 @@ func (h *ApplicationHandler) Create(ctx *gin.Context) {
 // @success 200 {object} models.Application
 // @router /application-inventory/application/:id [delete]
 // @param id path integer true "Application id"
-func (h *ApplicationHandler) Delete(ctx *gin.Context) {
+func (h ApplicationHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
-	result := db.DB.Delete(&models.Application{}, "id = ?", id)
+	result := h.DB.Delete(&models.Application{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.Status(http.StatusOK)
@@ -142,7 +143,7 @@ func (h *ApplicationHandler) Delete(ctx *gin.Context) {
 // @router /application-inventory/application/:id [put]
 // @param id path integer true "Application id"
 // @param application body models.Application true "Application data"
-func (h *ApplicationHandler) Update(ctx *gin.Context) {
+func (h ApplicationHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
 	updates := models.Application{}
@@ -155,7 +156,7 @@ func (h *ApplicationHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Model(&models.Application{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&models.Application{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{

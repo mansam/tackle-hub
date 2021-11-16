@@ -1,9 +1,8 @@
-package handlers
+package api
 
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/db"
 	"github.com/konveyor/tackle-hub/models"
 	"gorm.io/gorm"
 	"net/http"
@@ -12,25 +11,27 @@ import (
 //
 // Routes
 const (
-	ReviewsRoot = InventoryRoot + "/review"
-	ReviewRoot  = ReviewsRoot + "/:" + ID
+	StakeholdersRoot = ControlsRoot + "/stakeholder"
+	StakeholderRoot  = StakeholdersRoot + "/:" + ID
 )
 
-type ReviewHandler struct{}
-
-func (h *ReviewHandler) AddRoutes(e *gin.Engine) {
-	e.GET(ReviewsRoot, h.List)
-	e.GET(ReviewsRoot+"/", h.List)
-	e.POST(ReviewsRoot, h.Create)
-	e.GET(ReviewRoot, h.Get)
-	e.PUT(ReviewRoot, h.Update)
-	e.DELETE(ReviewRoot, h.Delete)
+type StakeholderHandler struct {
+	BaseHandler
 }
 
-func (h *ReviewHandler) Get(ctx *gin.Context) {
-	model := models.Review{}
+func (h StakeholderHandler) AddRoutes(e *gin.Engine) {
+	e.GET(StakeholdersRoot, h.List)
+	e.GET(StakeholdersRoot+"/", h.List)
+	e.POST(StakeholdersRoot, h.Create)
+	e.GET(StakeholderRoot, h.Get)
+	e.PUT(StakeholderRoot, h.Update)
+	e.DELETE(StakeholderRoot, h.Delete)
+}
+
+func (h StakeholderHandler) Get(ctx *gin.Context) {
+	model := models.Stakeholder{}
 	id := ctx.Param(ID)
-	result := db.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -48,9 +49,9 @@ func (h *ReviewHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
-func (h *ReviewHandler) List(ctx *gin.Context) {
-	var list []models.Review
-	result := db.DB.Find(&list)
+func (h StakeholderHandler) List(ctx *gin.Context) {
+	var list []models.Stakeholder
+	result := h.DB.Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -62,8 +63,8 @@ func (h *ReviewHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
-func (h *ReviewHandler) Create(ctx *gin.Context) {
-	model := models.Review{}
+func (h StakeholderHandler) Create(ctx *gin.Context) {
+	model := models.Stakeholder{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -73,7 +74,7 @@ func (h *ReviewHandler) Create(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Create(&model)
+	result := h.DB.Create(&model)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": MsgInternalServerError,
@@ -84,10 +85,10 @@ func (h *ReviewHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
-func (h *ReviewHandler) Delete(ctx *gin.Context) {
+func (h StakeholderHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
-	result := db.DB.Delete(&models.Review{}, "id = ?", id)
+	result := h.DB.Delete(&models.Stakeholder{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.Status(http.StatusOK)
@@ -103,10 +104,10 @@ func (h *ReviewHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *ReviewHandler) Update(ctx *gin.Context) {
+func (h StakeholderHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 
-	updates := models.Review{}
+	updates := models.Stakeholder{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -116,7 +117,7 @@ func (h *ReviewHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Model(&models.Review{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&models.Stakeholder{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{
