@@ -1,6 +1,6 @@
 package models
 
-type User struct {
+type Stakeholder struct {
 	Resource
 	Email            string `json:"email" gorm:"notnull" binding:"required,email"`
 	DisplayName      string `json:"display_name" gorm:"notnull" binding:"required"`

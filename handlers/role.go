@@ -12,9 +12,8 @@ import (
 //
 // Routes
 const (
-	RolesRoot = "/roles"
-	RoleParam = "role"
-	RoleRoot  = RolesRoot + "/:" + RoleParam
+	RolesRoot = ControlsRoot + "/role"
+	RoleRoot  = RolesRoot + "/:" + ID
 )
 
 type RoleHandler struct{}
@@ -30,7 +29,7 @@ func (h *RoleHandler) AddRoutes(e *gin.Engine) {
 
 func (h *RoleHandler) Get(ctx *gin.Context) {
 	model := models.Role{}
-	id := ctx.Param(RoleParam)
+	id := ctx.Param(ID)
 	result := db.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -86,7 +85,7 @@ func (h *RoleHandler) Create(ctx *gin.Context) {
 }
 
 func (h *RoleHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(RoleParam)
+	id := ctx.Param(ID)
 
 	result := db.DB.Delete(&models.Role{}, "id = ?", id)
 	if result.Error != nil {
@@ -105,7 +104,7 @@ func (h *RoleHandler) Delete(ctx *gin.Context) {
 }
 
 func (h *RoleHandler) Update(ctx *gin.Context) {
-	id := ctx.Param(RoleParam)
+	id := ctx.Param(ID)
 
 	updates := models.Role{}
 	err := ctx.BindJSON(&updates)

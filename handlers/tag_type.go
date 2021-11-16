@@ -12,9 +12,8 @@ import (
 //
 // Routes
 const (
-	TagTypesRoot = "/tag_types"
-	TagTypeParam = "tag_type"
-	TagTypeRoot  = TagTypesRoot + "/:" + TagTypeParam
+	TagTypesRoot = ControlsRoot + "/tag-type"
+	TagTypeRoot  = TagTypesRoot + "/:" + ID
 )
 
 type TagTypeHandler struct{}
@@ -30,7 +29,7 @@ func (h *TagTypeHandler) AddRoutes(e *gin.Engine) {
 
 func (h *TagTypeHandler) Get(ctx *gin.Context) {
 	model := models.TagType{}
-	id := ctx.Param(TagTypeParam)
+	id := ctx.Param(ID)
 	result := db.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -86,7 +85,7 @@ func (h *TagTypeHandler) Create(ctx *gin.Context) {
 }
 
 func (h *TagTypeHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(TagTypeParam)
+	id := ctx.Param(ID)
 
 	result := db.DB.Delete(&models.TagType{}, "id = ?", id)
 	if result.Error != nil {
@@ -105,7 +104,7 @@ func (h *TagTypeHandler) Delete(ctx *gin.Context) {
 }
 
 func (h *TagTypeHandler) Update(ctx *gin.Context) {
-	id := ctx.Param(TagTypeParam)
+	id := ctx.Param(ID)
 
 	updates := models.TagType{}
 	err := ctx.BindJSON(&updates)

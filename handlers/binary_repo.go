@@ -12,9 +12,8 @@ import (
 //
 // Routes
 const (
-	BinaryReposRoot = "/binary_repositories"
-	BinaryRepoParam = "binary_repository"
-	BinaryRepoRoot  = BinaryReposRoot + "/:" + BinaryRepoParam
+	BinaryReposRoot = InventoryRoot + "/binary-repository"
+	BinaryRepoRoot  = BinaryReposRoot + "/:" + ID
 )
 
 type BinaryRepoHandler struct{}
@@ -30,7 +29,7 @@ func (h *BinaryRepoHandler) AddRoutes(e *gin.Engine) {
 
 func (h *BinaryRepoHandler) Get(ctx *gin.Context) {
 	binaryRepo := models.BinaryRepo{}
-	id := ctx.Param(BinaryRepoParam)
+	id := ctx.Param(ID)
 	result := db.DB.First(&binaryRepo, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -86,7 +85,7 @@ func (h *BinaryRepoHandler) Create(ctx *gin.Context) {
 }
 
 func (h *BinaryRepoHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(BinaryRepoParam)
+	id := ctx.Param(ID)
 
 	result := db.DB.Delete(&models.BinaryRepo{}, "id = ?", id)
 	if result.Error != nil {
@@ -105,7 +104,7 @@ func (h *BinaryRepoHandler) Delete(ctx *gin.Context) {
 }
 
 func (h *BinaryRepoHandler) Update(ctx *gin.Context) {
-	id := ctx.Param(BinaryRepoParam)
+	id := ctx.Param(ID)
 
 	updates := models.BinaryRepo{}
 	err := ctx.BindJSON(&updates)

@@ -12,9 +12,8 @@ import (
 //
 // Routes
 const (
-	SourceReposRoot = "/source_repositories"
-	SourceRepoParam = "source_repositories"
-	SourceRepoRoot  = SourceReposRoot + "/:" + SourceRepoParam
+	SourceReposRoot = InventoryRoot + "/source-repository"
+	SourceRepoRoot  = SourceReposRoot + "/:" + ID
 )
 
 type SourceRepoHandler struct{}
@@ -30,7 +29,7 @@ func (h *SourceRepoHandler) AddRoutes(e *gin.Engine) {
 
 func (h *SourceRepoHandler) Get(ctx *gin.Context) {
 	model := models.SourceRepo{}
-	id := ctx.Param(SourceRepoParam)
+	id := ctx.Param(ID)
 	result := db.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -86,7 +85,7 @@ func (h *SourceRepoHandler) Create(ctx *gin.Context) {
 }
 
 func (h *SourceRepoHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(SourceRepoParam)
+	id := ctx.Param(ID)
 
 	result := db.DB.Delete(&models.SourceRepo{}, "id = ?", id)
 	if result.Error != nil {
@@ -105,7 +104,7 @@ func (h *SourceRepoHandler) Delete(ctx *gin.Context) {
 }
 
 func (h *SourceRepoHandler) Update(ctx *gin.Context) {
-	id := ctx.Param(SourceRepoParam)
+	id := ctx.Param(ID)
 
 	updates := models.SourceRepo{}
 	err := ctx.BindJSON(&updates)

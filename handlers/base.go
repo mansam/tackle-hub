@@ -14,6 +14,17 @@ const (
 	MsgBadRequest          = "bad request"
 )
 
+// Routes
+const (
+	InventoryRoot = "/application-inventory"
+	ControlsRoot  = "/controls"
+)
+
+// Params
+const (
+	ID = "id"
+)
+
 type Handler interface {
 	AddRoutes(e *gin.Engine)
 	Get(ctx *gin.Context)

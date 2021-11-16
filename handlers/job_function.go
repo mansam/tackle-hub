@@ -12,9 +12,8 @@ import (
 //
 // Routes
 const (
-	JobFunctionsRoot = "/job_functions"
-	JobFunctionParam = "job_function"
-	JobFunctionRoot  = JobFunctionsRoot + "/:" + JobFunctionParam
+	JobFunctionsRoot = ControlsRoot + "/job_functions"
+	JobFunctionRoot  = JobFunctionsRoot + "/:" + ID
 )
 
 type JobFunctionHandler struct{}
@@ -30,7 +29,7 @@ func (h *JobFunctionHandler) AddRoutes(e *gin.Engine) {
 
 func (h *JobFunctionHandler) Get(ctx *gin.Context) {
 	model := models.JobFunction{}
-	id := ctx.Param(JobFunctionParam)
+	id := ctx.Param(ID)
 	result := db.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -86,7 +85,7 @@ func (h *JobFunctionHandler) Create(ctx *gin.Context) {
 }
 
 func (h *JobFunctionHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(JobFunctionParam)
+	id := ctx.Param(ID)
 
 	result := db.DB.Delete(&models.JobFunction{}, "id = ?", id)
 	if result.Error != nil {
@@ -105,7 +104,7 @@ func (h *JobFunctionHandler) Delete(ctx *gin.Context) {
 }
 
 func (h *JobFunctionHandler) Update(ctx *gin.Context) {
-	id := ctx.Param(JobFunctionParam)
+	id := ctx.Param(ID)
 
 	updates := models.JobFunction{}
 	err := ctx.BindJSON(&updates)

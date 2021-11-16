@@ -12,9 +12,8 @@ import (
 //
 // Routes
 const (
-	BusinessServicesRoot = "/business_services"
-	BusinessServiceParam = "business_service"
-	BusinessServiceRoot  = BusinessServicesRoot + "/:" + BusinessServiceParam
+	BusinessServicesRoot = ControlsRoot + "/business-service"
+	BusinessServiceRoot  = BusinessServicesRoot + "/:" + ID
 )
 
 type BusinessServiceHandler struct{}
@@ -30,7 +29,7 @@ func (h *BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 
 func (h *BusinessServiceHandler) Get(ctx *gin.Context) {
 	model := models.BusinessService{}
-	id := ctx.Param(BusinessServiceParam)
+	id := ctx.Param(ID)
 	result := db.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -86,7 +85,7 @@ func (h *BusinessServiceHandler) Create(ctx *gin.Context) {
 }
 
 func (h *BusinessServiceHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(BusinessServiceParam)
+	id := ctx.Param(ID)
 
 	result := db.DB.Delete(&models.BusinessService{}, "id = ?", id)
 	if result.Error != nil {
@@ -105,7 +104,7 @@ func (h *BusinessServiceHandler) Delete(ctx *gin.Context) {
 }
 
 func (h *BusinessServiceHandler) Update(ctx *gin.Context) {
-	id := ctx.Param(BusinessServiceParam)
+	id := ctx.Param(ID)
 
 	updates := models.BusinessService{}
 	err := ctx.BindJSON(&updates)

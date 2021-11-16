@@ -19,14 +19,12 @@ func main() {
 		&handlers.BusinessServiceHandler{},
 		&handlers.GroupHandler{},
 		&handlers.JobFunctionHandler{},
-		&handlers.JobFunctionBindingHandler{},
 		&handlers.ReviewHandler{},
 		&handlers.RoleHandler{},
-		&handlers.RoleBindingHandler{},
 		&handlers.SourceRepoHandler{},
 		&handlers.TagHandler{},
 		&handlers.TagTypeHandler{},
-		&handlers.UserHandler{},
+		&handlers.StakeholderHandler{},
 	}
 	for _, h := range handlerList {
 		h.AddRoutes(e)

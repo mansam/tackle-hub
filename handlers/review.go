@@ -12,9 +12,8 @@ import (
 //
 // Routes
 const (
-	ReviewsRoot = "/reviews"
-	ReviewParam = "review"
-	ReviewRoot  = ReviewsRoot + "/:" + ReviewParam
+	ReviewsRoot = InventoryRoot + "/review"
+	ReviewRoot  = ReviewsRoot + "/:" + ID
 )
 
 type ReviewHandler struct{}
@@ -30,7 +29,7 @@ func (h *ReviewHandler) AddRoutes(e *gin.Engine) {
 
 func (h *ReviewHandler) Get(ctx *gin.Context) {
 	model := models.Review{}
-	id := ctx.Param(ReviewParam)
+	id := ctx.Param(ID)
 	result := db.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -86,7 +85,7 @@ func (h *ReviewHandler) Create(ctx *gin.Context) {
 }
 
 func (h *ReviewHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(ReviewParam)
+	id := ctx.Param(ID)
 
 	result := db.DB.Delete(&models.Review{}, "id = ?", id)
 	if result.Error != nil {
@@ -105,7 +104,7 @@ func (h *ReviewHandler) Delete(ctx *gin.Context) {
 }
 
 func (h *ReviewHandler) Update(ctx *gin.Context) {
-	id := ctx.Param(ReviewParam)
+	id := ctx.Param(ID)
 
 	updates := models.Review{}
 	err := ctx.BindJSON(&updates)

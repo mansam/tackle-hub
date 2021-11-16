@@ -45,7 +45,7 @@ func Setup() {
 		&models.SourceRepo{},
 		&models.Tag{},
 		&models.TagType{},
-		&models.User{})
+		&models.Stakeholder{})
 	if err != nil {
 		log.Fatal(err)
 	}

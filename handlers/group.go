@@ -12,9 +12,8 @@ import (
 //
 // Routes
 const (
-	GroupsRoot = "/groups"
-	GroupParam = "group"
-	GroupRoot  = GroupsRoot + "/:" + GroupParam
+	GroupsRoot = ControlsRoot + "/stakeholder-group"
+	GroupRoot  = GroupsRoot + "/:" + ID
 )
 
 type GroupHandler struct{}
@@ -30,7 +29,7 @@ func (h *GroupHandler) AddRoutes(e *gin.Engine) {
 
 func (h *GroupHandler) Get(ctx *gin.Context) {
 	model := models.Group{}
-	id := ctx.Param(GroupParam)
+	id := ctx.Param(ID)
 	result := db.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -86,7 +85,7 @@ func (h *GroupHandler) Create(ctx *gin.Context) {
 }
 
 func (h *GroupHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(GroupParam)
+	id := ctx.Param(ID)
 
 	result := db.DB.Delete(&models.Group{}, "id = ?", id)
 	if result.Error != nil {
@@ -105,7 +104,7 @@ func (h *GroupHandler) Delete(ctx *gin.Context) {
 }
 
 func (h *GroupHandler) Update(ctx *gin.Context) {
-	id := ctx.Param(GroupParam)
+	id := ctx.Param(ID)
 
 	updates := models.Group{}
 	err := ctx.BindJSON(&updates)

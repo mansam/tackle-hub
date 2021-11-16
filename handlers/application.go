@@ -12,9 +12,8 @@ import (
 //
 // Routes
 const (
-	ApplicationsRoot = "/applications"
-	ApplicationParam = "application"
-	ApplicationRoot  = ApplicationsRoot + "/:" + ApplicationParam
+	ApplicationsRoot = InventoryRoot + "/application"
+	ApplicationRoot  = ApplicationsRoot + "/:" + ID
 )
 
 type ApplicationHandler struct{}
@@ -28,9 +27,16 @@ func (h *ApplicationHandler) AddRoutes(e *gin.Engine) {
 	e.DELETE(ApplicationRoot, h.Delete)
 }
 
+// Get godoc
+// @summary Get an application by ID.
+// @description Get an application by ID.
+// @tags get
+// @produce json
+// @success 200 {object} models.Application
+// @router /application-inventory/application/:id [get]
 func (h *ApplicationHandler) Get(ctx *gin.Context) {
 	model := models.Application{}
-	id := ctx.Param(ApplicationParam)
+	id := ctx.Param(ID)
 	result := db.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -49,6 +55,13 @@ func (h *ApplicationHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// List godoc
+// @summary List all applications.
+// @description List all applications.
+// @tags list
+// @produce json
+// @success 200 {object} []models.Application
+// @router /application-inventory/application [get]
 func (h *ApplicationHandler) List(ctx *gin.Context) {
 	var list []models.Application
 	result := db.DB.Find(&list)
@@ -62,6 +75,15 @@ func (h *ApplicationHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
+// Create godoc
+// @summary Create an application.
+// @description Create an application.
+// @tags create
+// @accept json
+// @produce json
+// @success 200 {object} models.Application
+// @router /application-inventory/application [post]
+// @param application body models.Application true "Application data"
 func (h *ApplicationHandler) Create(ctx *gin.Context) {
 	model := models.Application{}
 	err := ctx.BindJSON(&model)
@@ -84,8 +106,15 @@ func (h *ApplicationHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
+// Delete godoc
+// @summary Delete an application.
+// @description Delete an application.
+// @tags delete
+// @success 200 {object} models.Application
+// @router /application-inventory/application/:id [delete]
+// @param id path integer true "Application id"
 func (h *ApplicationHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(ApplicationParam)
+	id := ctx.Param(ID)
 
 	result := db.DB.Delete(&models.Application{}, "id = ?", id)
 	if result.Error != nil {
@@ -103,8 +132,18 @@ func (h *ApplicationHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
+// Update godoc
+// @summary Update an application.
+// @description Update an application.
+// @tags update
+// @accept json
+// @produce json
+// @success 200 {object} models.Application
+// @router /application-inventory/application/:id [put]
+// @param id path integer true "Application id"
+// @param application body models.Application true "Application data"
 func (h *ApplicationHandler) Update(ctx *gin.Context) {
-	id := ctx.Param(ApplicationParam)
+	id := ctx.Param(ID)
 
 	updates := models.Application{}
 	err := ctx.BindJSON(&updates)

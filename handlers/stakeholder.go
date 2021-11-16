@@ -12,25 +12,24 @@ import (
 //
 // Routes
 const (
-	JobFunctionBindingsRoot = "/job_function_binding"
-	JobFunctionBindingParam = "job_function_binding"
-	JobFunctionBindingRoot  = JobFunctionBindingsRoot + "/:" + JobFunctionBindingParam
+	StakeholdersRoot = ControlsRoot + "/stakeholder"
+	StakeholderRoot  = StakeholdersRoot + "/:" + ID
 )
 
-type JobFunctionBindingHandler struct{}
+type StakeholderHandler struct{}
 
-func (h *JobFunctionBindingHandler) AddRoutes(e *gin.Engine) {
-	e.GET(JobFunctionBindingsRoot, h.List)
-	e.GET(JobFunctionBindingsRoot+"/", h.List)
-	e.POST(JobFunctionBindingsRoot, h.Create)
-	e.GET(JobFunctionBindingRoot, h.Get)
-	e.PUT(JobFunctionBindingRoot, h.Update)
-	e.DELETE(JobFunctionBindingRoot, h.Delete)
+func (h *StakeholderHandler) AddRoutes(e *gin.Engine) {
+	e.GET(StakeholdersRoot, h.List)
+	e.GET(StakeholdersRoot+"/", h.List)
+	e.POST(StakeholdersRoot, h.Create)
+	e.GET(StakeholderRoot, h.Get)
+	e.PUT(StakeholderRoot, h.Update)
+	e.DELETE(StakeholderRoot, h.Delete)
 }
 
-func (h *JobFunctionBindingHandler) Get(ctx *gin.Context) {
-	model := models.JobFunctionBinding{}
-	id := ctx.Param(JobFunctionBindingParam)
+func (h *StakeholderHandler) Get(ctx *gin.Context) {
+	model := models.Stakeholder{}
+	id := ctx.Param(ID)
 	result := db.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -49,8 +48,8 @@ func (h *JobFunctionBindingHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
-func (h *JobFunctionBindingHandler) List(ctx *gin.Context) {
-	var list []models.JobFunctionBinding
+func (h *StakeholderHandler) List(ctx *gin.Context) {
+	var list []models.Stakeholder
 	result := db.DB.Find(&list)
 	if result.Error != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -63,8 +62,8 @@ func (h *JobFunctionBindingHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
-func (h *JobFunctionBindingHandler) Create(ctx *gin.Context) {
-	model := models.JobFunctionBinding{}
+func (h *StakeholderHandler) Create(ctx *gin.Context) {
+	model := models.Stakeholder{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -85,10 +84,10 @@ func (h *JobFunctionBindingHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model)
 }
 
-func (h *JobFunctionBindingHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(JobFunctionBindingParam)
+func (h *StakeholderHandler) Delete(ctx *gin.Context) {
+	id := ctx.Param(ID)
 
-	result := db.DB.Delete(&models.JobFunctionBinding{}, "id = ?", id)
+	result := db.DB.Delete(&models.Stakeholder{}, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.Status(http.StatusOK)
@@ -104,10 +103,10 @@ func (h *JobFunctionBindingHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *JobFunctionBindingHandler) Update(ctx *gin.Context) {
-	id := ctx.Param(JobFunctionBindingParam)
+func (h *StakeholderHandler) Update(ctx *gin.Context) {
+	id := ctx.Param(ID)
 
-	updates := models.JobFunctionBinding{}
+	updates := models.Stakeholder{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -117,7 +116,7 @@ func (h *JobFunctionBindingHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	result := db.DB.Model(&models.JobFunctionBinding{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := db.DB.Model(&models.Stakeholder{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{

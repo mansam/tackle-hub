@@ -12,9 +12,8 @@ import (
 //
 // Routes
 const (
-	TagsRoot = "/tags"
-	TagParam = "tag"
-	TagRoot  = TagsRoot + "/:" + TagParam
+	TagsRoot = ControlsRoot + "/tag"
+	TagRoot  = TagsRoot + "/:" + ID
 )
 
 type TagHandler struct{}
@@ -30,7 +29,7 @@ func (h *TagHandler) AddRoutes(e *gin.Engine) {
 
 func (h *TagHandler) Get(ctx *gin.Context) {
 	model := models.Tag{}
-	id := ctx.Param(TagParam)
+	id := ctx.Param(ID)
 	result := db.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -86,7 +85,7 @@ func (h *TagHandler) Create(ctx *gin.Context) {
 }
 
 func (h *TagHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(TagParam)
+	id := ctx.Param(ID)
 
 	result := db.DB.Delete(&models.Tag{}, "id = ?", id)
 	if result.Error != nil {
@@ -105,7 +104,7 @@ func (h *TagHandler) Delete(ctx *gin.Context) {
 }
 
 func (h *TagHandler) Update(ctx *gin.Context) {
-	id := ctx.Param(TagParam)
+	id := ctx.Param(ID)
 
 	updates := models.Tag{}
 	err := ctx.BindJSON(&updates)
