@@ -37,7 +37,7 @@ func (h TagTypeHandler) AddRoutes(e *gin.Engine) {
 func (h TagTypeHandler) Get(ctx *gin.Context) {
 	model := models.TagType{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -99,7 +99,7 @@ func (h TagTypeHandler) Create(ctx *gin.Context) {
 // @param id path string true "Tag Type ID"
 func (h TagTypeHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.TagType{}, "id = ?", id)
+	result := h.DB.Delete(&models.TagType{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return

@@ -37,7 +37,7 @@ func (h SourceRepoHandler) AddRoutes(e *gin.Engine) {
 func (h SourceRepoHandler) Get(ctx *gin.Context) {
 	model := models.SourceRepo{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -98,7 +98,7 @@ func (h SourceRepoHandler) Create(ctx *gin.Context) {
 // @param id path string true "Source Repository ID"
 func (h SourceRepoHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.SourceRepo{}, "id = ?", id)
+	result := h.DB.Delete(&models.SourceRepo{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return

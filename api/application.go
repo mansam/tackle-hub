@@ -37,7 +37,7 @@ func (h ApplicationHandler) AddRoutes(e *gin.Engine) {
 func (h ApplicationHandler) Get(ctx *gin.Context) {
 	model := models.Application{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -99,7 +99,7 @@ func (h ApplicationHandler) Create(ctx *gin.Context) {
 // @param id path string true "Application id"
 func (h ApplicationHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.Application{}, "id = ?", id)
+	result := h.DB.Delete(&models.Application{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return

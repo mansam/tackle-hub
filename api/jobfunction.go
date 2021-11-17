@@ -37,7 +37,7 @@ func (h JobFunctionHandler) AddRoutes(e *gin.Engine) {
 func (h JobFunctionHandler) Get(ctx *gin.Context) {
 	model := models.JobFunction{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -99,7 +99,7 @@ func (h JobFunctionHandler) Create(ctx *gin.Context) {
 // @param id path string true "Job Function ID"
 func (h JobFunctionHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.JobFunction{}, "id = ?", id)
+	result := h.DB.Delete(&models.JobFunction{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return

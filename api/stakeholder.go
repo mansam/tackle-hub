@@ -37,7 +37,7 @@ func (h StakeholderHandler) AddRoutes(e *gin.Engine) {
 func (h StakeholderHandler) Get(ctx *gin.Context) {
 	model := models.Stakeholder{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -99,7 +99,7 @@ func (h StakeholderHandler) Create(ctx *gin.Context) {
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.Stakeholder{}, "id = ?", id)
+	result := h.DB.Delete(&models.Stakeholder{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return

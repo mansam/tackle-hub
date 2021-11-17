@@ -37,7 +37,7 @@ func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 func (h ReviewHandler) Get(ctx *gin.Context) {
 	model := models.Review{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -99,7 +99,7 @@ func (h ReviewHandler) Create(ctx *gin.Context) {
 // @param id path string true "Review ID"
 func (h ReviewHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.Review{}, "id = ?", id)
+	result := h.DB.Delete(&models.Review{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return

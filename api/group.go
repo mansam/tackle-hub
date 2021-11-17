@@ -37,7 +37,7 @@ func (h GroupHandler) AddRoutes(e *gin.Engine) {
 func (h GroupHandler) Get(ctx *gin.Context) {
 	model := models.Group{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -99,7 +99,7 @@ func (h GroupHandler) Create(ctx *gin.Context) {
 // @param id path string true "Stakeholder Group ID"
 func (h GroupHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.Group{}, "id = ?", id)
+	result := h.DB.Delete(&models.Group{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return

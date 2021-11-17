@@ -37,7 +37,7 @@ func (h BinaryRepoHandler) AddRoutes(e *gin.Engine) {
 func (h BinaryRepoHandler) Get(ctx *gin.Context) {
 	model := models.BinaryRepo{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -99,7 +99,7 @@ func (h BinaryRepoHandler) Create(ctx *gin.Context) {
 // @param id path string true "Binary Repository ID"
 func (h BinaryRepoHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.BinaryRepo{}, "id = ?", id)
+	result := h.DB.Delete(&models.BinaryRepo{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return

@@ -37,7 +37,7 @@ func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 	model := models.BusinessService{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, "id = ?", id)
+	result := h.DB.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -99,7 +99,7 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 // @param id path string true "Business service ID"
 func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.BusinessService{}, "id = ?", id)
+	result := h.DB.Delete(&models.BusinessService{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
