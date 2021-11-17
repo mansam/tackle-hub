@@ -35,7 +35,7 @@ func (h BinaryRepoHandler) AddRoutes(e *gin.Engine) {
 // @router /application-inventory/binary-repository/:id [get]
 // @param id path string true "Binary Repository ID"
 func (h BinaryRepoHandler) Get(ctx *gin.Context) {
-	model := models.BinaryRepo{}
+	model := models.BinaryRepository{}
 	id := ctx.Param(ID)
 	result := h.DB.First(&model, id)
 	if result.Error != nil {
@@ -54,7 +54,7 @@ func (h BinaryRepoHandler) Get(ctx *gin.Context) {
 // @success 200 {object} models.BinaryRepository
 // @router /application-inventory/binary-repository [get]
 func (h BinaryRepoHandler) List(ctx *gin.Context) {
-	var list []models.BinaryRepo
+	var list []models.BinaryRepository
 	page := NewPagination(ctx)
 	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
@@ -75,7 +75,7 @@ func (h BinaryRepoHandler) List(ctx *gin.Context) {
 // @router /application-inventory/binary-repository [post]
 // @param binary_repository body models.BinaryRepository true "Binary Repository data"
 func (h BinaryRepoHandler) Create(ctx *gin.Context) {
-	model := models.BinaryRepo{}
+	model := models.BinaryRepository{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -99,7 +99,7 @@ func (h BinaryRepoHandler) Create(ctx *gin.Context) {
 // @param id path string true "Binary Repository ID"
 func (h BinaryRepoHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.BinaryRepo{}, id)
+	result := h.DB.Delete(&models.BinaryRepository{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -120,13 +120,13 @@ func (h BinaryRepoHandler) Delete(ctx *gin.Context) {
 // @param binary_repository body models.BinaryRepository true "Binary Repository data"
 func (h BinaryRepoHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := models.BinaryRepo{}
+	updates := models.BinaryRepository{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&models.BinaryRepo{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&models.BinaryRepository{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return

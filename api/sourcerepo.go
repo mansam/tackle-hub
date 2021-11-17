@@ -35,7 +35,7 @@ func (h SourceRepoHandler) AddRoutes(e *gin.Engine) {
 // @router /application-inventory/source-repository/:id [get]
 // @param id path string true "Source Repository ID"
 func (h SourceRepoHandler) Get(ctx *gin.Context) {
-	model := models.SourceRepo{}
+	model := models.SourceRepository{}
 	id := ctx.Param(ID)
 	result := h.DB.First(&model, id)
 	if result.Error != nil {
@@ -54,7 +54,7 @@ func (h SourceRepoHandler) Get(ctx *gin.Context) {
 // @success 200 {object} models.SourceRepository
 // @router /application-inventory/source-repository [get]
 func (h SourceRepoHandler) List(ctx *gin.Context) {
-	var list []models.SourceRepo
+	var list []models.SourceRepository
 	page := NewPagination(ctx)
 	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
@@ -75,7 +75,7 @@ func (h SourceRepoHandler) List(ctx *gin.Context) {
 // @router /application-inventory/source-repository [post]
 // @param source_repository body models.SourceRepository true "Source Repository data"
 func (h SourceRepoHandler) Create(ctx *gin.Context) {
-	model := models.SourceRepo{}
+	model := models.SourceRepository{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -98,7 +98,7 @@ func (h SourceRepoHandler) Create(ctx *gin.Context) {
 // @param id path string true "Source Repository ID"
 func (h SourceRepoHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.SourceRepo{}, id)
+	result := h.DB.Delete(&models.SourceRepository{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -119,13 +119,13 @@ func (h SourceRepoHandler) Delete(ctx *gin.Context) {
 // @param source_repository body models.SourceRepository true "Source Repository data"
 func (h SourceRepoHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := models.SourceRepo{}
+	updates := models.SourceRepository{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&models.SourceRepo{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&models.SourceRepository{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return

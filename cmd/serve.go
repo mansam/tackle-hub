@@ -32,12 +32,12 @@ func Setup() *gorm.DB {
 	}
 	err = db.AutoMigrate(
 		&models.Application{},
-		&models.BinaryRepo{},
+		&models.BinaryRepository{},
 		&models.BusinessService{},
 		&models.Group{},
 		&models.JobFunction{},
 		&models.Review{},
-		&models.SourceRepo{},
+		&models.SourceRepository{},
 		&models.Tag{},
 		&models.TagType{},
 		&models.Stakeholder{})

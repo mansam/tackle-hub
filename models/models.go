@@ -15,7 +15,7 @@ type Application struct {
 	BusinessService   BusinessService `json:"businessService"`
 }
 
-type BinaryRepo struct {
+type BinaryRepository struct {
 	Model
 	Type          string `json:"name" gorm:"notnull" binding:"required" validate:"oneof=mvn"`
 	URL           string `json:"url" gorm:"notnull" binding:"required"`
@@ -58,7 +58,7 @@ type Review struct {
 	Application         Application
 }
 
-type SourceRepo struct {
+type SourceRepository struct {
 	Model
 	Type          string `json:"name" gorm:"notnull" binding:"required" validate:"oneof=git svn"`
 	URL           string `json:"url" gorm:"notnull" binding:"required"`

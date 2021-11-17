@@ -176,3 +176,7 @@ func NewPagination(ctx *gin.Context) Pagination {
 		Sort:   sort,
 	}
 }
+
+type Resource struct {
+	ID uint `json:"id"`
+}
