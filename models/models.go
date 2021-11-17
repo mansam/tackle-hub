@@ -1,25 +1,11 @@
 package models
 
 import (
-	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"time"
 )
 
-type Resource struct {
-	ID        string `sql:"primary_key"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
-}
-
-func (r *Resource) BeforeCreate(_ *gorm.DB) (err error) {
-	r.ID = uuid.NewString()
-	return
-}
-
 type Application struct {
-	Resource
+	gorm.Model
 	Name              string          `json:"name"`
 	Description       string          `json:"description"`
 	Comments          string          `json:"comments"`
@@ -30,7 +16,7 @@ type Application struct {
 }
 
 type BinaryRepo struct {
-	Resource
+	gorm.Model
 	Type          string `json:"name" gorm:"notnull" binding:"required" validate:"oneof=mvn"`
 	URL           string `json:"url" gorm:"notnull" binding:"required"`
 	Group         string `json:"group" gorm:"notnull" binding:"required"`
@@ -41,7 +27,7 @@ type BinaryRepo struct {
 }
 
 type BusinessService struct {
-	Resource
+	gorm.Model
 	Name        string      `json:"name" gorm:"notnull,unique" validate:"required"`
 	Description string      `json:"description"`
 	OwnerID     string      `json:"owner_id"`
@@ -49,20 +35,20 @@ type BusinessService struct {
 }
 
 type Group struct {
-	Resource
+	gorm.Model
 	Name         string         `json:"name" gorm:"unique,index" validate:"required,alphanum,min=6,max=32"`
 	Description  string         `json:"description"`
 	Stakeholders []*Stakeholder `json:"stakeholders" gorm:"many2many:stakeholder_groups"`
 }
 
 type JobFunction struct {
-	Resource
+	gorm.Model
 	Role         string        `json:"role" gorm:"notnull,unique"`
 	Stakeholders []Stakeholder `json:"stakeholders"`
 }
 
 type Review struct {
-	Resource
+	gorm.Model
 	Comments            string `json:"comments"`
 	BusinessCriticality uint   `json:"businessCriticality" gorm:"notnull" binding:"required"`
 	EffortEstimate      string `json:"effortEstimate" gorm:"notnull" binding:"required"`
@@ -73,7 +59,7 @@ type Review struct {
 }
 
 type SourceRepo struct {
-	Resource
+	gorm.Model
 	Type          string `json:"name" gorm:"notnull" binding:"required" validate:"oneof=git svn"`
 	URL           string `json:"url" gorm:"notnull" binding:"required"`
 	Branch        string `json:"branch" gorm:"notnull" binding:"required"`
@@ -82,7 +68,7 @@ type SourceRepo struct {
 }
 
 type Stakeholder struct {
-	Resource
+	gorm.Model
 	Email         string   `json:"email" gorm:"notnull" binding:"required,email"`
 	DisplayName   string   `json:"displayName" gorm:"notnull" binding:"required"`
 	Groups        []*Group `json:"groups" gorm:"many2many:stakeholder_groups"`
@@ -91,14 +77,14 @@ type Stakeholder struct {
 }
 
 type Tag struct {
-	Resource
+	gorm.Model
 	Name      string `json:"name" gorm:"notnull" binding:"required"`
 	TagTypeID string `json:"tag_type_id" gorm:"notnull" binding:"required"`
 	TagType   TagType
 }
 
 type TagType struct {
-	Resource
+	gorm.Model
 	Name   string `json:"name" gorm:"notnull" binding:"required"`
 	Rank   uint   `json:"rank"`
 	Colour string `json:"colour"`

@@ -1,10 +1,8 @@
 package api
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/tackle-hub/models"
-	"gorm.io/gorm"
 	"net/http"
 )
 
@@ -41,19 +39,10 @@ func (h TagHandler) Get(ctx *gin.Context) {
 	id := ctx.Param(ID)
 	result := h.DB.First(&model, "id = ?", id)
 	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"error": MsgNotFound,
-			})
-			return
-		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"error": MsgInternalServerError,
-			})
-			log.Error(result.Error, MsgInternalServerError)
-			return
-		}
+		h.getFailed(ctx, result.Error)
+		return
 	}
+
 	ctx.JSON(http.StatusOK, model)
 }
 
@@ -69,10 +58,7 @@ func (h TagHandler) List(ctx *gin.Context) {
 	page := NewPagination(ctx)
 	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": MsgInternalServerError,
-		})
-		log.Error(result.Error, MsgInternalServerError)
+		h.listFailed(ctx, result.Error)
 		return
 	}
 
@@ -92,19 +78,12 @@ func (h TagHandler) Create(ctx *gin.Context) {
 	model := models.Tag{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": MsgBadRequest,
-		})
-		log.Error(err, MsgBadRequest)
+		h.createFailed(ctx, err)
 		return
 	}
-
 	result := h.DB.Create(&model)
 	if result.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": MsgInternalServerError,
-		})
-		log.Error(result.Error, MsgInternalServerError)
+		h.createFailed(ctx, result.Error)
 		return
 	}
 	ctx.JSON(http.StatusOK, model)
@@ -121,17 +100,10 @@ func (h TagHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
 	result := h.DB.Delete(&models.Tag{}, "id = ?", id)
 	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			ctx.Status(http.StatusOK)
-			return
-		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"error": MsgInternalServerError,
-			})
-			log.Error(result.Error, MsgInternalServerError)
-			return
-		}
+		h.deleteFailed(ctx, result.Error)
+		return
 	}
+
 	ctx.Status(http.StatusOK)
 }
 
@@ -150,27 +122,14 @@ func (h TagHandler) Update(ctx *gin.Context) {
 	updates := models.Tag{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": MsgBadRequest,
-		})
-		log.Error(err, MsgBadRequest)
+		h.updateFailed(ctx, err)
+		return
+	}
+	result := h.DB.Model(&models.Tag{}).Where("id = ?", id).Omit("id").Updates(updates)
+	if result.Error != nil {
+		h.updateFailed(ctx, result.Error)
 		return
 	}
 
-	result := h.DB.Model(&models.Tag{}).Where("id = ?", id).Omit("id").Updates(updates)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"error": MsgNotFound,
-			})
-			return
-		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"error": MsgInternalServerError,
-			})
-			log.Error(result.Error, MsgInternalServerError)
-			return
-		}
-	}
 	ctx.Status(http.StatusOK)
 }
