@@ -30,7 +30,6 @@ func Setup() *gorm.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	err = db.AutoMigrate(
 		&models.Application{},
 		&models.BinaryRepo{},
@@ -51,27 +50,26 @@ func Setup() *gorm.DB {
 
 func main() {
 	db := Setup()
-	e := gin.Default()
-	e.Use(gin.Logger())
-	e.Use(gin.Recovery())
-
+	router := gin.Default()
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
 	handlerList := []api.Handler{
-		&api.ApplicationHandler{BaseHandler: api.BaseHandler{DB: db}},
-		&api.BinaryRepoHandler{BaseHandler: api.BaseHandler{DB: db}},
-		&api.BusinessServiceHandler{BaseHandler: api.BaseHandler{DB: db}},
-		&api.GroupHandler{BaseHandler: api.BaseHandler{DB: db}},
-		&api.JobFunctionHandler{BaseHandler: api.BaseHandler{DB: db}},
-		&api.ReviewHandler{BaseHandler: api.BaseHandler{DB: db}},
-		&api.SourceRepoHandler{BaseHandler: api.BaseHandler{DB: db}},
-		&api.TagHandler{BaseHandler: api.BaseHandler{DB: db}},
-		&api.TagTypeHandler{BaseHandler: api.BaseHandler{DB: db}},
-		&api.StakeholderHandler{BaseHandler: api.BaseHandler{DB: db}},
+		&api.ApplicationHandler{},
+		&api.BinaryRepoHandler{},
+		&api.BusinessServiceHandler{},
+		&api.GroupHandler{},
+		&api.JobFunctionHandler{},
+		&api.ReviewHandler{},
+		&api.SourceRepoHandler{},
+		&api.TagHandler{},
+		&api.TagTypeHandler{},
+		&api.StakeholderHandler{},
 	}
 	for _, h := range handlerList {
-		h.AddRoutes(e)
+		h.With(db)
+		h.AddRoutes(router)
 	}
-
-	err := e.Run()
+	err := router.Run()
 	if err != nil {
 		log.Fatal(err)
 	}

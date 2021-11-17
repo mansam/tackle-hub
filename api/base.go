@@ -29,12 +29,13 @@ const (
 const (
 	Limit  = 20
 	Offset = 0
-	Sort   = "created_at asc"
+	Sort   = "id asc"
 )
 
 //
 // Handler.
 type Handler interface {
+	With(*gorm.DB)
 	AddRoutes(e *gin.Engine)
 }
 
@@ -43,6 +44,10 @@ type Handler interface {
 type BaseHandler struct {
 	// DB
 	DB *gorm.DB
+}
+
+func (h *BaseHandler) With(db *gorm.DB) {
+	h.DB = db
 }
 
 //
