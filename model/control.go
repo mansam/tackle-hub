@@ -2,24 +2,25 @@ package model
 
 type BusinessService struct {
 	Model
-	Name          string        `json:"name" gorm:"notnull,unique"`
-	Description   string        `json:"description"`
-	StakeholderID uint          `json:"-"`
-	Stakeholder   *Stakeholder  `json:"owner"`
+	Name          string       `json:"name" gorm:"notnull,unique"`
+	Description   string       `json:"description"`
+	StakeholderID uint         `json:"-"`
+	Stakeholder   *Stakeholder `json:"owner"`
 }
 
 type StakeholderGroup struct {
 	Model
 	Name         string        `json:"name" gorm:"unique,index"`
+	Username     string        `json:"username"`
 	Description  string        `json:"description"`
-	Stakeholders []Stakeholder `json:"stakeholders" gorm:"many2many:StakeholderGroup"`
+	Stakeholders []Stakeholder `json:"stakeholders" gorm:"many2many:sgStakeholder"`
 }
 
 type Stakeholder struct {
 	Model
 	Name             string             `json:"displayName" gorm:"notnull"`
 	Email            string             `json:"email" gorm:"notnull"`
-	Groups           []StakeholderGroup `json:"groups" gorm:"many2many:StakeholderGroup"`
+	Groups           []StakeholderGroup `json:"stakeholderGroups" gorm:"many2many:sgStakeholder"`
 	BusinessServices []BusinessService  `json:"businessServices"`
 	JobFunctionID    uint               `json:"-" gorm:"notnull"`
 	JobFunction      *JobFunction       `json:"jobFunction"`
@@ -27,7 +28,7 @@ type Stakeholder struct {
 
 type JobFunction struct {
 	Model
-	username     string        `json:"username"`
+	Username     string        `json:"username"`
 	Role         string        `json:"role" gorm:"notnull,unique"`
 	Stakeholders []Stakeholder `json:"stakeholders"`
 }

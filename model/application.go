@@ -6,7 +6,7 @@ type Application struct {
 	Description       string           `json:"description"`
 	Review            *Review          `json:"review"`
 	Comments          string           `json:"comments"`
-	Tags              []Tag            `json:"tags" gorm:"many2many:ApplicationTags"`
+	Tags              []Tag            `json:"tags" gorm:"many2many:applicationTags"`
 	BusinessServiceID uint             `json:"-"`
 	BusinessService   *BusinessService `json:"businessService"`
 }

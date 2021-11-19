@@ -44,7 +44,8 @@ func (h StakeholderHandler) Get(ctx *gin.Context) {
 	db := h.preLoad(
 		h.DB,
 		"JobFunction",
-		"BusinessServices")
+		"BusinessServices",
+		"StakeholderGroups")
 	result := db.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
@@ -68,7 +69,8 @@ func (h StakeholderHandler) List(ctx *gin.Context) {
 	db = h.preLoad(
 		db,
 		"JobFunction",
-		"BusinessServices")
+		"BusinessServices",
+		"Groups")
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)

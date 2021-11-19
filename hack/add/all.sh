@@ -11,6 +11,7 @@ cd ${dir}
 
 ./tag.sh
 ./job-function.sh
+./stakeholder-group.sh
 ./stakeholder.sh
 ./business-service.sh
 ./application.sh

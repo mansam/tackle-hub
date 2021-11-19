@@ -8,7 +8,8 @@ curl -X POST ${host}/controls/stakeholder -d \
     "username": "tackle",
     "email": "tackle@konveyor.org",
     "role": "Administrator",
+    "stakeholderGroups": [{"id": 1}],
     "jobFunction" : {
-          "id": 1
+      "id": 1
     }
 }'

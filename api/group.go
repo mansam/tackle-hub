@@ -41,7 +41,8 @@ func (h StakeholderGroupHandler) AddRoutes(e *gin.Engine) {
 func (h StakeholderGroupHandler) Get(ctx *gin.Context) {
 	model := model.StakeholderGroup{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, id)
+	db := h.preLoad(h.DB, "Stakeholders")
+	result := db.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -61,6 +62,7 @@ func (h StakeholderGroupHandler) List(ctx *gin.Context) {
 	var list []model.StakeholderGroup
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
+	db = h.preLoad(h.DB, "Stakeholders")
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
