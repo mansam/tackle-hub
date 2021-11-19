@@ -41,7 +41,8 @@ func (h JobFunctionHandler) AddRoutes(e *gin.Engine) {
 func (h JobFunctionHandler) Get(ctx *gin.Context) {
 	model := model.JobFunction{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, id)
+	db := h.preLoad(h.DB, "Stakeholders")
+	result := db.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -61,6 +62,7 @@ func (h JobFunctionHandler) List(ctx *gin.Context) {
 	var list []model.JobFunction
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
+	db = h.preLoad(db, "Stakeholders")
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)

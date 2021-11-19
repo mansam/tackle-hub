@@ -172,8 +172,8 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 // Application REST resource.
 type Application struct {
 	model.Application
-	Tags []string `json:"tags"`
-	BusinessService string `json:"businessService"`
+	Tags            []string `json:"tags"`
+	BusinessService string   `json:"businessService"`
 }
 
 //
