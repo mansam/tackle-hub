@@ -2,8 +2,9 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/models"
+	"github.com/konveyor/tackle-hub/model"
 	"net/http"
+	"strconv"
 )
 
 //
@@ -13,10 +14,14 @@ const (
 	ApplicationRoot  = ApplicationsRoot + "/:" + ID
 )
 
+//
+// ApplicationHandler handles application resource routes.
 type ApplicationHandler struct {
 	BaseHandler
 }
 
+//
+// AddRoutes adds routes.
 func (h ApplicationHandler) AddRoutes(e *gin.Engine) {
 	e.GET(ApplicationsRoot, h.List)
 	e.GET(ApplicationsRoot+"/", h.List)
@@ -31,19 +36,22 @@ func (h ApplicationHandler) AddRoutes(e *gin.Engine) {
 // @description Get an application by ID.
 // @tags get
 // @produce json
-// @success 200 {object} models.Application
+// @success 200 {object} api.Application
 // @router /application-inventory/application/:id [get]
-// @param id path string true "Application ID"
+// @param id path int true "Application ID"
 func (h ApplicationHandler) Get(ctx *gin.Context) {
-	model := models.Application{}
+	m := &model.Application{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, id)
+	db := h.DB.Preload("Review").Preload("Tags")
+	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
+	r := Application{}
+	r.With(m)
 
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, r)
 }
 
 // List godoc
@@ -51,18 +59,28 @@ func (h ApplicationHandler) Get(ctx *gin.Context) {
 // @description List all applications.
 // @tags list
 // @produce json
-// @success 200 {object} []models.Application
+// @success 200 {object} []api.Application
 // @router /application-inventory/application [get]
 func (h ApplicationHandler) List(ctx *gin.Context) {
-	var list []models.Application
+	var list []model.Application
 	page := NewPagination(ctx)
-	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
+	db := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort)
+	db = db.Preload("Review").Preload("Tags")
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
+	rList := []Application{}
+	for i := range list {
+		r := Application{}
+		r.With(&list[i])
+		rList = append(
+			rList,
+			r)
+	}
 
-	ctx.JSON(http.StatusOK, list)
+	ctx.JSON(http.StatusOK, rList)
 }
 
 // Create godoc
@@ -71,35 +89,42 @@ func (h ApplicationHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} models.Application
+// @success 200 {object} api.Application
 // @router /application-inventory/application [post]
-// @param application body models.Application true "Application data"
+// @param application body model.Application true "Application data"
 func (h ApplicationHandler) Create(ctx *gin.Context) {
-	model := models.Application{}
-	err := ctx.BindJSON(&model)
+	r := &Application{}
+	err := ctx.BindJSON(r)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
-	result := h.DB.Create(&model)
+	m := r.Model()
+	result := h.DB.Create(&m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
+	err = h.DB.Model(m).Association("Tags").Replace("Tags", m.Tags)
+	if err != nil {
+		h.createFailed(ctx, err)
+		return
+	}
+	r.With(m)
 
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, r)
 }
 
 // Delete godoc
 // @summary Delete an application.
 // @description Delete an application.
 // @tags delete
-// @success 200 {object} models.Application
+// @success 200
 // @router /application-inventory/application/:id [delete]
-// @param id path string true "Application id"
+// @param id path int true "Application id"
 func (h ApplicationHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.Application{}, id)
+	result := h.DB.Delete(&model.Application{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -114,23 +139,59 @@ func (h ApplicationHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} models.Application
+// @success 200 {object} api.Application
 // @router /application-inventory/application/:id [put]
-// @param id path string true "Application id"
-// @param application body models.Application true "Application data"
+// @param id path int true "Application id"
+// @param application body api.Application true "Application data"
 func (h ApplicationHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := models.Application{}
-	err := ctx.BindJSON(&updates)
+	r := &Application{}
+	err := ctx.BindJSON(r)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&models.Application{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&model.Application{}).Where("id = ?", id).Omit("id").Updates(r)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
 	}
 
 	ctx.Status(http.StatusOK)
+}
+
+//
+// Application REST resource.
+type Application struct {
+	model.Application
+	Tags []string `json:"tags"`
+}
+
+//
+// With updates the resource using the model.
+func (r *Application) With(m *model.Application) {
+	r.Application = *m
+	for _, tag := range m.Tags {
+		r.Tags = append(
+			r.Tags,
+			strconv.Itoa(int(tag.ID)))
+	}
+}
+
+//
+// Model builds a model.
+func (r *Application) Model() (m *model.Application) {
+	m = &r.Application
+	for _, tagID := range r.Tags {
+		id, _ := strconv.Atoi(tagID)
+		m.Tags = append(
+			m.Tags,
+			model.Tag{
+				Model: model.Model{
+					ID: uint(id),
+				},
+			})
+	}
+
+	return
 }

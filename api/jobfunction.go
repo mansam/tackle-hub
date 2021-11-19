@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/models"
+	"github.com/konveyor/tackle-hub/model"
 	"net/http"
 )
 
@@ -13,10 +13,14 @@ const (
 	JobFunctionRoot  = JobFunctionsRoot + "/:" + ID
 )
 
+//
+// JobFunctionHandler handles job-function routes.
 type JobFunctionHandler struct {
 	BaseHandler
 }
 
+//
+// AddRoutes adds routes.
 func (h JobFunctionHandler) AddRoutes(e *gin.Engine) {
 	e.GET(JobFunctionsRoot, h.List)
 	e.GET(JobFunctionsRoot+"/", h.List)
@@ -31,11 +35,11 @@ func (h JobFunctionHandler) AddRoutes(e *gin.Engine) {
 // @description Get a job function by ID.
 // @tags get
 // @produce json
-// @success 200 {object} models.JobFunction
+// @success 200 {object} model.JobFunction
 // @router /controls/job-function/:id [get]
 // @param id path string true "Job Function ID"
 func (h JobFunctionHandler) Get(ctx *gin.Context) {
-	model := models.JobFunction{}
+	model := model.JobFunction{}
 	id := ctx.Param(ID)
 	result := h.DB.First(&model, id)
 	if result.Error != nil {
@@ -51,10 +55,10 @@ func (h JobFunctionHandler) Get(ctx *gin.Context) {
 // @description List all job functions.
 // @tags get
 // @produce json
-// @success 200 {object} models.JobFunction
+// @success 200 {object} model.JobFunction
 // @router /controls/job-function [get]
 func (h JobFunctionHandler) List(ctx *gin.Context) {
-	var list []models.JobFunction
+	var list []model.JobFunction
 	page := NewPagination(ctx)
 	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
@@ -71,11 +75,11 @@ func (h JobFunctionHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} models.JobFunction
+// @success 200 {object} model.JobFunction
 // @router /controls/job-function [post]
-// @param job_function body models.JobFunction true "Job Function data"
+// @param job_function body model.JobFunction true "Job Function data"
 func (h JobFunctionHandler) Create(ctx *gin.Context) {
-	model := models.JobFunction{}
+	model := model.JobFunction{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -94,12 +98,12 @@ func (h JobFunctionHandler) Create(ctx *gin.Context) {
 // @summary Delete a job function.
 // @description Delete a job function.
 // @tags delete
-// @success 200 {object} models.JobFunction
+// @success 200 {object} model.JobFunction
 // @router /controls/job-function/:id [delete]
 // @param id path string true "Job Function ID"
 func (h JobFunctionHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.JobFunction{}, id)
+	result := h.DB.Delete(&model.JobFunction{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -114,19 +118,19 @@ func (h JobFunctionHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} models.JobFunction
+// @success 200 {object} model.JobFunction
 // @router /controls/job-function/:id [put]
 // @param id path string true "Job Function ID"
-// @param job_function body models.JobFunction true "Job Function data"
+// @param job_function body model.JobFunction true "Job Function data"
 func (h JobFunctionHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := models.JobFunction{}
+	updates := model.JobFunction{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&models.JobFunction{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&model.JobFunction{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return

@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/models"
+	"github.com/konveyor/tackle-hub/model"
 	"net/http"
 )
 
@@ -13,10 +13,14 @@ const (
 	BusinessServiceRoot  = BusinessServicesRoot + "/:" + ID
 )
 
+//
+// BusinessServiceHandler handles business-service routes.
 type BusinessServiceHandler struct {
 	BaseHandler
 }
 
+//
+// AddRoutes adds routes.
 func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 	e.GET(BusinessServicesRoot, h.List)
 	e.GET(BusinessServicesRoot+"/", h.List)
@@ -31,13 +35,14 @@ func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 // @description Get a business service by ID.
 // @tags get
 // @produce json
-// @success 200 {object} models.BusinessService
+// @success 200 {object} model.BusinessService
 // @router /controls/business-service/:id [get]
 // @param id path string true "Business Service ID"
 func (h BusinessServiceHandler) Get(ctx *gin.Context) {
-	model := models.BusinessService{}
+	model := model.BusinessService{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, id)
+	db := h.DB.Preload("Applications")
+	result := db.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -51,12 +56,14 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 // @description List all business services.
 // @tags list
 // @produce json
-// @success 200 {object} models.BusinessService
+// @success 200 {object} model.BusinessService
 // @router /controls/business-service [get]
 func (h BusinessServiceHandler) List(ctx *gin.Context) {
-	var list []models.BusinessService
+	var list []model.BusinessService
 	page := NewPagination(ctx)
-	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
+	db := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort)
+	db = db.Preload("Applications")
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
@@ -71,11 +78,11 @@ func (h BusinessServiceHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} models.BusinessService
+// @success 200 {object} model.BusinessService
 // @router /controls/business-service [post]
-// @param business_service body models.BusinessService true "Business service data"
+// @param business_service body model.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Create(ctx *gin.Context) {
-	model := models.BusinessService{}
+	model := model.BusinessService{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -94,12 +101,12 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 // @summary Delete a business service.
 // @description Delete a business service.
 // @tags delete
-// @success 200 {object} models.BusinessService
+// @success 200 {object} model.BusinessService
 // @router /controls/business-service/:id [delete]
 // @param id path string true "Business service ID"
 func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.BusinessService{}, id)
+	result := h.DB.Delete(&model.BusinessService{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -114,19 +121,19 @@ func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} models.BusinessService
+// @success 200 {object} model.BusinessService
 // @router /controls/business-service/:id [put]
 // @param id path string true "Business service ID"
-// @param business_service body models.BusinessService true "Business service data"
+// @param business_service body model.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := models.BusinessService{}
+	updates := model.BusinessService{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&models.BusinessService{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&model.BusinessService{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return

@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/models"
+	"github.com/konveyor/tackle-hub/model"
 	"net/http"
 )
 
@@ -13,10 +13,14 @@ const (
 	StakeholderRoot  = StakeholdersRoot + "/:" + ID
 )
 
+//
+// StakeholderHandler handles stakeholder routes.
 type StakeholderHandler struct {
 	BaseHandler
 }
 
+//
+// AddRoutes adds routes.
 func (h StakeholderHandler) AddRoutes(e *gin.Engine) {
 	e.GET(StakeholdersRoot, h.List)
 	e.GET(StakeholdersRoot+"/", h.List)
@@ -31,11 +35,11 @@ func (h StakeholderHandler) AddRoutes(e *gin.Engine) {
 // @description Get a stakeholder by ID.
 // @tags get
 // @produce json
-// @success 200 {object} models.Stakeholder
+// @success 200 {object} model.Stakeholder
 // @router /controls/stakeholder/:id [get]
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Get(ctx *gin.Context) {
-	model := models.Stakeholder{}
+	model := model.Stakeholder{}
 	id := ctx.Param(ID)
 	result := h.DB.First(&model, id)
 	if result.Error != nil {
@@ -51,10 +55,10 @@ func (h StakeholderHandler) Get(ctx *gin.Context) {
 // @description List all stakeholders.
 // @tags get
 // @produce json
-// @success 200 {object} models.Stakeholder
+// @success 200 {object} model.Stakeholder
 // @router /controls/stakeholder [get]
 func (h StakeholderHandler) List(ctx *gin.Context) {
-	var list []models.Stakeholder
+	var list []model.Stakeholder
 	page := NewPagination(ctx)
 	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
@@ -71,11 +75,11 @@ func (h StakeholderHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} models.Stakeholder
+// @success 200 {object} model.Stakeholder
 // @router /controls/stakeholder [post]
-// @param stakeholder body models.Stakeholder true "Stakeholder data"
+// @param stakeholder body model.Stakeholder true "Stakeholder data"
 func (h StakeholderHandler) Create(ctx *gin.Context) {
-	model := models.Stakeholder{}
+	model := model.Stakeholder{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -94,12 +98,12 @@ func (h StakeholderHandler) Create(ctx *gin.Context) {
 // @summary Delete a stakeholder.
 // @description Delete a stakeholder.
 // @tags delete
-// @success 200 {object} models.Stakeholder
+// @success 200 {object} model.Stakeholder
 // @router /controls/stakeholder/:id [delete]
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.Stakeholder{}, id)
+	result := h.DB.Delete(&model.Stakeholder{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -114,19 +118,19 @@ func (h StakeholderHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} models.Stakeholder
+// @success 200 {object} model.Stakeholder
 // @router /controls/stakeholder/:id [put]
 // @param id path string true "Stakeholder ID"
-// @param stakeholder body models.Stakeholder true "Stakeholder data"
+// @param stakeholder body model.Stakeholder true "Stakeholder data"
 func (h StakeholderHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := models.Stakeholder{}
+	updates := model.Stakeholder{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&models.Stakeholder{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&model.Stakeholder{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return

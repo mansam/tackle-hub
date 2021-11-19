@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/tackle-hub/api"
-	"github.com/konveyor/tackle-hub/models"
+	"github.com/konveyor/tackle-hub/model"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"log"
@@ -17,30 +17,33 @@ const (
 	DatabaseFileName = "tackle-hub.sqlite"
 )
 
+//
+// dbPath builds DB path.
 func dbPath() string {
-	base, ok := os.LookupEnv(DatabasePathEnv)
-	if !ok {
+	dir, found := os.LookupEnv(DatabasePathEnv)
+	if !found {
 		log.Fatal(fmt.Sprintf("%s not set, aborting.", DatabasePathEnv))
 	}
-	return path.Join(base, DatabaseFileName)
+
+	return path.Join(dir, DatabaseFileName)
 }
 
+//
+// Setup the DB and models.
 func Setup() *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(dbPath()), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
 	err = db.AutoMigrate(
-		&models.Application{},
-		&models.BinaryRepository{},
-		&models.BusinessService{},
-		&models.Group{},
-		&models.JobFunction{},
-		&models.Review{},
-		&models.SourceRepository{},
-		&models.Tag{},
-		&models.TagType{},
-		&models.Stakeholder{})
+		&model.Application{},
+		&model.Review{},
+		&model.BusinessService{},
+		&model.StakeholderGroup{},
+		&model.JobFunction{},
+		&model.Tag{},
+		&model.TagType{},
+		&model.Stakeholder{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,6 +51,8 @@ func Setup() *gorm.DB {
 	return db
 }
 
+//
+// main.
 func main() {
 	db := Setup()
 	router := gin.Default()
@@ -55,12 +60,10 @@ func main() {
 	router.Use(gin.Recovery())
 	handlerList := []api.Handler{
 		&api.ApplicationHandler{},
-		&api.BinaryRepoHandler{},
-		&api.BusinessServiceHandler{},
-		&api.GroupHandler{},
-		&api.JobFunctionHandler{},
 		&api.ReviewHandler{},
-		&api.SourceRepoHandler{},
+		&api.BusinessServiceHandler{},
+		&api.StakeholderGroupHandler{},
+		&api.JobFunctionHandler{},
 		&api.TagHandler{},
 		&api.TagTypeHandler{},
 		&api.StakeholderHandler{},

@@ -1,11 +1,11 @@
 
 # Run go fmt against code
 fmt:
-	go fmt ./cmd/... ./api/... ./models/...
+	go fmt ./cmd/... ./api/... ./model/...
 
 # Run go vet against code
 vet:
-	go vet ./cmd/... ./api/... ./models/...
+	go vet ./cmd/... ./api/... ./model/...
 
 # Build server binary
 server: fmt vet

@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/models"
+	"github.com/konveyor/tackle-hub/model"
 	"net/http"
 )
 
@@ -13,11 +13,15 @@ const (
 	GroupRoot  = GroupsRoot + "/:" + ID
 )
 
-type GroupHandler struct {
+//
+// StakeholderGroupHandler handles stakeholder-group routes.
+type StakeholderGroupHandler struct {
 	BaseHandler
 }
 
-func (h GroupHandler) AddRoutes(e *gin.Engine) {
+//
+// AddRoutes adds routes.
+func (h StakeholderGroupHandler) AddRoutes(e *gin.Engine) {
 	e.GET(GroupsRoot, h.List)
 	e.GET(GroupsRoot+"/", h.List)
 	e.POST(GroupsRoot, h.Create)
@@ -34,8 +38,8 @@ func (h GroupHandler) AddRoutes(e *gin.Engine) {
 // @success 200 {object} models.StakeholderGroup
 // @router /controls/stakeholder-group/:id [get]
 // @param id path string true "Stakeholder Group ID"
-func (h GroupHandler) Get(ctx *gin.Context) {
-	model := models.Group{}
+func (h StakeholderGroupHandler) Get(ctx *gin.Context) {
+	model := model.StakeholderGroup{}
 	id := ctx.Param(ID)
 	result := h.DB.First(&model, id)
 	if result.Error != nil {
@@ -53,8 +57,8 @@ func (h GroupHandler) Get(ctx *gin.Context) {
 // @produce json
 // @success 200 {object} models.StakeholderGroup
 // @router /controls/stakeholder-group [get]
-func (h GroupHandler) List(ctx *gin.Context) {
-	var list []models.Group
+func (h StakeholderGroupHandler) List(ctx *gin.Context) {
+	var list []model.StakeholderGroup
 	page := NewPagination(ctx)
 	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
@@ -74,8 +78,8 @@ func (h GroupHandler) List(ctx *gin.Context) {
 // @success 200 {object} models.StakeholderGroup
 // @router /controls/stakeholder-group [post]
 // @param stakeholder_group body models.StakeholderGroup true "Stakeholder Group data"
-func (h GroupHandler) Create(ctx *gin.Context) {
-	model := models.Group{}
+func (h StakeholderGroupHandler) Create(ctx *gin.Context) {
+	model := model.StakeholderGroup{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -97,9 +101,9 @@ func (h GroupHandler) Create(ctx *gin.Context) {
 // @success 200 {object} models.StakeholderGroup
 // @router /controls/stakeholder-group/:id [delete]
 // @param id path string true "Stakeholder Group ID"
-func (h GroupHandler) Delete(ctx *gin.Context) {
+func (h StakeholderGroupHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.Group{}, id)
+	result := h.DB.Delete(&model.StakeholderGroup{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -118,15 +122,15 @@ func (h GroupHandler) Delete(ctx *gin.Context) {
 // @router /controls/stakeholder-group/:id [put]
 // @param id path string true "Stakeholder Group ID"
 // @param stakeholder_group body models.StakeholderGroup true "Stakeholder Group data"
-func (h GroupHandler) Update(ctx *gin.Context) {
+func (h StakeholderGroupHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := models.Group{}
+	updates := model.StakeholderGroup{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&models.Group{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&model.StakeholderGroup{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return

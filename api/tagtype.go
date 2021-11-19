@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/models"
+	"github.com/konveyor/tackle-hub/model"
 	"net/http"
 )
 
@@ -13,10 +13,14 @@ const (
 	TagTypeRoot  = TagTypesRoot + "/:" + ID
 )
 
+//
+// TagTypeHandler handles the tag-type route.
 type TagTypeHandler struct {
 	BaseHandler
 }
 
+//
+// AddRoutes adds routes.
 func (h TagTypeHandler) AddRoutes(e *gin.Engine) {
 	e.GET(TagTypesRoot, h.List)
 	e.GET(TagTypesRoot+"/", h.List)
@@ -31,13 +35,14 @@ func (h TagTypeHandler) AddRoutes(e *gin.Engine) {
 // @description Get a tag type by ID.
 // @tags get
 // @produce json
-// @success 200 {object} models.TagType
+// @success 200 {object} model.TagType
 // @router /controls/tag-type/:id [get]
 // @param id path string true "Tag Type ID"
 func (h TagTypeHandler) Get(ctx *gin.Context) {
-	model := models.TagType{}
+	model := model.TagType{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, id)
+	db := h.DB.Preload("Tags")
+	result := db.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -51,12 +56,14 @@ func (h TagTypeHandler) Get(ctx *gin.Context) {
 // @description List all tag types.
 // @tags get
 // @produce json
-// @success 200 {object} models.TagType
+// @success 200 {object} model.TagType
 // @router /controls/tag-type [get]
 func (h TagTypeHandler) List(ctx *gin.Context) {
-	var list []models.TagType
+	var list []model.TagType
 	page := NewPagination(ctx)
-	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
+	db := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort)
+	db.Preload("Tags")
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
@@ -71,11 +78,11 @@ func (h TagTypeHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} models.TagType
+// @success 200 {object} model.TagType
 // @router /controls/tag-type [post]
-// @param tag_type body models.TagType true "Tag Type data"
+// @param tag_type body model.TagType true "Tag Type data"
 func (h TagTypeHandler) Create(ctx *gin.Context) {
-	model := models.TagType{}
+	model := model.TagType{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -94,12 +101,12 @@ func (h TagTypeHandler) Create(ctx *gin.Context) {
 // @summary Delete a tag type.
 // @description Delete a tag type.
 // @tags delete
-// @success 200 {object} models.TagType
+// @success 200 {object} model.TagType
 // @router /controls/tag-type/:id [delete]
 // @param id path string true "Tag Type ID"
 func (h TagTypeHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.TagType{}, id)
+	result := h.DB.Delete(&model.TagType{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -114,19 +121,19 @@ func (h TagTypeHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} models.TagType
+// @success 200 {object} model.TagType
 // @router /controls/tag-type/:id [put]
 // @param id path string true "Tag Type ID"
-// @param tag_type body models.TagType true "Tag Type data"
+// @param tag_type body model.TagType true "Tag Type data"
 func (h TagTypeHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := models.TagType{}
+	updates := model.TagType{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&models.TagType{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&model.TagType{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return

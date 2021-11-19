@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/models"
+	"github.com/konveyor/tackle-hub/model"
 	"net/http"
 )
 
@@ -13,10 +13,14 @@ const (
 	ReviewRoot  = ReviewsRoot + "/:" + ID
 )
 
+//
+// ReviewHandler handles review routes.
 type ReviewHandler struct {
 	BaseHandler
 }
 
+//
+// AddRoutes adds routes.
 func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 	e.GET(ReviewsRoot, h.List)
 	e.GET(ReviewsRoot+"/", h.List)
@@ -31,11 +35,11 @@ func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 // @description Get a review by ID.
 // @tags get
 // @produce json
-// @success 200 {object} models.Review
+// @success 200 {object} model.Review
 // @router /application-inventory/review/:id [get]
 // @param id path string true "Review ID"
 func (h ReviewHandler) Get(ctx *gin.Context) {
-	model := models.Review{}
+	model := model.Review{}
 	id := ctx.Param(ID)
 	result := h.DB.First(&model, id)
 	if result.Error != nil {
@@ -51,10 +55,10 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 // @description List all reviews.
 // @tags get
 // @produce json
-// @success 200 {object} models.Review
+// @success 200 {object} model.Review
 // @router /application-inventory/review [get]
 func (h ReviewHandler) List(ctx *gin.Context) {
-	var list []models.Review
+	var list []model.Review
 	page := NewPagination(ctx)
 	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
 	if result.Error != nil {
@@ -71,11 +75,11 @@ func (h ReviewHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} models.Review
+// @success 200 {object} model.Review
 // @router /application-inventory/review [post]
-// @param review body models.Review true "Review data"
+// @param review body model.Review true "Review data"
 func (h ReviewHandler) Create(ctx *gin.Context) {
-	model := models.Review{}
+	model := model.Review{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -94,12 +98,12 @@ func (h ReviewHandler) Create(ctx *gin.Context) {
 // @summary Delete a review.
 // @description Delete a review.
 // @tags delete
-// @success 200 {object} models.Review
+// @success 200 {object} model.Review
 // @router /application-inventory/review/:id [delete]
 // @param id path string true "Review ID"
 func (h ReviewHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&models.Review{}, id)
+	result := h.DB.Delete(&model.Review{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -114,22 +118,23 @@ func (h ReviewHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} models.Review
+// @success 200 {object} model.Review
 // @router /application-inventory/review/:id [put]
 // @param id path string true "Review ID"
-// @param review body models.Review true "Review data"
+// @param review body model.Review true "Review data"
 func (h ReviewHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := models.Review{}
+	updates := model.Review{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&models.Review{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&model.Review{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
 	}
+
 	ctx.Status(http.StatusOK)
 }
