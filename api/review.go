@@ -41,7 +41,8 @@ func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 func (h ReviewHandler) Get(ctx *gin.Context) {
 	model := model.Review{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&model, id)
+	db := h.DB.Preload("Application")
+	result := db.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -60,7 +61,9 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 func (h ReviewHandler) List(ctx *gin.Context) {
 	var list []model.Review
 	page := NewPagination(ctx)
-	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
+	db := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort)
+	db = db.Preload("Application")
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return

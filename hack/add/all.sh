@@ -3,12 +3,13 @@
 host="localhost:8080"
 
 #######################################################
-# APPLICATIONS
+# ALL
 #######################################################
 
-curl -X POST ${host}/application-inventory/application -d \
-'{
-    "createUser": "tackle",
-    "name":"jeff",
-    "tags":["1","2"]
-}'
+dir=`dirname $0`
+cd ${dir}
+
+./tag.sh
+./application.sh
+./review.sh
+
