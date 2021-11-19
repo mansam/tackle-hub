@@ -173,12 +173,14 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 type Application struct {
 	model.Application
 	Tags []string `json:"tags"`
+	BusinessService string `json:"businessService"`
 }
 
 //
 // With updates the resource using the model.
 func (r *Application) With(m *model.Application) {
 	r.Application = *m
+	r.BusinessService = strconv.Itoa(int(m.BusinessServiceID))
 	for _, tag := range m.Tags {
 		r.Tags = append(
 			r.Tags,
@@ -190,6 +192,10 @@ func (r *Application) With(m *model.Application) {
 // Model builds a model.
 func (r *Application) Model() (m *model.Application) {
 	m = &r.Application
+	if len(r.BusinessService) > 0 {
+		id, _ := strconv.Atoi(r.BusinessService)
+		m.BusinessServiceID = uint(id)
+	}
 	for _, tagID := range r.Tags {
 		id, _ := strconv.Atoi(tagID)
 		m.Tags = append(
