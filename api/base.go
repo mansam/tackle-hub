@@ -40,18 +40,19 @@ type Handler interface {
 }
 
 //
-// Base handler.
+// BaseHandler base handler.
 type BaseHandler struct {
 	// DB
 	DB *gorm.DB
 }
 
+// With database.
 func (h *BaseHandler) With(db *gorm.DB) {
 	h.DB = db
 }
 
 //
-// Get failed.
+// getFailed handles Get() errors.
 func (h *BaseHandler) getFailed(ctx *gin.Context, err error) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		ctx.JSON(
@@ -76,7 +77,7 @@ func (h *BaseHandler) getFailed(ctx *gin.Context, err error) {
 }
 
 //
-// List failed.
+// listFailed handles List() errors.
 func (h *BaseHandler) listFailed(ctx *gin.Context, err error) {
 	ctx.JSON(
 		http.StatusInternalServerError,
@@ -93,7 +94,7 @@ func (h *BaseHandler) listFailed(ctx *gin.Context, err error) {
 }
 
 //
-// Create failed.
+// createFailed handles Create() errors.
 func (h *BaseHandler) createFailed(ctx *gin.Context, err error) {
 	ctx.JSON(
 		http.StatusInternalServerError,
@@ -110,7 +111,7 @@ func (h *BaseHandler) createFailed(ctx *gin.Context, err error) {
 }
 
 //
-// Update failed.
+// updateFailed handles Update() errors.
 func (h *BaseHandler) updateFailed(ctx *gin.Context, err error) {
 	ctx.JSON(
 		http.StatusInternalServerError,
@@ -127,7 +128,7 @@ func (h *BaseHandler) updateFailed(ctx *gin.Context, err error) {
 }
 
 //
-// Delete failed.
+// deleteFailed handles Delete() errors.
 func (h *BaseHandler) deleteFailed(ctx *gin.Context, err error) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		ctx.Status(http.StatusOK)
@@ -148,7 +149,18 @@ func (h *BaseHandler) deleteFailed(ctx *gin.Context, err error) {
 }
 
 //
-// Pagination.
+// preLoad update DB to pre-load fields.
+func (h *BaseHandler) preLoad(db *gorm.DB, fields ...string) (tx *gorm.DB) {
+	tx = db
+	for _, f := range fields {
+		tx = tx.Preload(f)
+	}
+
+	return
+}
+
+//
+// Pagination provides pagination and sorting.
 type Pagination struct {
 	Limit  int
 	Offset int
@@ -156,7 +168,15 @@ type Pagination struct {
 }
 
 //
-// Build pagination with parameters.
+// apply pagination.
+func (p *Pagination) apply(db *gorm.DB) (tx *gorm.DB) {
+	tx = db.Offset(p.Offset).Limit(p.Limit)
+	tx = tx.Order(p.Sort)
+	return
+}
+
+//
+// NewPagination factory.
 func NewPagination(ctx *gin.Context) Pagination {
 	limit, err := strconv.Atoi(ctx.Query("size"))
 	if err != nil {

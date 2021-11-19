@@ -41,7 +41,7 @@ func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 func (h ReviewHandler) Get(ctx *gin.Context) {
 	model := model.Review{}
 	id := ctx.Param(ID)
-	db := h.DB.Preload("Application")
+	db := h.preLoad(h.DB, "Application")
 	result := db.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
@@ -60,9 +60,9 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 // @router /application-inventory/review [get]
 func (h ReviewHandler) List(ctx *gin.Context) {
 	var list []model.Review
-	page := NewPagination(ctx)
-	db := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort)
-	db = db.Preload("Application")
+	pagination := NewPagination(ctx)
+	db := pagination.apply(h.DB)
+	db = h.preLoad(db, "Application")
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)

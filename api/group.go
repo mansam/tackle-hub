@@ -59,8 +59,9 @@ func (h StakeholderGroupHandler) Get(ctx *gin.Context) {
 // @router /controls/stakeholder-group [get]
 func (h StakeholderGroupHandler) List(ctx *gin.Context) {
 	var list []model.StakeholderGroup
-	page := NewPagination(ctx)
-	result := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort).Find(&list)
+	pagination := NewPagination(ctx)
+	db := pagination.apply(h.DB)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return

@@ -2,10 +2,6 @@
 
 host="localhost:8080"
 
-#######################################################
-# REVIEWS
-#######################################################
-
 curl -X POST ${host}/application-inventory/review -d \
 '{
     "createUser": "tackle",

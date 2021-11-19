@@ -42,7 +42,11 @@ func (h ApplicationHandler) AddRoutes(e *gin.Engine) {
 func (h ApplicationHandler) Get(ctx *gin.Context) {
 	m := &model.Application{}
 	id := ctx.Param(ID)
-	db := h.DB.Preload("Review").Preload("Tags")
+	db := h.BaseHandler.preLoad(
+		h.DB,
+		"Tags",
+		"Review",
+		"BusinessService")
 	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
@@ -63,9 +67,13 @@ func (h ApplicationHandler) Get(ctx *gin.Context) {
 // @router /application-inventory/application [get]
 func (h ApplicationHandler) List(ctx *gin.Context) {
 	var list []model.Application
-	page := NewPagination(ctx)
-	db := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort)
-	db = db.Preload("Review").Preload("Tags")
+	pagination := NewPagination(ctx)
+	db := pagination.apply(h.DB)
+	db = h.BaseHandler.preLoad(
+		db,
+		"Tags",
+		"Review",
+		"BusinessService")
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)

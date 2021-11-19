@@ -41,7 +41,7 @@ func (h TagHandler) AddRoutes(e *gin.Engine) {
 func (h TagHandler) Get(ctx *gin.Context) {
 	model := model.Tag{}
 	id := ctx.Param(ID)
-	db := h.DB.Preload("TagType")
+	db := h.preLoad(h.DB, "TagType")
 	result := db.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
@@ -60,9 +60,9 @@ func (h TagHandler) Get(ctx *gin.Context) {
 // @router /controls/tag [get]
 func (h TagHandler) List(ctx *gin.Context) {
 	var list []model.Tag
-	page := NewPagination(ctx)
-	db := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort)
-	db.Preload("TagType")
+	pagination := NewPagination(ctx)
+	db := pagination.apply(h.DB)
+	db = h.preLoad(db, "TagType")
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)

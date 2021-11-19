@@ -5,7 +5,8 @@ type BusinessService struct {
 	Name          string        `json:"name" gorm:"notnull,unique"`
 	Description   string        `json:"description"`
 	Applications  []Application `json:"applications"`
-	StakeholderID uint          `json:"owner"`
+	StakeholderID uint          `json:"-"`
+	Stakeholder   *Stakeholder  `json:"owner"`
 }
 
 type StakeholderGroup struct {

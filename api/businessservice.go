@@ -41,7 +41,7 @@ func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 	model := model.BusinessService{}
 	id := ctx.Param(ID)
-	db := h.DB.Preload("Applications")
+	db := h.preLoad(h.DB, "Applications")
 	result := db.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
@@ -60,9 +60,9 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 // @router /controls/business-service [get]
 func (h BusinessServiceHandler) List(ctx *gin.Context) {
 	var list []model.BusinessService
-	page := NewPagination(ctx)
-	db := h.DB.Offset(page.Offset).Limit(page.Limit).Order(page.Sort)
-	db = db.Preload("Applications")
+	pagination := NewPagination(ctx)
+	db := pagination.apply(h.DB)
+	db = h.preLoad(db, "Applications")
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)

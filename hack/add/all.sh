@@ -10,6 +10,7 @@ dir=`dirname $0`
 cd ${dir}
 
 ./tag.sh
+./business-service.sh
 ./application.sh
 ./review.sh
 
