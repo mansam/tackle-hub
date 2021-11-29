@@ -7,6 +7,12 @@ import (
 )
 
 //
+// Kind
+const (
+	BusinessServiceKind = "business-service"
+)
+
+//
 // Routes
 const (
 	BusinessServicesRoot = ControlsRoot + "/business-service"
@@ -59,17 +65,19 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 // @success 200 {object} model.BusinessService
 // @router /controls/business-service [get]
 func (h BusinessServiceHandler) List(ctx *gin.Context) {
-	var list []model.BusinessService
+	var count int64
+	var models []model.BusinessService
+	h.DB.Model(model.BusinessService{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Stakeholder")
-	result := db.Find(&list)
+	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, list)
+	h.listResponse(ctx, BusinessServiceKind, models, int(count))
 }
 
 // Create godoc

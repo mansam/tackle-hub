@@ -7,10 +7,16 @@ import (
 )
 
 //
+// Kind
+const (
+	StakeholderGroupKind = "stakeholder-group"
+)
+
+//
 // Routes
 const (
-	GroupsRoot = ControlsRoot + "/stakeholder-group"
-	GroupRoot  = GroupsRoot + "/:" + ID
+	StakeholderGroupsRoot = ControlsRoot + "/stakeholder-group"
+	StakeholderGroupRoot  = StakeholderGroupsRoot + "/:" + ID
 )
 
 //
@@ -22,12 +28,12 @@ type StakeholderGroupHandler struct {
 //
 // AddRoutes adds routes.
 func (h StakeholderGroupHandler) AddRoutes(e *gin.Engine) {
-	e.GET(GroupsRoot, h.List)
-	e.GET(GroupsRoot+"/", h.List)
-	e.POST(GroupsRoot, h.Create)
-	e.GET(GroupRoot, h.Get)
-	e.PUT(GroupRoot, h.Update)
-	e.DELETE(GroupRoot, h.Delete)
+	e.GET(StakeholderGroupsRoot, h.List)
+	e.GET(StakeholderGroupsRoot+"/", h.List)
+	e.POST(StakeholderGroupsRoot, h.Create)
+	e.GET(StakeholderGroupRoot, h.Get)
+	e.PUT(StakeholderGroupRoot, h.Update)
+	e.DELETE(StakeholderGroupRoot, h.Delete)
 }
 
 // Get godoc
@@ -59,17 +65,19 @@ func (h StakeholderGroupHandler) Get(ctx *gin.Context) {
 // @success 200 {object} models.StakeholderGroup
 // @router /controls/stakeholder-group [get]
 func (h StakeholderGroupHandler) List(ctx *gin.Context) {
-	var list []model.StakeholderGroup
+	var count int64
+	var models []model.StakeholderGroup
+	h.DB.Model(model.StakeholderGroup{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(h.DB, "Stakeholders")
-	result := db.Find(&list)
+	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, list)
+	h.listResponse(ctx, StakeholderGroupKind, models, int(count))
 }
 
 // Create godoc

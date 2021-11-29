@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 var Settings = &settings.Settings
@@ -164,6 +165,21 @@ func (h *BaseHandler) preLoad(db *gorm.DB, fields ...string) (tx *gorm.DB) {
 }
 
 //
+// listResponse selectively returns hal+json or plain json based on the "accept" header
+func (h *BaseHandler) listResponse(ctx *gin.Context, kind string, resources interface{}, count int) {
+	for _, accept := range ctx.Request.Header.Values("Accept") {
+		if strings.Contains(accept, "application/hal+json") {
+			ctx.Writer.Header().Set("Content-Type", "application/hal+json; charset=utf-8")
+			hal := Hal{}
+			hal.With(kind, resources, count)
+			ctx.JSON(http.StatusOK, hal)
+			return
+		}
+	}
+	ctx.JSON(http.StatusOK, resources)
+}
+
+//
 // Pagination provides pagination and sorting.
 type Pagination struct {
 	Limit  int
@@ -196,7 +212,22 @@ func NewPagination(ctx *gin.Context) Pagination {
 	}
 	return Pagination{
 		Limit:  limit,
-		Offset: offset,
+		Offset: offset * limit,
 		Sort:   sort,
 	}
+}
+
+//
+// Hal REST resource.
+type Hal struct {
+	Embedded   map[string]interface{} `json:"_embedded"`
+	TotalCount int                    `json:"total_count"`
+}
+
+//
+// With sets the embedded resource and count.
+func (r *Hal) With(kind string, resources interface{}, total int) {
+	r.Embedded = make(map[string]interface{})
+	r.Embedded[kind] = resources
+	r.TotalCount = total
 }

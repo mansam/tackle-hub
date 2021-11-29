@@ -7,6 +7,12 @@ import (
 )
 
 //
+// Kind
+const (
+	ReviewKind = "review"
+)
+
+//
 // Routes
 const (
 	ReviewsRoot = InventoryRoot + "/review"
@@ -59,17 +65,19 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 // @success 200 {object} model.Review
 // @router /application-inventory/review [get]
 func (h ReviewHandler) List(ctx *gin.Context) {
-	var list []model.Review
+	var count int64
+	var models []model.Review
+	h.DB.Model(model.Review{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Application")
-	result := db.Find(&list)
+	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, list)
+	h.listResponse(ctx, ReviewKind, models, int(count))
 }
 
 // Create godoc

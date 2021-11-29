@@ -7,6 +7,12 @@ import (
 )
 
 //
+// Kind
+const (
+	JobFunctionKind = "job-function"
+)
+
+//
 // Routes
 const (
 	JobFunctionsRoot = ControlsRoot + "/job-function"
@@ -59,17 +65,19 @@ func (h JobFunctionHandler) Get(ctx *gin.Context) {
 // @success 200 {object} model.JobFunction
 // @router /controls/job-function [get]
 func (h JobFunctionHandler) List(ctx *gin.Context) {
-	var list []model.JobFunction
+	var count int64
+	var models []model.JobFunction
+	h.DB.Model(model.JobFunction{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Stakeholders")
-	result := db.Find(&list)
+	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, list)
+	h.listResponse(ctx, JobFunctionKind, models, int(count))
 }
 
 // Create godoc

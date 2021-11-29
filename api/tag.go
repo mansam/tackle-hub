@@ -7,6 +7,12 @@ import (
 )
 
 //
+// Kind
+const (
+	TagKind = "tag"
+)
+
+//
 // Routes
 const (
 	TagsRoot = ControlsRoot + "/tag"
@@ -59,17 +65,19 @@ func (h TagHandler) Get(ctx *gin.Context) {
 // @success 200 {object} model.Tag
 // @router /controls/tag [get]
 func (h TagHandler) List(ctx *gin.Context) {
-	var list []model.Tag
+	var count int64
+	var models []model.Tag
+	h.DB.Model(model.Tag{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "TagType")
-	result := db.Find(&list)
+	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, list)
+	h.listResponse(ctx, TagKind, models, int(count))
 }
 
 // Create godoc

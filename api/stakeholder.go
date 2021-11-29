@@ -7,6 +7,12 @@ import (
 )
 
 //
+// Kind
+const (
+	StakeholderKind = "stakeholder"
+)
+
+//
 // Routes
 const (
 	StakeholdersRoot = ControlsRoot + "/stakeholder"
@@ -63,7 +69,9 @@ func (h StakeholderHandler) Get(ctx *gin.Context) {
 // @success 200 {object} model.Stakeholder
 // @router /controls/stakeholder [get]
 func (h StakeholderHandler) List(ctx *gin.Context) {
-	var list []model.Stakeholder
+	var count int64
+	var models []model.Stakeholder
+	h.DB.Model(model.Stakeholder{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(
@@ -71,13 +79,13 @@ func (h StakeholderHandler) List(ctx *gin.Context) {
 		"JobFunction",
 		"BusinessServices",
 		"Groups")
-	result := db.Find(&list)
+	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, list)
+	h.listResponse(ctx, StakeholderKind, models, int(count))
 }
 
 // Create godoc
