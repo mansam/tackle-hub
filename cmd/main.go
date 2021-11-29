@@ -78,6 +78,7 @@ func main() {
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+	router.Use(api.HAL())
 	handlerList := []api.Handler{
 		&api.ApplicationHandler{},
 		&api.ArtifactHandler{},

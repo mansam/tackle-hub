@@ -230,3 +230,12 @@ func NewPagination(ctx *gin.Context) Pagination {
 		Sort:   sort,
 	}
 }
+
+//
+// HAL sets the content type header to `application/hal+json`.
+func HAL() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctx.Writer.Header().Set("Content-Type", "application/hal+json; charset=utf-8")
+		ctx.Next()
+	}
+}
