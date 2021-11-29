@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/tackle-hub/model"
 	"net/http"
@@ -79,14 +80,8 @@ func (h ApplicationHandler) List(ctx *gin.Context) {
 		h.listFailed(ctx, result.Error)
 		return
 	}
-	rList := []Application{}
-	for i := range list {
-		r := Application{}
-		r.With(&list[i])
-		rList = append(
-			rList,
-			r)
-	}
+	rList := ApplicationList{}
+	rList.With(list, pagination.next())
 
 	ctx.JSON(http.StatusOK, rList)
 }
@@ -172,6 +167,7 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 // Application REST resource.
 type Application struct {
 	model.Application
+	Links           Links    `json:"_links"`
 	Tags            []string `json:"tags"`
 	BusinessService string   `json:"businessService"`
 }
@@ -186,6 +182,7 @@ func (r *Application) With(m *model.Application) {
 			r.Tags,
 			strconv.Itoa(int(tag.ID)))
 	}
+	r.Links.Self = Link{Href: fmt.Sprintf("%s/%d", ApplicationsRoot, r.ID)}
 }
 
 //
@@ -208,4 +205,24 @@ func (r *Application) Model() (m *model.Application) {
 	}
 
 	return
+}
+
+//
+// ApplicationList REST resource.
+type ApplicationList struct {
+	Links    Links                    `json:"_links"`
+	Embedded map[string][]Application `json:"_embedded"`
+}
+
+//
+// With updates the resource using the models.
+func (r *ApplicationList) With(models []model.Application, next Pagination) {
+	r.Links.Self = Link{Href: ApplicationsRoot}
+	r.Links.Next = Link{Href: ApplicationsRoot + next.query()}
+	r.Embedded = make(map[string][]Application)
+	for i := range models {
+		m := Application{}
+		m.With(&models[i])
+		r.Embedded["applications"] = append(r.Embedded["applications"], m)
+	}
 }
