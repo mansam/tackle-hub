@@ -77,7 +77,7 @@ func (h ApplicationHandler) List(ctx *gin.Context) {
 	h.DB.Model(model.Application{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
-	db = h.BaseHandler.preLoad(
+	db = h.preLoad(
 		db,
 		"Tags",
 		"Review",
@@ -144,7 +144,7 @@ func (h ApplicationHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -165,13 +165,18 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&model.Application{}).Where("id = ?", id).Omit("id").Updates(r)
+	m := r.Model()
+	result := h.DB.Model(&model.Application{}).Where("id = ?", id).Omit("id").Updates(m)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
 	}
-
-	ctx.Status(http.StatusOK)
+	err = h.DB.Model(m).Association("Tags").Replace("Tags", m.Tags)
+	if err != nil {
+		h.updateFailed(ctx, err)
+		return
+	}
+	ctx.Status(http.StatusNoContent)
 }
 
 //

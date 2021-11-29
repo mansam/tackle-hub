@@ -17,6 +17,7 @@ const (
 const (
 	ReviewsRoot = InventoryRoot + "/review"
 	ReviewRoot  = ReviewsRoot + "/:" + ID
+	BulkRoot    = ReviewsRoot + "/bulk"
 )
 
 //
@@ -34,6 +35,7 @@ func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 	e.GET(ReviewRoot, h.Get)
 	e.PUT(ReviewRoot, h.Update)
 	e.DELETE(ReviewRoot, h.Delete)
+	e.POST(BulkRoot, h.Copy)
 }
 
 // Get godoc
@@ -90,19 +92,64 @@ func (h ReviewHandler) List(ctx *gin.Context) {
 // @router /application-inventory/review [post]
 // @param review body Review true "Review data"
 func (h ReviewHandler) Create(ctx *gin.Context) {
-	model := Review{}
-	err := ctx.BindJSON(&model)
+	review := Review{}
+	err := ctx.BindJSON(&review)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
-	result := h.DB.Create(&model)
+	model := review.Model()
+	result := h.DB.Create(model)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
 
 	ctx.JSON(http.StatusCreated, model)
+}
+
+func (h ReviewHandler) Copy(ctx *gin.Context) {
+	b := Bulk{}
+	err := ctx.BindJSON(&b)
+	if err != nil {
+		h.createFailed(ctx, err)
+		return
+	}
+	m := model.Review{}
+	result := h.DB.First(&m, b.SourceReview)
+	if result.Error != nil {
+		h.createFailed(ctx, result.Error)
+		return
+	}
+	for _, id := range b.TargetApplications {
+		copied := model.Review{
+			BusinessCriticality: m.BusinessCriticality,
+			EffortEstimate:      m.EffortEstimate,
+			ProposedAction:      m.ProposedAction,
+			WorkPriority:        m.WorkPriority,
+			Comments:            m.Comments,
+			ApplicationID:       id,
+		}
+		existing := []model.Review{}
+		result = h.DB.Find(&existing, "application_id = ?", id)
+		if result.Error != nil {
+			h.createFailed(ctx, result.Error)
+			return
+		}
+		if len(existing) == 0 {
+			result = h.DB.Create(&copied)
+			if result.Error != nil {
+				h.createFailed(ctx, result.Error)
+				return
+			}
+		} else {
+			result = h.DB.Model(&model.Review{}).Where("id = ?", existing[0].ID).Updates(&copied)
+			if result.Error != nil {
+				h.createFailed(ctx, result.Error)
+				return
+			}
+		}
+	}
 }
 
 // Delete godoc
@@ -120,7 +167,7 @@ func (h ReviewHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -135,21 +182,54 @@ func (h ReviewHandler) Delete(ctx *gin.Context) {
 // @param review body Review true "Review data"
 func (h ReviewHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := Review{}
-	err := ctx.BindJSON(&updates)
+	review := Review{}
+	err := ctx.BindJSON(&review)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&Review{}).Where("id = ?", id).Omit("id").Updates(updates)
+	updates := review.Model()
+	result := h.DB.Model(&model.Review{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 //
-// Review REST resource.
-type Review = model.Review
+// Review request struct.
+type Review struct {
+	BusinessCriticality uint   `json:"businessCriticality"`
+	EffortEstimate      string `json:"effortEstimate"`
+	ProposedAction      string `json:"proposedAction"`
+	WorkPriority        uint   `json:"workPriority"`
+	Comments            string `json:"comments"`
+	Application         *struct {
+		ID uint `json:"id"`
+	} `json:"application"`
+}
+
+//
+// Model builds a model.
+func (r *Review) Model() (m *model.Review) {
+	m = &model.Review{
+		BusinessCriticality: r.BusinessCriticality,
+		EffortEstimate:      r.EffortEstimate,
+		ProposedAction:      r.ProposedAction,
+		WorkPriority:        r.WorkPriority,
+		Comments:            r.Comments,
+	}
+	if r.Application != nil {
+		m.ApplicationID = r.Application.ID
+	}
+	return
+}
+
+//
+//
+type Bulk struct {
+	SourceReview       uint   `json:"sourceReview"`
+	TargetApplications []uint `json:"targetApplications"`
+}

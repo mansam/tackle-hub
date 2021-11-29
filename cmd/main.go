@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/controller/pkg/logging"
 	"github.com/konveyor/tackle-hub/api"
+	"github.com/konveyor/tackle-hub/importer"
 	"github.com/konveyor/tackle-hub/k8s"
 	crd "github.com/konveyor/tackle-hub/k8s/api"
 	"github.com/konveyor/tackle-hub/model"
@@ -30,9 +31,13 @@ func Setup() (db *gorm.DB, err error) {
 	if err != nil {
 		return
 	}
+	db.Exec("PRAGMA foreign_keys = ON")
 	err = db.AutoMigrate(
 		&model.Application{},
 		&model.Artifact{},
+		&model.ApplicationImport{},
+		&model.ImportSummary{},
+		&model.ImportTag{},
 		&model.Review{},
 		&model.BusinessService{},
 		&model.StakeholderGroup{},
@@ -41,7 +46,8 @@ func Setup() (db *gorm.DB, err error) {
 		&model.TagType{},
 		&model.Stakeholder{},
 		&model.TaskReport{},
-		&model.Task{})
+		&model.Task{},
+		&model.Dependency{})
 	if err != nil {
 		return
 	}
@@ -94,6 +100,11 @@ func main() {
 		&api.AddonHandler{
 			Client: client,
 		},
+		&api.UploadHandler{},
+		&api.ImportHandler{},
+		&api.ExportHandler{},
+		&api.SummaryHandler{},
+		&api.DependencyHandler{},
 	}
 	for _, h := range handlerList {
 		h.With(db)
@@ -104,5 +115,9 @@ func main() {
 		DB:     db,
 	}
 	taskManager.Run(context.Background())
+	importManager := importer.Manager{
+		DB: db,
+	}
+	importManager.Run(context.Background())
 	err = router.Run()
 }
