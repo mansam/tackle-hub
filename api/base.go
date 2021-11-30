@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/controller/pkg/logging"
 	"github.com/konveyor/tackle-hub/settings"
@@ -165,6 +164,13 @@ func (h *BaseHandler) preLoad(db *gorm.DB, fields ...string) (tx *gorm.DB) {
 }
 
 //
+//
+func (h *BaseHandler) hal(ctx *gin.Context, code int, obj interface{}) {
+	ctx.JSON(code, obj)
+	ctx.Writer.Header().Set("Content-Type", "application/hal+json; charset=utf-8")
+}
+
+//
 // Pagination provides pagination and sorting.
 type Pagination struct {
 	Limit  int
@@ -178,35 +184,6 @@ func (p *Pagination) apply(db *gorm.DB) (tx *gorm.DB) {
 	tx = db.Offset(p.Offset).Limit(p.Limit)
 	tx = tx.Order(p.Sort)
 	return
-}
-
-//
-// next generates the next page parameters.
-func (p *Pagination) next() (nextPage Pagination) {
-	return Pagination{
-		Limit:  p.Limit,
-		Offset: p.Offset + 1,
-		Sort:   p.Sort,
-	}
-}
-
-//
-// query generates a query string with the page parameters.
-func (p *Pagination) query() (query string) {
-	return fmt.Sprintf("?size=%d&page=%d&sort=%s", p.Limit, p.Offset, p.Sort)
-}
-
-//
-// Links represents `_links` structure in HAL response.
-type Links struct {
-	Self Link `json:"self"`
-	Next Link `json:"next"`
-}
-
-//
-// Link represents a hyperlink.
-type Link struct {
-	Href string `json:"href"`
 }
 
 //
@@ -232,10 +209,14 @@ func NewPagination(ctx *gin.Context) Pagination {
 }
 
 //
-// HAL sets the content type header to `application/hal+json`.
-func HAL() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		ctx.Writer.Header().Set("Content-Type", "application/hal+json; charset=utf-8")
-		ctx.Next()
-	}
+// List REST resource.
+type List struct {
+	Embedded map[string]interface{} `json:"_embedded"`
+}
+
+//
+// With updates the resource list using the models.
+func (r *List) With(kind string, resources interface{}) {
+	r.Embedded = make(map[string]interface{})
+	r.Embedded[kind] = resources
 }

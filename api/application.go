@@ -1,11 +1,16 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/tackle-hub/model"
 	"net/http"
 	"strconv"
+)
+
+//
+// Kind
+const (
+	ApplicationKind = "application"
 )
 
 //
@@ -67,7 +72,7 @@ func (h ApplicationHandler) Get(ctx *gin.Context) {
 // @success 200 {object} []api.Application
 // @router /application-inventory/application [get]
 func (h ApplicationHandler) List(ctx *gin.Context) {
-	var list []model.Application
+	var models []model.Application
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.BaseHandler.preLoad(
@@ -75,15 +80,21 @@ func (h ApplicationHandler) List(ctx *gin.Context) {
 		"Tags",
 		"Review",
 		"BusinessService")
-	result := db.Find(&list)
+	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
-	rList := ApplicationList{}
-	rList.With(list, pagination.next())
+	resources := []Application{}
+	for i := range models {
+		r := Application{}
+		r.With(&models[i])
+		resources = append(resources, r)
+	}
 
-	ctx.JSON(http.StatusOK, rList)
+	list := List{}
+	list.With(ApplicationKind, resources)
+	h.hal(ctx, http.StatusOK, list)
 }
 
 // Create godoc
@@ -167,7 +178,6 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 // Application REST resource.
 type Application struct {
 	model.Application
-	Links           Links    `json:"_links"`
 	Tags            []string `json:"tags"`
 	BusinessService string   `json:"businessService"`
 }
@@ -182,7 +192,6 @@ func (r *Application) With(m *model.Application) {
 			r.Tags,
 			strconv.Itoa(int(tag.ID)))
 	}
-	r.Links.Self = Link{Href: fmt.Sprintf("%s/%d", ApplicationsRoot, r.ID)}
 }
 
 //
@@ -205,24 +214,4 @@ func (r *Application) Model() (m *model.Application) {
 	}
 
 	return
-}
-
-//
-// ApplicationList REST resource.
-type ApplicationList struct {
-	Links    Links                    `json:"_links"`
-	Embedded map[string][]Application `json:"_embedded"`
-}
-
-//
-// With updates the resource using the models.
-func (r *ApplicationList) With(models []model.Application, next Pagination) {
-	r.Links.Self = Link{Href: ApplicationsRoot}
-	r.Links.Next = Link{Href: ApplicationsRoot + next.query()}
-	r.Embedded = make(map[string][]Application)
-	for i := range models {
-		m := Application{}
-		m.With(&models[i])
-		r.Embedded["applications"] = append(r.Embedded["applications"], m)
-	}
 }
