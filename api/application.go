@@ -72,6 +72,7 @@ func (h ApplicationHandler) Get(ctx *gin.Context) {
 // @success 200 {object} []api.Application
 // @router /application-inventory/application [get]
 func (h ApplicationHandler) List(ctx *gin.Context) {
+	var count int64
 	var models []model.Application
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
@@ -80,7 +81,7 @@ func (h ApplicationHandler) List(ctx *gin.Context) {
 		"Tags",
 		"Review",
 		"BusinessService")
-	result := db.Find(&models)
+	result := db.Find(&models).Count(&count)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
@@ -93,7 +94,7 @@ func (h ApplicationHandler) List(ctx *gin.Context) {
 	}
 
 	list := List{}
-	list.With(ApplicationKind, resources)
+	list.With(ApplicationKind, resources, int(count))
 	h.hal(ctx, http.StatusOK, list)
 }
 

@@ -211,12 +211,14 @@ func NewPagination(ctx *gin.Context) Pagination {
 //
 // List REST resource.
 type List struct {
-	Embedded map[string]interface{} `json:"_embedded"`
+	Embedded   map[string]interface{} `json:"_embedded"`
+	TotalCount int                    `json:"total_count"`
 }
 
 //
 // With updates the resource list using the models.
-func (r *List) With(kind string, resources interface{}) {
+func (r *List) With(kind string, resources interface{}, total int) {
 	r.Embedded = make(map[string]interface{})
 	r.Embedded[kind] = resources
+	r.TotalCount = total
 }

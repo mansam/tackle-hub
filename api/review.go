@@ -65,18 +65,19 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 // @success 200 {object} model.Review
 // @router /application-inventory/review [get]
 func (h ReviewHandler) List(ctx *gin.Context) {
+	var count int64
 	var models []model.Review
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Application")
-	result := db.Find(&models)
+	result := db.Find(&models).Count(&count)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
 	list := List{}
-	list.With(ReviewKind, models)
+	list.With(ReviewKind, models, int(count))
 	h.hal(ctx, http.StatusOK, list)
 }
 

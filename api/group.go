@@ -65,18 +65,19 @@ func (h StakeholderGroupHandler) Get(ctx *gin.Context) {
 // @success 200 {object} models.StakeholderGroup
 // @router /controls/stakeholder-group [get]
 func (h StakeholderGroupHandler) List(ctx *gin.Context) {
+	var count int64
 	var models []model.StakeholderGroup
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(h.DB, "Stakeholders")
-	result := db.Find(&models)
+	result := db.Find(&models).Count(&count)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
 	list := List{}
-	list.With(StakeholderGroupKind, models)
+	list.With(StakeholderGroupKind, models, int(count))
 	h.hal(ctx, http.StatusOK, list)
 }
 

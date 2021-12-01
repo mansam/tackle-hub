@@ -9,7 +9,7 @@ import (
 //
 // Kind
 const (
-	TagTypeKind = "tag"
+	TagTypeKind = "tag-type"
 )
 
 //
@@ -65,18 +65,19 @@ func (h TagTypeHandler) Get(ctx *gin.Context) {
 // @success 200 {object} model.TagType
 // @router /controls/tag-type [get]
 func (h TagTypeHandler) List(ctx *gin.Context) {
+	var count int64
 	var models []model.TagType
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Tags")
-	result := db.Find(&models)
+	result := db.Find(&models).Count(&count)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
 	list := List{}
-	list.With(TagTypeKind, models)
+	list.With(TagTypeKind, models, int(count))
 	h.hal(ctx, http.StatusOK, list)
 }
 

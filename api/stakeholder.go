@@ -69,6 +69,7 @@ func (h StakeholderHandler) Get(ctx *gin.Context) {
 // @success 200 {object} model.Stakeholder
 // @router /controls/stakeholder [get]
 func (h StakeholderHandler) List(ctx *gin.Context) {
+	var count int64
 	var models []model.Stakeholder
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
@@ -77,14 +78,14 @@ func (h StakeholderHandler) List(ctx *gin.Context) {
 		"JobFunction",
 		"BusinessServices",
 		"Groups")
-	result := db.Find(&models)
+	result := db.Find(&models).Count(&count)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
 	list := List{}
-	list.With(StakeholderKind, models)
+	list.With(StakeholderKind, models, int(count))
 	h.hal(ctx, http.StatusOK, list)
 }
 

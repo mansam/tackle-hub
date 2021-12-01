@@ -65,18 +65,19 @@ func (h JobFunctionHandler) Get(ctx *gin.Context) {
 // @success 200 {object} model.JobFunction
 // @router /controls/job-function [get]
 func (h JobFunctionHandler) List(ctx *gin.Context) {
+	var count int64
 	var models []model.JobFunction
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Stakeholders")
-	result := db.Find(&models)
+	result := db.Find(&models).Count(&count)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
 	list := List{}
-	list.With(JobFunctionKind, models)
+	list.With(JobFunctionKind, models, int(count))
 	h.hal(ctx, http.StatusOK, list)
 }
 
