@@ -21,3 +21,11 @@ type Review struct {
 	Application         *Application `json:"application"`
 	ApplicationID       uint         `json:"-"`
 }
+
+type Artifact struct {
+	Model
+	Name          string `json:"name"`
+	Kind          string `json:"kind"`
+	Path          string `json:"path"`
+	ApplicationID uint   `json:"application"`
+}

@@ -21,7 +21,8 @@ const (
 //
 // Params
 const (
-	ID = "id"
+	ID   = "id"
+	Name = "name"
 )
 
 //
