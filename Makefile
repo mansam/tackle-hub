@@ -9,15 +9,15 @@ vet:
 
 # Build hub
 hub: generate fmt vet
-	go build -o bin/serve github.com/konveyor/tackle-hub/cmd
+	go build -o bin/hub github.com/konveyor/tackle-hub/cmd
 
 # Build manager binary with compiler optimizations disabled
 debug: fmt vet
-	go build -o bin/serve -gcflags=all="-N -l" github.com/konveyor/tackle-hub/cmd
+	go build -o bin/hub -gcflags=all="-N -l" github.com/konveyor/tackle-hub/cmd
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: fmt vet
-	go run ./cmd/serve.go
+	go run ./cmd/main.go
 
 # Generate manifests e.g. CRD, Webhooks
 manifests: controller-gen
