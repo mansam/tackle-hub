@@ -248,11 +248,11 @@ func (r *Task) container() (container core.Container) {
 		Image: r.Image,
 		Env: []core.EnvVar {
 			{
-				Name: settings.EnvBaseURL,
-				Value: Settings.API.URL,
+				Name: settings.EnvHubBaseURL,
+				Value: Settings.Addon.Hub.URL,
 			},
 			{
-				Name: settings.AddonSecret,
+				Name: settings.EnvAddonSecretPath,
 				Value: Settings.Addon.Secret.Path,
 			},
 		},

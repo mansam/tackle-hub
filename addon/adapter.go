@@ -157,7 +157,7 @@ func (h *Adapter) putReport() (err error) {
 func newAdapter() (adapter *Adapter) {
 	adapter = &Adapter{}
 	// base URL
-	adapter.baseURL = Settings.Addon.API.URL
+	adapter.baseURL = Settings.Addon.Hub.URL
 	// Load secret.
 	b, err := os.ReadFile(Settings.Addon.Secret.Path)
 	if err != nil {
