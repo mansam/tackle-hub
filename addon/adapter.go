@@ -8,27 +8,23 @@ import (
 	"encoding/json"
 	"github.com/konveyor/tackle-hub/api"
 	"github.com/konveyor/tackle-hub/model"
+	"github.com/konveyor/tackle-hub/settings"
 	"github.com/konveyor/tackle-hub/task"
 	"net/http"
-	"net/url"
 	"os"
 	pathlib "path"
 	"strconv"
 	"strings"
 )
 
+var Settings = settings.Settings
+
 //
 // Addon An addon adapter configured for a task execution.
 var Addon *Adapter
 
-const (
-	// URL The base URL for the hub API.
-	URL = "HUB"
-	// Secret The path to the addon secret.
-	Secret = "SECRET"
-)
-
 func init() {
+	_ = Settings.Load()
 	Addon = newAdapter()
 }
 
@@ -161,15 +157,9 @@ func (h *Adapter) putReport() (err error) {
 func newAdapter() (adapter *Adapter) {
 	adapter = &Adapter{}
 	// base URL
-	value, _ := os.LookupEnv(URL)
-	_, err := url.Parse(value)
-	if err != nil {
-		panic(err)
-	}
-	adapter.baseURL = value
+	adapter.baseURL = Settings.Addon.API.URL
 	// Load secret.
-	value, _ = os.LookupEnv(Secret)
-	b, err := os.ReadFile(value)
+	b, err := os.ReadFile(Settings.Addon.Secret.Path)
 	if err != nil {
 		panic(err)
 	}

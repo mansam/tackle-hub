@@ -7,6 +7,7 @@ import (
 	"github.com/konveyor/tackle-hub/k8s"
 	crd "github.com/konveyor/tackle-hub/k8s/api"
 	"github.com/konveyor/tackle-hub/model"
+	"github.com/konveyor/tackle-hub/settings"
 	"github.com/konveyor/tackle-hub/task"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -15,25 +16,16 @@ import (
 	"os"
 )
 
-const (
-	DatabasePathEnv  = "DB_PATH"
-)
+var Settings = &settings.Settings
 
-//
-// dbPath builds DB path.
-func dbPath() (path string) {
-	path, found := os.LookupEnv(DatabasePathEnv)
-	if !found {
-		path = "/tmp/tackle.db"
-	}
-
-	return
+func init() {
+	_ = Settings.Load()
 }
 
 //
 // Setup the DB and models.
 func Setup() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open(dbPath()), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(Settings.DB.Path), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}

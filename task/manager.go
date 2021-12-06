@@ -6,6 +6,7 @@ import (
 	"github.com/konveyor/tackle-hub/k8s"
 	crd "github.com/konveyor/tackle-hub/k8s/api/tackle/v1alpha1"
 	"github.com/konveyor/tackle-hub/model"
+	"github.com/konveyor/tackle-hub/settings"
 	"gorm.io/gorm"
 	batch "k8s.io/api/batch/v1"
 	core "k8s.io/api/core/v1"
@@ -27,6 +28,8 @@ const (
 const (
 	Namespace = k8s.Namespace
 )
+
+var Settings = &settings.Settings
 
 //
 // Manager provides task management.
@@ -243,10 +246,20 @@ func (r *Task) container() (container core.Container) {
 	container = core.Container{
 		Name:  "main",
 		Image: r.Image,
+		Env: []core.EnvVar {
+			{
+				Name: settings.EnvBaseURL,
+				Value: Settings.API.URL,
+			},
+			{
+				Name: settings.AddonSecret,
+				Value: Settings.Addon.Secret.Path,
+			},
+		},
 		VolumeMounts: []core.VolumeMount{
 			{
 				Name:      "hub",
-				MountPath: "/tmp/hub",
+				MountPath: path.Dir(Settings.Addon.Secret.Path),
 			},
 		},
 	}
@@ -268,7 +281,7 @@ func (r *Task) secret() (secret core.Secret) {
 			Labels: r.labels(),
 		},
 		Data: map[string][]byte{
-			"hub.json": encoded,
+			path.Base(Settings.Addon.Secret.Path): encoded,
 		},
 	}
 
