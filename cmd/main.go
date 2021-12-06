@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/tackle-hub/api"
 	"github.com/konveyor/tackle-hub/k8s"
@@ -14,23 +13,21 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"log"
 	"os"
-	"path"
 )
 
 const (
-	DatabasePathEnv  = "TACKLE_HUB_DB_PATH"
-	DatabaseFileName = "tackle-hub.sqlite"
+	DatabasePathEnv  = "DB_PATH"
 )
 
 //
 // dbPath builds DB path.
-func dbPath() string {
-	dir, found := os.LookupEnv(DatabasePathEnv)
+func dbPath() (path string) {
+	path, found := os.LookupEnv(DatabasePathEnv)
 	if !found {
-		log.Fatal(fmt.Sprintf("%s not set, aborting.", DatabasePathEnv))
+		path = "/tmp/tackle.db"
 	}
 
-	return path.Join(dir, DatabaseFileName)
+	return
 }
 
 //
