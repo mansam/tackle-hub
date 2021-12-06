@@ -4,6 +4,7 @@ COPY . .
 RUN make addon
 
 FROM registry.access.redhat.com/ubi8-micro
+RUN microdnf -y install findutils && microdnf clean all
 COPY --from=builder /opt/app-root/src/bin/addon /usr/local/bin/addon
 ENTRYPOINT ["/usr/local/bin/addon"]
 

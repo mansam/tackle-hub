@@ -6,7 +6,6 @@ import (
 	hub "github.com/konveyor/tackle-hub/addon"
 	"os"
 	"os/exec"
-	"path"
 	"strings"
 	"time"
 )
@@ -68,20 +67,24 @@ func pause() {
 //
 // list directory.
 func list() (paths []string, err error) {
-	dir := "/var/log"
-	cmd := exec.Command("ls", dir)
+	cmd := exec.Command(
+		"find",
+		"/etc",
+		"-maxdepth",
+		"1",
+		"-type",
+		"f")
 	var stdout bytes.Buffer
+	var stderr bytes.Buffer
 	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
+		fmt.Println(stderr.String())
 		return
 	}
-	files := strings.Fields(stdout.String())
-	for _, name := range files {
-		paths = append(
-			paths,
-			path.Join(dir, name))
-	}
+
+	paths = strings.Fields(stdout.String())
 
 	fmt.Printf("Listed: %v", paths)
 
