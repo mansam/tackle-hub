@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/konveyor/controller/pkg/logging"
 	"github.com/konveyor/tackle-hub/api"
 	"github.com/konveyor/tackle-hub/k8s"
 	crd "github.com/konveyor/tackle-hub/k8s/api"
@@ -12,11 +13,11 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"k8s.io/client-go/kubernetes/scheme"
-	"log"
-	"os"
 )
 
 var Settings = &settings.Settings
+
+var log = logging.WithName("hub")
 
 func init() {
 	_ = Settings.Load()
@@ -24,10 +25,10 @@ func init() {
 
 //
 // Setup the DB and models.
-func Setup() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open(Settings.DB.Path), &gorm.Config{})
+func Setup() (db *gorm.DB, err error) {
+	db, err = gorm.Open(sqlite.Open(Settings.DB.Path), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	err = db.AutoMigrate(
 		&model.Application{},
@@ -42,31 +43,38 @@ func Setup() *gorm.DB {
 		&model.TaskReport{},
 		&model.Task{})
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 
-	return db
+	return
 }
 
 //
 // buildScheme adds CRDs to the k8s scheme.
-func buildScheme() {
-	err := crd.AddToScheme(scheme.Scheme)
-	if err != nil {
-		log.Fatal(err, "Add CRD failed.")
-		os.Exit(1)
-	}
+func buildScheme() (err error) {
+	err = crd.AddToScheme(scheme.Scheme)
+	return
 }
 
 //
 // main.
 func main() {
-	buildScheme()
+	log.Info("Started", "settings", Settings)
+	var err error
+	defer func() {
+		if err != nil {
+			log.Trace(err)
+		}
+	}()
+	err = buildScheme()
+	if err != nil {
+		return
+	}
 	client, err := k8s.NewClient()
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
-	db := Setup()
+	db, err := Setup()
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
@@ -97,7 +105,4 @@ func main() {
 	}
 	taskManager.Run(context.Background())
 	err = router.Run()
-	if err != nil {
-		log.Fatal(err)
-	}
 }

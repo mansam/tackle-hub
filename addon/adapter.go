@@ -153,7 +153,7 @@ func (h *Adapter) putReport() (err error) {
 }
 
 //
-// newHub builds a new Addon Adapter object.
+// newAdapter builds a new Addon Adapter object.
 func newAdapter() (adapter *Adapter) {
 	adapter = &Adapter{}
 	// base URL

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	hub "github.com/konveyor/tackle-hub/addon"
 	"os"
 	"os/exec"
@@ -15,12 +16,13 @@ const (
 )
 
 var (
-	addon    = hub.Addon
+	addon = hub.Addon
 )
 
 //
 // main
 func main() {
+	fmt.Printf("Started.")
 	_ = addon.Started()
 	paths, err := list()
 	if err != nil {
@@ -80,6 +82,8 @@ func list() (paths []string, err error) {
 			paths,
 			path.Join(dir, name))
 	}
+
+	fmt.Printf("Listed: %v", paths)
 
 	return
 }
