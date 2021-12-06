@@ -18,9 +18,9 @@ type Hub struct {
 
 func (r *Hub) Load() (err error) {
 	var found bool
-	r.DB.Path, found = os.LookupEnv(EnvNamespace)
+	r.Namespace, found = os.LookupEnv(EnvNamespace)
 	if !found {
-		r.DB.Path = "tackle-hub"
+		r.Namespace = "tackle-hub"
 	}
 	r.DB.Path, found = os.LookupEnv(EnvDbPath)
 	if !found {
