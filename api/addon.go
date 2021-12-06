@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/konveyor/tackle-hub/k8s"
 	crd "github.com/konveyor/tackle-hub/k8s/api/tackle/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"net/http"
@@ -38,7 +37,7 @@ func (h AddonHandler) Get(ctx *gin.Context) {
 	err := h.Client.Get(
 		context.TODO(),
 		client.ObjectKey{
-			Namespace: k8s.Namespace,
+			Namespace: Settings.Hub.Namespace,
 			Name:      name,
 		},
 		addon)

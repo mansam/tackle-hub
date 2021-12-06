@@ -6,10 +6,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 )
 
-const (
-	Namespace = "tackle-hub"
-)
-
 //
 // NewClient builds new k8s client.
 func NewClient() (newClient client.Client, err error) {

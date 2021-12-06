@@ -3,7 +3,6 @@ package task
 import (
 	"context"
 	"encoding/json"
-	"github.com/konveyor/tackle-hub/k8s"
 	crd "github.com/konveyor/tackle-hub/k8s/api/tackle/v1alpha1"
 	"github.com/konveyor/tackle-hub/model"
 	"github.com/konveyor/tackle-hub/settings"
@@ -23,10 +22,6 @@ const (
 	Succeeded = "Succeeded"
 	Failed = "Failed"
 	Running = "Running"
-)
-
-const (
-	Namespace = k8s.Namespace
 )
 
 var Settings = &settings.Settings
@@ -152,7 +147,7 @@ func (r *Task) Reflect() (err error) {
 		context.TODO(),
 		&client.ListOptions{
 			LabelSelector: labels.SelectorFromSet(r.labels()),
-			Namespace:     Namespace,
+			Namespace:     Settings.Hub.Namespace,
 		},
 		&list)
 	if err != nil {
@@ -188,7 +183,7 @@ func (r *Task) findAddon(name string) (addon *crd.Addon, err error) {
 	err = r.client.Get(
 		context.TODO(),
 		client.ObjectKey{
-			Namespace: Namespace,
+			Namespace: Settings.Hub.Namespace,
 			Name: name,
 		},
 		addon)
@@ -206,7 +201,7 @@ func (r *Task) job(secret *core.Secret) (job batch.Job) {
 	job = batch.Job{
 		Spec: batch.JobSpec{Template: template},
 		ObjectMeta: meta.ObjectMeta{
-			Namespace: Namespace,
+			Namespace: Settings.Hub.Namespace,
 			GenerateName: strings.ToLower(r.Name) + "-",
 			Labels: r.labels(),
 		},
@@ -276,7 +271,7 @@ func (r *Task) secret() (secret core.Secret) {
 	encoded, _ := json.Marshal(data)
 	secret = core.Secret{
 		ObjectMeta: meta.ObjectMeta{
-			Namespace: Namespace,
+			Namespace: Settings.Hub.Namespace,
 			GenerateName: strings.ToLower(r.Name) + "-",
 			Labels: r.labels(),
 		},
@@ -300,6 +295,7 @@ func (r *Task) labels() map[string]string {
 // Secret payload.
 type Secret struct {
 	Hub struct {
+		Token string
 		Task uint
 	}
 	Addon interface{}
