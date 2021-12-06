@@ -1,20 +1,28 @@
 ---
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: tackle-hub
   labels:
     app: tackle-hub
 spec:
-  serviceAccountName: tackle-hub
-  automountServiceAccountToken: true
-  containers:
-  - name: main
-    image: quay.io/jortel/tackle-hub:latest
-    env:
-      - name: "HUB_BASE_URL"
-        value: "http://tackle-hub.tackle-hub.svc.cluster.local"
-  restartPolicy: OnFailure
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tackle-hub
+  template:
+    metadata:
+      labels:
+        app: tackle-hub
+    spec:
+      serviceAccountName: tackle-hub
+      automountServiceAccountToken: true
+      containers:
+      - name: main
+        image: quay.io/jortel/tackle-hub:latest
+        env:
+          - name: "HUB_BASE_URL"
+            value: "http://tackle-hub.tackle-hub.svc.cluster.local"
 
 ---
 apiVersion: v1
