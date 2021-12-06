@@ -71,6 +71,7 @@ func (h StakeholderHandler) Get(ctx *gin.Context) {
 func (h StakeholderHandler) List(ctx *gin.Context) {
 	var count int64
 	var models []model.Stakeholder
+	h.DB.Model(model.Stakeholder{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(
@@ -78,7 +79,7 @@ func (h StakeholderHandler) List(ctx *gin.Context) {
 		"JobFunction",
 		"BusinessServices",
 		"Groups")
-	result := db.Find(&models).Count(&count)
+	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return

@@ -67,10 +67,11 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 func (h ReviewHandler) List(ctx *gin.Context) {
 	var count int64
 	var models []model.Review
+	h.DB.Model(model.Review{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Application")
-	result := db.Find(&models).Count(&count)
+	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return

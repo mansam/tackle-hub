@@ -203,7 +203,7 @@ func NewPagination(ctx *gin.Context) Pagination {
 	}
 	return Pagination{
 		Limit:  limit,
-		Offset: offset,
+		Offset: offset * limit,
 		Sort:   sort,
 	}
 }

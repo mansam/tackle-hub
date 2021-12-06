@@ -67,10 +67,11 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 func (h BusinessServiceHandler) List(ctx *gin.Context) {
 	var count int64
 	var models []model.BusinessService
+	h.DB.Model(model.BusinessService{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Stakeholder")
-	result := db.Find(&models).Count(&count)
+	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return

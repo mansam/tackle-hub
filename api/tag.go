@@ -67,10 +67,11 @@ func (h TagHandler) Get(ctx *gin.Context) {
 func (h TagHandler) List(ctx *gin.Context) {
 	var count int64
 	var models []model.Tag
+	h.DB.Model(model.Tag{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "TagType")
-	result := db.Find(&models).Count(&count)
+	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
