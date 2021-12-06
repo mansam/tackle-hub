@@ -3,7 +3,7 @@ ENV GOPATH=$APP_ROOT
 COPY . .
 RUN make addon
 
-FROM registry.access.redhat.com/ubi8-micro
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4
 RUN microdnf -y install findutils && microdnf clean all
 COPY --from=builder /opt/app-root/src/bin/addon /usr/local/bin/addon
 ENTRYPOINT ["/usr/local/bin/addon"]

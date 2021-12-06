@@ -1,3 +1,4 @@
+GOBIN ?= ${GOPATH}/bin
 
 # Run go fmt against code
 fmt:
