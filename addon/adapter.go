@@ -116,9 +116,17 @@ func (h *Adapter) Total(n int) (err error) {
 }
 
 //
+// Increment report addon completed (+1) items.
+func (h *Adapter) Increment() (err error) {
+	h.report.Completed++
+	err = h.putReport()
+	return
+}
+
+//
 // Completed report addon completed (N) items.
 func (h *Adapter) Completed(n int) (err error) {
-	h.report.Completed += n
+	h.report.Completed = n
 	err = h.putReport()
 	return
 }

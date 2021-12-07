@@ -68,7 +68,7 @@ func upload(paths []string) {
 		//
 		// Task update: Increment the number of completed
 		// items processed by the addon.
-		_ = addon.Completed(1)
+		_ = addon.Increment()
 	}
 	//
 	// Task update: update the current addon activity.
