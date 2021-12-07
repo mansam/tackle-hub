@@ -4,10 +4,13 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/controller/pkg/logging"
+	"github.com/konveyor/tackle-hub/settings"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
+
+var Settings = &settings.Settings
 
 var log = logging.WithName("api")
 
@@ -21,7 +24,8 @@ const (
 //
 // Params
 const (
-	ID = "id"
+	ID   = "id"
+	Name = "name"
 )
 
 //

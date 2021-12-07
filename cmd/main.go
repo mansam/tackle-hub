@@ -1,65 +1,86 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/konveyor/controller/pkg/logging"
 	"github.com/konveyor/tackle-hub/api"
+	"github.com/konveyor/tackle-hub/k8s"
+	crd "github.com/konveyor/tackle-hub/k8s/api"
 	"github.com/konveyor/tackle-hub/model"
+	"github.com/konveyor/tackle-hub/settings"
+	"github.com/konveyor/tackle-hub/task"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"log"
-	"os"
-	"path"
+	"k8s.io/client-go/kubernetes/scheme"
 )
 
-const (
-	DatabasePathEnv  = "TACKLE_HUB_DB_PATH"
-	DatabaseFileName = "tackle-hub.sqlite"
-)
+var Settings = &settings.Settings
 
-//
-// dbPath builds DB path.
-func dbPath() string {
-	dir, found := os.LookupEnv(DatabasePathEnv)
-	if !found {
-		log.Fatal(fmt.Sprintf("%s not set, aborting.", DatabasePathEnv))
-	}
+var log = logging.WithName("hub")
 
-	return path.Join(dir, DatabaseFileName)
+func init() {
+	_ = Settings.Load()
 }
 
 //
 // Setup the DB and models.
-func Setup() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open(dbPath()), &gorm.Config{})
+func Setup() (db *gorm.DB, err error) {
+	db, err = gorm.Open(sqlite.Open(Settings.DB.Path), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	err = db.AutoMigrate(
 		&model.Application{},
+		&model.Artifact{},
 		&model.Review{},
 		&model.BusinessService{},
 		&model.StakeholderGroup{},
 		&model.JobFunction{},
 		&model.Tag{},
 		&model.TagType{},
-		&model.Stakeholder{})
+		&model.Stakeholder{},
+		&model.TaskReport{},
+		&model.Task{})
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 
-	return db
+	return
+}
+
+//
+// buildScheme adds CRDs to the k8s scheme.
+func buildScheme() (err error) {
+	err = crd.AddToScheme(scheme.Scheme)
+	return
 }
 
 //
 // main.
 func main() {
-	db := Setup()
+	log.Info("Started", "settings", Settings)
+	var err error
+	defer func() {
+		if err != nil {
+			log.Trace(err)
+		}
+	}()
+	err = buildScheme()
+	if err != nil {
+		return
+	}
+	client, err := k8s.NewClient()
+	if err != nil {
+		return
+	}
+	db, err := Setup()
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	handlerList := []api.Handler{
 		&api.ApplicationHandler{},
+		&api.ArtifactHandler{},
 		&api.ReviewHandler{},
 		&api.BusinessServiceHandler{},
 		&api.StakeholderGroupHandler{},
@@ -67,13 +88,21 @@ func main() {
 		&api.TagHandler{},
 		&api.TagTypeHandler{},
 		&api.StakeholderHandler{},
+		&api.TaskHandler{
+			Client: client,
+		},
+		&api.AddonHandler{
+			Client: client,
+		},
 	}
 	for _, h := range handlerList {
 		h.With(db)
 		h.AddRoutes(router)
 	}
-	err := router.Run()
-	if err != nil {
-		log.Fatal(err)
+	taskManager := task.Manager{
+		Client: client,
+		DB:     db,
 	}
+	taskManager.Run(context.Background())
+	err = router.Run()
 }
