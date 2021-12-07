@@ -12,6 +12,7 @@ import (
 
 //
 // Client provides a REST client.
+// TODO: REPLACE WITH CLIENT IN controller/rest (TBD).
 type Client struct {
 	// baseURL for the nub.
 	baseURL string
