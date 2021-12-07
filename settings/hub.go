@@ -1,6 +1,8 @@
 package settings
 
-import "os"
+import (
+	"os"
+)
 
 const (
 	EnvNamespace = "NAMESPACE"
@@ -18,13 +20,34 @@ type Hub struct {
 
 func (r *Hub) Load() (err error) {
 	var found bool
-	r.Namespace, found = os.LookupEnv(EnvNamespace)
-	if !found {
-		r.Namespace = "tackle-hub"
+	r.Namespace, err = r.namespace()
+	if err != nil {
+		return
 	}
 	r.DB.Path, found = os.LookupEnv(EnvDbPath)
 	if !found {
 		r.DB.Path = "/tmp/tackle.db"
+	}
+
+	return
+}
+
+//
+// namespace determines the namespace.
+func (r *Hub) namespace() (ns string, err error) {
+	ns, found := os.LookupEnv(EnvNamespace)
+	if found {
+		return
+	}
+	path := "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
+	b, err := os.ReadFile(path)
+	if err == nil {
+		ns = string(b)
+		return
+	}
+	if os.IsNotExist(err) {
+		ns = "tackle-operator"
+		err = nil
 	}
 
 	return

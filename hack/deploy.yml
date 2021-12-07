@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tackle-hub
+  name: tackle-operator
   labels:
     app: tackle-hub
 spec:
@@ -22,13 +23,16 @@ spec:
         image: quay.io/jortel/tackle-hub:latest
         env:
           - name: "HUB_BASE_URL"
-            value: "http://tackle-hub.tackle-hub.svc.cluster.local"
+            value: "http://tackle-hub.tackle-operator.svc.cluster.local"
+          - name: "SECRET_PATH"
+            value: "/var/run/secrets/konveyor.io/tackle/addon.json"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: tackle-hub
+  name: tackle-operator
 spec:
   selector:
     app: tackle-hub
@@ -42,6 +46,7 @@ apiVersion: v1
 kind: Route
 metadata:
   name: tackle-hub
+  name: tackle-operator
 spec:
   host: konveyor-tackle-hub.apps.cluster-jortel.v2v.bos.redhat.com
   to:
