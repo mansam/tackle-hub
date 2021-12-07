@@ -55,8 +55,15 @@ func (h *Adapter) Data() (d map[string]interface{}) {
 }
 
 //
-// Application provides the application
-// to be processed by the addon.
+// DataWith populates the addon data object.
+func (h *Adapter) DataWith(object interface{}) (err error) {
+	b, _ := json.Marshal(h.secret.Addon)
+	err = json.Unmarshal(b, object)
+	return
+}
+
+//
+// Application get an application by ID.
 func (h *Adapter) Application(id int) (m *model.Application, err error) {
 	m = &model.Application{}
 	err = h.client.Get(

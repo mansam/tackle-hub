@@ -15,6 +15,7 @@ const (
 )
 
 var (
+	// addon adapter.
 	addon = hub.Addon
 )
 
@@ -34,25 +35,14 @@ func main() {
 }
 
 //
-// application returns the application ID
-// specified in the secret.
-func application() (id uint) {
-	value := addon.Data()["application"]
-	if f, cast := value.(float64); cast {
-		id = uint(f)
-	}
-
-	return
-}
-
-//
 // upload artifacts.
 func upload(paths []string) {
+	d := &Data{}
+	_ = addon.DataWith(d)
 	_ = addon.Total(len(paths))
-	id := application()
 	for _, p := range paths {
 		_ = addon.Activity("uploading: ", p)
-		_ = addon.Upload(id, Kind, p)
+		_ = addon.Upload(d.Application, Kind, p)
 		pause()
 		_ = addon.Completed(1)
 	}
@@ -89,4 +79,10 @@ func list() (paths []string, err error) {
 	fmt.Printf("Listed: %v", paths)
 
 	return
+}
+
+//
+// Data Addon data passed in the secret.
+type Data struct {
+	Application uint `json:"application"`
 }
