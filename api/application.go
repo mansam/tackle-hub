@@ -77,7 +77,7 @@ func (h ApplicationHandler) List(ctx *gin.Context) {
 	h.DB.Model(model.Application{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
-	db = h.BaseHandler.preLoad(
+	db = h.preLoad(
 		db,
 		"Tags",
 		"Review",

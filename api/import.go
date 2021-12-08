@@ -127,70 +127,13 @@ func (h *UploadHandler) importFromRow(fileName string, row []string) (app *model
 	}
 
 	for i := 5; i < len(row); i++ {
-		switch i {
-		case 6:
-			app.Tag1 = row[i-1]
-			app.TagType1 = row[i]
-		case 8:
-			app.Tag1 = row[i-1]
-			app.TagType1 = row[i]
-		case 10:
-			app.Tag2 = row[i-1]
-			app.TagType2 = row[i]
-		case 12:
-			app.Tag3 = row[i-1]
-			app.TagType3 = row[i]
-		case 14:
-			app.Tag4 = row[i-1]
-			app.TagType4 = row[i]
-		case 16:
-			app.Tag5 = row[i-1]
-			app.TagType5 = row[i]
-		case 18:
-			app.Tag6 = row[i-1]
-			app.TagType6 = row[i]
-		case 20:
-			app.Tag7 = row[i-1]
-			app.TagType7 = row[i]
-		case 22:
-			app.Tag8 = row[i-1]
-			app.TagType8 = row[i]
-		case 24:
-			app.Tag9 = row[i-1]
-			app.TagType9 = row[i]
-		case 26:
-			app.Tag10 = row[i-1]
-			app.TagType10 = row[i]
-		case 28:
-			app.Tag11 = row[i-1]
-			app.TagType11 = row[i]
-		case 30:
-			app.Tag12 = row[i-1]
-			app.TagType12 = row[i]
-		case 32:
-			app.Tag13 = row[i-1]
-			app.TagType13 = row[i]
-		case 34:
-			app.Tag13 = row[i-1]
-			app.TagType13 = row[i]
-		case 36:
-			app.Tag14 = row[i-1]
-			app.TagType14 = row[i]
-		case 38:
-			app.Tag15 = row[i-1]
-			app.TagType15 = row[i]
-		case 40:
-			app.Tag16 = row[i-1]
-			app.TagType16 = row[i]
-		case 42:
-			app.Tag17 = row[i-1]
-			app.TagType18 = row[i]
-		case 44:
-			app.Tag19 = row[i-1]
-			app.TagType19 = row[i]
-		case 46:
-			app.Tag20 = row[i-1]
-			app.TagType20 = row[i]
+		if i%2 == 0 {
+			tag := model.ImportTag{
+				Name:    row[i-1],
+				TagType: row[i],
+				Order:   uint(i - 5),
+			}
+			app.ImportTags = append(app.ImportTags, tag)
 		}
 	}
 
@@ -214,6 +157,7 @@ func (h SummaryHandler) List(ctx *gin.Context) {
 	h.DB.Model(model.ImportSummary{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
+	db = h.preLoad(db, "ApplicationImports")
 	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
@@ -234,7 +178,8 @@ func (h SummaryHandler) List(ctx *gin.Context) {
 func (h SummaryHandler) Get(ctx *gin.Context) {
 	m := &model.ImportSummary{}
 	id := ctx.Param(ID)
-	result := h.DB.First(m, id)
+	db := h.preLoad(h.DB, "ApplicationImports")
+	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
@@ -267,28 +212,36 @@ func (h ImportHandler) AddRoutes(e *gin.Engine) {
 func (h ImportHandler) Get(ctx *gin.Context) {
 	m := &model.ApplicationImport{}
 	id := ctx.Param(ID)
-	result := h.DB.First(m, id)
+	db := h.preLoad(h.DB, "ImportTags")
+	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
-	ctx.JSON(http.StatusOK, m)
+	ctx.JSON(http.StatusOK, m.AsMap())
 }
 
 func (h ImportHandler) List(ctx *gin.Context) {
 	var count int64
 	var models []model.ApplicationImport
-	h.DB.Model(model.ApplicationImport{}).Count(&count)
+	summaryId := ctx.Query("importSummary.id")
+	db := h.DB.Where("import_summary_id = ? AND is_valid = false", summaryId)
+	db.Model(model.ApplicationImport{}).Count(&count)
 	pagination := NewPagination(ctx)
-	db := pagination.apply(h.DB)
+	db = pagination.apply(db)
+	db = h.preLoad(db, "ImportTags")
 	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
+	resources := []map[string]interface{}{}
+	for i := range models {
+		resources = append(resources, models[i].AsMap())
+	}
 
 	list := List{}
-	list.With(ImportKind, models, int(count))
+	list.With(ImportKind, resources, int(count))
 	h.hal(ctx, http.StatusOK, list)
 }
 
@@ -312,23 +265,41 @@ func (h ExportHandler) AddRoutes(e *gin.Engine) {
 }
 
 func (h ExportHandler) Get(ctx *gin.Context) {
-	id := ctx.Query("importSummaryId")
+	summaryId := ctx.Query("importSummary.id")
 	imports := &[]model.ApplicationImport{}
-	result := h.DB.Find(imports).Where("import_summary_id = ?", id)
+	result := h.DB.Find(imports).Where("import_summary_id = ?", summaryId)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
-	// TODO: find csv file on disk and return it.
+	// TODO:
 	ctx.Status(http.StatusNoContent)
 }
 
 type ImportSummary struct {
 	model.ImportSummary
-	ImportTime time.Time `json:"importTime"`
+	ImportTime   time.Time `json:"importTime"`
+	ValidCount   int       `json:"validCount"`
+	InvalidCount int       `json:"invalidCount"`
 }
 
 func (r *ImportSummary) With(m *model.ImportSummary) {
 	r.ImportSummary = *m
 	r.ImportTime = m.CreateTime
+	for _, imp := range r.ApplicationImports {
+		if imp.Processed {
+			if imp.IsValid {
+				r.ValidCount++
+			} else {
+				r.InvalidCount++
+			}
+		}
+	}
+	if len(r.ApplicationImports) == r.InvalidCount {
+		r.ImportStatus = "Failed"
+	} else if len(r.ApplicationImports) == r.ValidCount+r.InvalidCount {
+		r.ImportStatus = "Completed"
+	} else {
+		r.ImportStatus = "In Progress"
+	}
 }

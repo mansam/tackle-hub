@@ -36,6 +36,7 @@ func Setup() (db *gorm.DB, err error) {
 		&model.Artifact{},
 		&model.ApplicationImport{},
 		&model.ImportSummary{},
+		&model.ImportTag{},
 		&model.Review{},
 		&model.BusinessService{},
 		&model.StakeholderGroup{},
