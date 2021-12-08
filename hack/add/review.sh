@@ -1,6 +1,6 @@
 #!/bin/bash
 
-host="localhost:8080"
+host="${HOST:-localhost:8080}"
 
 curl -X POST ${host}/application-inventory/review -d \
 '{

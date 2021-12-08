@@ -1,13 +1,16 @@
 #!/bin/bash
 
-host="localhost:8080"
+host="${HOST:-localhost:8080}"
 
-curl -X PUT ${host}/tasks/1/report -d \
+# ID to update (default:1)
+id="${1:-1}"
+
+
+curl -X PUT ${host}/tasks/${id}/report -d \
 '{
-    "createUser": "tackle",
     "updateUser": "tackle",
     "status": "Running",
     "total": 10,
     "completed": 9,
-    "detail": "reading /files/application/dog.java."
+    "activity": "reading /files/application/dog.java."
 }'

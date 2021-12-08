@@ -1,6 +1,9 @@
 #!/bin/bash
 
-host="localhost:8080"
+host="${HOST:-localhost:8080}"
 
-curl -X DELETE ${host}/tasks/1
+# ID to delete (default:1)
+id="${1:-1}"
+
+curl -X DELETE ${host}/tasks/${id}
 

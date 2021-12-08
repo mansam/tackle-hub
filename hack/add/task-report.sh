@@ -1,13 +1,15 @@
 #!/bin/bash
 
-host="localhost:8080"
+host="${HOST:-localhost:8080}"
 
-curl -X POST ${host}/tasks/1/report -d \
+# ID to update (default:1)
+id="${1:-1}"
+
+curl -X POST ${host}/tasks/${id}/report -d \
 '{
-    "createUser": "tackle",
     "updateUser": "tackle",
     "status": "Running",
     "total": 10,
     "completed": 0,
-    "detail": "addon started."
+    "activity": "addon started."
 }'
