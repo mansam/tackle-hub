@@ -9,6 +9,7 @@ curl -X POST ${host}/tasks -d \
     "name":"Test",
     "addon": "test",
     "data": {
-      "application": 1
+      "application": 1,
+      "path": "/etc"
     }
 }'

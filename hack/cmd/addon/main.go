@@ -38,13 +38,10 @@ func main() {
 	_ = addon.DataWith(d)
 	//
 	// Find files.
-	paths, _ := find()
+	paths, _ := find(d.Path)
 	//
 	// Upload files and create artifacts.
 	upload(d, paths)
-	//
-	// Tag application.
-	// tag(d)
 	//
 	// Task update: The addon has succeeded.
 	_ = addon.Succeeded()
@@ -86,10 +83,11 @@ func pause() {
 
 //
 // find files.
-func find() (paths []string, err error) {
+func find(path string) (paths []string, err error) {
+	fmt.Printf("Listing: %s", path)
 	cmd := exec.Command(
 		"find",
-		"/etc",
+		path,
 		"-maxdepth",
 		"1",
 		"-type",
@@ -136,4 +134,5 @@ func tag(d *Data) {
 // Data Addon data passed in the secret.
 type Data struct {
 	Application uint `json:"application"`
+	Path string `json:"path"`
 }
