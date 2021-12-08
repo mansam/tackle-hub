@@ -12,4 +12,4 @@ curl -X POST ${host}/tasks -d \
       "application": 1,
       "path": "/etc"
     }
-}'
+}' | jq -M .

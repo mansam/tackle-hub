@@ -6,5 +6,5 @@ curl -X POST ${host}/addons/test/tasks -d \
 '{
    "application": 1,
    "path": "/etc"
-}'
+}' | jq -M . 
 
