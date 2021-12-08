@@ -10,4 +10,4 @@ curl -X POST ${host}/controls/business-service -d \
     "owner": {
       "id": 1
     }
-}'
+}' | jq -M .

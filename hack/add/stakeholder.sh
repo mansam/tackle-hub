@@ -12,4 +12,4 @@ curl -X POST ${host}/controls/stakeholder -d \
     "jobFunction" : {
       "id": 1
     }
-}'
+}' | jq -M .

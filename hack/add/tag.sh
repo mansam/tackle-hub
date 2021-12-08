@@ -13,7 +13,7 @@ curl -X POST ${host}/controls/tag-type -d \
     "name":"Testing",
     "colour": "#807ded",
     "rank": 0
-}'
+}' | jq -M .
 
 curl -X POST ${host}/controls/tag-type -d \
 '{
@@ -22,7 +22,7 @@ curl -X POST ${host}/controls/tag-type -d \
     "name":"Operating System",
     "colour": "#807ded",
     "rank": 10
-}'
+}' | jq -M .
 
 curl -X POST ${host}/controls/tag-type -d \
 '{
@@ -31,7 +31,7 @@ curl -X POST ${host}/controls/tag-type -d \
     "name":"Database",
     "colour": "#8aed7d",
     "rank": 20
-}'
+}' | jq -M .
 
 curl -X POST ${host}/controls/tag-type -d \
 '{
@@ -40,7 +40,7 @@ curl -X POST ${host}/controls/tag-type -d \
     "name":"Language",
     "colour": "#ede97d",
     "rank": 30
-}'
+}' | jq -M .
 
 #
 # Tags
@@ -52,7 +52,7 @@ curl -X POST ${host}/controls/tag -d \
     "username": "tackle",
     "name":"RHEL",
     "tagType": {"id":1}
-}'
+}' | jq -M .
 
 curl -X POST ${host}/controls/tag -d \
 '{
@@ -60,7 +60,7 @@ curl -X POST ${host}/controls/tag -d \
     "username": "tackle",
     "name":"PostgreSQL",
     "tagType": {"id":2}
-}'
+}' | jq -M .
 
 curl -X POST ${host}/controls/tag -d \
 '{
@@ -68,7 +68,7 @@ curl -X POST ${host}/controls/tag -d \
     "username": "tackle",
     "name":"C++",
     "tagType": {"id":3}
-}'
+}' | jq -M .
 
 curl -X POST ${host}/controls/tag -d \
 '{
@@ -82,7 +82,7 @@ curl -X POST ${host}/controls/tag -d \
       "colour": "#0000",
       "rank": 40
     }
-}'
+}' | jq -M .
 
 curl -X POST ${host}/controls/tag -d \
 '{
@@ -97,4 +97,5 @@ curl -X POST ${host}/controls/tag -d \
       "colour": "#66666",
       "rank": 40
     }
-}'
+}' | jq -M .
+

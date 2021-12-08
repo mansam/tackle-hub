@@ -8,4 +8,4 @@ curl -X POST ${host}/controls/stakeholder-group -d \
     "name": "Big Dogs",
     "username": "tackle",
     "description": "Group of big dogs."
-}'
+}' | jq -M .

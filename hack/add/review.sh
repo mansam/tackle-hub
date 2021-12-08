@@ -13,4 +13,4 @@ curl -X POST ${host}/application-inventory/review -d \
     "application": {
       "id": 1
     }
-}'
+}' | jq -M .

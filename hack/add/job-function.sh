@@ -7,4 +7,4 @@ curl -X POST ${host}/controls/job-function -d \
     "createUser": "tackle",
     "username": "tackle",
     "role": "Administrator"
-}'
+}' | jq -M .

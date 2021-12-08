@@ -12,4 +12,4 @@ curl -X POST ${host}/tasks/${id}/report -d \
     "total": 10,
     "completed": 0,
     "activity": "addon started."
-}'
+}' | jq -M .

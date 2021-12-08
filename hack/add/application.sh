@@ -12,4 +12,4 @@ curl -X POST ${host}/application-inventory/application -d \
       "1",
       "2"
     ]
-}'
+}' | jq -M .
