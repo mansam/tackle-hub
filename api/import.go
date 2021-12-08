@@ -324,8 +324,6 @@ func (h ExportHandler) Get(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
-
-
 type ImportSummary struct {
 	model.ImportSummary
 	ImportTime time.Time `json:"importTime"`
