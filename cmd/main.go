@@ -33,6 +33,8 @@ func Setup() (db *gorm.DB, err error) {
 	err = db.AutoMigrate(
 		&model.Application{},
 		&model.Artifact{},
+		&model.ApplicationImport{},
+		&model.ImportSummary{},
 		&model.Review{},
 		&model.BusinessService{},
 		&model.StakeholderGroup{},
@@ -94,6 +96,10 @@ func main() {
 		&api.AddonHandler{
 			Client: client,
 		},
+		&api.UploadHandler{},
+		&api.ImportHandler{},
+		&api.ExportHandler{},
+		&api.SummaryHandler{},
 	}
 	for _, h := range handlerList {
 		h.With(db)

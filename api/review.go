@@ -92,13 +92,14 @@ func (h ReviewHandler) List(ctx *gin.Context) {
 // @router /application-inventory/review [post]
 // @param review body model.Review true "Review data"
 func (h ReviewHandler) Create(ctx *gin.Context) {
-	model := model.Review{}
-	err := ctx.BindJSON(&model)
+	review := UnmarshalledReview{}
+	err := ctx.BindJSON(&review)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
-	result := h.DB.Create(&model)
+	model := review.Model()
+	result := h.DB.Create(model)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
@@ -122,7 +123,7 @@ func (h ReviewHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -137,17 +138,47 @@ func (h ReviewHandler) Delete(ctx *gin.Context) {
 // @param review body model.Review true "Review data"
 func (h ReviewHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := model.Review{}
-	err := ctx.BindJSON(&updates)
+	review := UnmarshalledReview{}
+	err := ctx.BindJSON(&review)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
+	updates := review.Model()
 	result := h.DB.Model(&model.Review{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
+}
+
+//
+// Review request struct.
+type UnmarshalledReview struct {
+	BusinessCriticality uint   `json:"businessCriticality"`
+	EffortEstimate      string `json:"effortEstimate"`
+	ProposedAction      string `json:"proposedAction"`
+	WorkPriority        uint   `json:"workPriority"`
+	Comments            string `json:"comments"`
+	Application         *struct {
+		ID uint `json:"id"`
+	} `json:"application"`
+}
+
+//
+// Model builds a model.
+func (r *UnmarshalledReview) Model() (m *model.Review) {
+	m = &model.Review{
+		BusinessCriticality: r.BusinessCriticality,
+		EffortEstimate:      r.EffortEstimate,
+		ProposedAction:      r.ProposedAction,
+		WorkPriority:        r.WorkPriority,
+		Comments:            r.Comments,
+	}
+	if r.Application != nil {
+		m.ApplicationID = r.Application.ID
+	}
+	return
 }
