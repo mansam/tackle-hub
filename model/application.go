@@ -92,4 +92,10 @@ type ApplicationImport struct {
 	TagType20           string        `json:"tagType20"`
 	ImportSummary       ImportSummary `json:"-"`
 	ImportSummaryID     uint          `json:"-"`
+	Processed           bool          `json:"-"`
+	Tags              []Tag            `json:"tags" gorm:"many2many:applicationTags"`
+}
+
+func (r *ApplicationImport) AsApplication() (app Application) {
+	return
 }

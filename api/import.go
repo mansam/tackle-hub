@@ -61,8 +61,17 @@ func (h UploadHandler) Create(ctx *gin.Context) {
 	if err != nil {
 		ctx.Status(http.StatusBadRequest)
 	}
-	valid := 0
-	invalid := 0
+
+	m := model.ImportSummary{
+		Filename:     fileName,
+		ImportStatus: "In Progress",
+	}
+	result := h.DB.Create(&m)
+	if result.Error != nil {
+		h.createFailed(ctx, result.Error)
+		return
+	}
+
 	for {
 		row, err := reader.Read()
 		if err != nil {
@@ -83,25 +92,15 @@ func (h UploadHandler) Create(ctx *gin.Context) {
 				Filename:    fileName,
 				RecordType1: row[0],
 			}
-			invalid++
 		}
+		imp.ImportSummary = m
 		result := h.DB.Create(imp)
 		if result.Error != nil {
 			h.createFailed(ctx, result.Error)
 			return
 		}
 	}
-	m := model.ImportSummary{
-		Filename:     fileName,
-		ValidCount:   valid,
-		InvalidCount: invalid,
-		ImportStatus: "In Progress",
-	}
-	result := h.DB.Create(&m)
-	if result.Error != nil {
-		h.createFailed(ctx, result.Error)
-		return
-	}
+
 	summary := ImportSummary{}
 	summary.With(&m)
 	ctx.JSON(http.StatusCreated, summary)

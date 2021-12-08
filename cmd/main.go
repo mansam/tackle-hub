@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/controller/pkg/logging"
 	"github.com/konveyor/tackle-hub/api"
+	"github.com/konveyor/tackle-hub/importer"
 	"github.com/konveyor/tackle-hub/k8s"
 	crd "github.com/konveyor/tackle-hub/k8s/api"
 	"github.com/konveyor/tackle-hub/model"
@@ -110,5 +111,9 @@ func main() {
 		DB:     db,
 	}
 	taskManager.Run(context.Background())
+	importManager := importer.Manager{
+		DB: db,
+	}
+	importManager.Run(context.Background())
 	err = router.Run()
 }
