@@ -10,6 +10,15 @@ curl -X POST ${host}/controls/tag-type -d \
 '{
     "createUser": "tackle",
     "username": "tackle",
+    "name":"Testing",
+    "colour": "#807ded",
+    "rank": 0
+}'
+
+curl -X POST ${host}/controls/tag-type -d \
+'{
+    "createUser": "tackle",
+    "username": "tackle",
     "name":"Operating System",
     "colour": "#807ded",
     "rank": 10

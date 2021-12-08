@@ -6,15 +6,10 @@ package addon
 
 import (
 	"encoding/json"
-	"github.com/konveyor/tackle-hub/api"
-	"github.com/konveyor/tackle-hub/model"
 	"github.com/konveyor/tackle-hub/settings"
 	"github.com/konveyor/tackle-hub/task"
 	"net/http"
 	"os"
-	pathlib "path"
-	"strconv"
-	"strings"
 )
 
 var Settings = settings.Settings
@@ -24,21 +19,26 @@ var Settings = settings.Settings
 var Addon *Adapter
 
 func init() {
-	_ = Settings.Load()
+	err := Settings.Load()
+	if err != nil {
+		panic(err)
+	}
+
 	Addon = newAdapter()
 }
 
 //
 // The Adapter provides hub/addon integration.
 type Adapter struct {
-	// baseURL for the API.
-	baseURL string
-	// secret
-	secret task.Secret
+	Task
+	// Application API.
+	Application Application
+	// Artifact API.
+	Artifact Artifact
+	// Tag API.
+	Tag Tag
 	// client A REST client.
 	client *Client
-	// Task report.
-	report model.TaskReport
 }
 
 //
@@ -48,144 +48,39 @@ func (h *Adapter) Client() *Client {
 }
 
 //
-// Data returns the addon data.
-func (h *Adapter) Data() (d map[string]interface{}) {
-	d = h.secret.Addon.(map[string]interface{})
-	return
-}
-
-//
-// DataWith populates the addon data object.
-func (h *Adapter) DataWith(object interface{}) (err error) {
-	b, _ := json.Marshal(h.secret.Addon)
-	err = json.Unmarshal(b, object)
-	return
-}
-
-//
-// Application get an application by ID.
-func (h *Adapter) Application(id int) (m *model.Application, err error) {
-	m = &model.Application{}
-	err = h.client.Get(
-		pathlib.Join(
-			api.ApplicationsRoot,
-			strconv.Itoa(id)),
-		m)
-	return
-}
-
-//
-// Started report addon started.
-func (h *Adapter) Started() (err error) {
-	h.report.Status = task.Running
-	err = h.postReport()
-	return
-}
-
-//
-// Succeeded report addon succeeded.
-func (h *Adapter) Succeeded() (err error) {
-	h.report.Status = task.Succeeded
-	err = h.putReport()
-	return
-}
-
-//
-// Failed report addon failed.
-func (h *Adapter) Failed(reason string) (err error) {
-	h.report.Status = task.Failed
-	h.report.Error = reason
-	err = h.putReport()
-	return
-}
-
-//
-// Activity report addon activity.
-func (h *Adapter) Activity(word ...string) (err error) {
-	h.report.Activity = strings.Join(word, " ")
-	err = h.putReport()
-	return
-}
-
-//
-// Total report addon total items.
-func (h *Adapter) Total(n int) (err error) {
-	h.report.Total = n
-	err = h.postReport()
-	return
-}
-
-//
-// Increment report addon completed (+1) items.
-func (h *Adapter) Increment() (err error) {
-	h.report.Completed++
-	err = h.putReport()
-	return
-}
-
-//
-// Completed report addon completed (N) items.
-func (h *Adapter) Completed(n int) (err error) {
-	h.report.Completed = n
-	err = h.putReport()
-	return
-}
-
-//
-// Upload an artifact.
-func (h *Adapter) Upload(application uint, kind string, path string) (err error) {
-	artifact := &model.Artifact{}
-	artifact.CreateUser = "addon"
-	artifact.Name = pathlib.Base(path)
-	artifact.ApplicationID = application
-	artifact.Kind = kind
-	err = h.client.Post(api.ArtifactsRoot, artifact)
-	return
-}
-
-func (h *Adapter) postReport() (err error) {
-	taskID := strconv.Itoa(int(h.secret.Hub.Task))
-	h.report.CreateUser = "addon"
-	err = h.client.Post(
-		pathlib.Join(
-			api.TasksRoot,
-			taskID,
-			"report"),
-		&h.report)
-	return
-}
-
-func (h *Adapter) putReport() (err error) {
-	taskID := strconv.Itoa(int(h.secret.Hub.Task))
-	h.report.UpdateUser = "addon"
-	err = h.client.Put(
-		pathlib.Join(
-			api.TasksRoot,
-			taskID,
-			"report"),
-		&h.report)
-	return
-}
-
-//
 // newAdapter builds a new Addon Adapter object.
 func newAdapter() (adapter *Adapter) {
-	adapter = &Adapter{}
-	// base URL
-	adapter.baseURL = Settings.Addon.Hub.URL
 	// Load secret.
+	secret := &task.Secret{}
 	b, err := os.ReadFile(Settings.Addon.Secret.Path)
 	if err != nil {
 		panic(err)
 	}
-	err = json.Unmarshal(b, &adapter.secret)
+	err = json.Unmarshal(b, secret)
 	if err != nil {
 		panic(err)
 	}
-	// REST client.
-	adapter.client = &Client{
-		baseURL: adapter.baseURL,
+	// Build REST client.
+	client := &Client{
+		baseURL: Settings.Addon.Hub.URL,
 		http: &http.Client{},
+	}
+	// Build Adapter.
+	adapter = &Adapter{
+		Task: Task{
+			client: client,
+			secret: secret,
+		},
+		Application: Application{
+			client: client,
+		},
+		Artifact: Artifact{
+			client: client,
+		},
+		Tag: Tag{
+			client: client,
+		},
+		client: client,
 	}
 
 	return
