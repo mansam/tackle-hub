@@ -57,11 +57,41 @@ func (h *Artifact) Upload(application uint, kind string, path string) (err error
 	return
 }
 
+// TagType API.
+type TagType struct {
+	// hub API client.
+	client *Client
+}
+
+// List all tag types.
+func (h *TagType) List() (tagTypes []*model.TagType, err error) {
+        tagTypes = []*model.TagType{}
+        err = h.client.Get(api.TagTypesRoot, tagTypes)
+        return
+}
+
+//
+// Create a tag type.
+func (h *TagType) Create(name string) (tagType *model.TagType, err error) {
+	tagType = &model.TagType{}
+	tagType.Name = name
+	err = h.client.Post(api.TagTypesRoot, tagType)
+	return
+}
+
 //
 // Tag API.
 type Tag struct {
 	// hub API client.
 	client *Client
+}
+
+//
+// List all tags.
+func (h *Tag) List() (tags []*model.Tag, err error) {
+        tags = []*model.Tag{}
+        err = h.client.Get(api.TagsRoot, tags)
+        return
 }
 
 //
