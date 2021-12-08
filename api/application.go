@@ -120,7 +120,7 @@ func (h ApplicationHandler) Create(ctx *gin.Context) {
 	}
 	r.With(m)
 
-	ctx.JSON(http.StatusOK, r)
+	ctx.JSON(http.StatusCreated, r)
 }
 
 // Delete godoc

@@ -27,7 +27,7 @@ type Task struct {
 	Terminated *time.Time  `json:"terminated"`
 	Status     string      `json:"status"`
 	Error      string      `json:"error"`
-	Pod        string      `json:"pod"`
+	Job        string      `json:"job"`
 	Report     *TaskReport `json:"report"`
 }
 

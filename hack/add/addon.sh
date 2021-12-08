@@ -4,6 +4,11 @@ host="localhost:8080"
 
 curl -X POST ${host}/addons/test/tasks -d \
 '{
-    "application": 1
+    "createUser": "tackle",
+    "username": "tackle",
+    "name":"Test",
+    "data": {
+      "application": 1
+    }
 }'
 

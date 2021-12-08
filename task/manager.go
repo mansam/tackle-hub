@@ -9,8 +9,8 @@ import (
 	"gorm.io/gorm"
 	batch "k8s.io/api/batch/v1"
 	core "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"path"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strconv"
@@ -133,7 +133,7 @@ func (r *Task) Run() (err error) {
 	mark := time.Now()
 	r.Started = &mark
 	r.Status = Running
-	r.Pod = path.Join(
+	r.Job = path.Join(
 		job.Namespace,
 		job.Name)
 	return
@@ -142,23 +142,21 @@ func (r *Task) Run() (err error) {
 //
 // Reflect finds the associated job and updates the task status.
 func (r *Task) Reflect() (err error) {
-	list := batch.JobList{}
-	err = r.client.List(
+	job := &batch.Job{}
+	err = r.client.Get(
 		context.TODO(),
-		&client.ListOptions{
-			LabelSelector: labels.SelectorFromSet(r.labels()),
-			Namespace:     Settings.Hub.Namespace,
+		client.ObjectKey{
+			Namespace: path.Dir(r.Job),
+			Name: path.Base(r.Job),
 		},
-		&list)
+		job)
 	if err != nil {
-		return
-	}
-	if len(list.Items) == 0 {
-		err = r.Run()
+		if errors.IsNotFound(err) {
+			err = r.Run()
+		}
 		return
 	}
 	mark := time.Now()
-	job := list.Items[0]
 	status := job.Status
 	for _, cnd := range status.Conditions {
 		if cnd.Type == batch.JobFailed {

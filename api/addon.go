@@ -60,7 +60,9 @@ func (h AddonHandler) List(ctx *gin.Context) {
 	list := &crd.AddonList{}
 	err := h.Client.List(
 		context.TODO(),
-		nil,
+		&client.ListOptions{
+			Namespace: Settings.Namespace,
+		},
 		list)
 	if err != nil {
 		h.listFailed(ctx, err)

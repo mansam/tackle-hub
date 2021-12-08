@@ -26,6 +26,6 @@ type Artifact struct {
 	Model
 	Name          string `json:"name"`
 	Kind          string `json:"kind"`
-	Path          string `json:"path"`
+	Location      string `json:"location"`
 	ApplicationID uint   `json:"application"`
 }

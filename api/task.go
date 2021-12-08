@@ -5,8 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 	crd "github.com/konveyor/tackle-hub/k8s/api/tackle/v1alpha1"
 	"github.com/konveyor/tackle-hub/model"
+	batch "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"net/http"
+	"path"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strconv"
 )
@@ -156,7 +158,24 @@ func (h TaskHandler) AddonCreate(ctx *gin.Context) {
 // @param id path string true "Task ID"
 func (h TaskHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&model.Task{}, id)
+	task := &model.Task{}
+	result := h.DB.First(task, id)
+	if result.Error != nil {
+		h.deleteFailed(ctx, result.Error)
+		return
+	}
+	if task.Job != "" {
+		job := &batch.Job{}
+		job.Namespace = path.Dir(task.Job)
+		job.Name = path.Base(task.Job)
+		err := h.Client.Delete(
+			context.TODO(),
+			job)
+		if err != nil {
+			h.deleteFailed(ctx, result.Error)
+		}
+	}
+	result = h.DB.Delete(task, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return

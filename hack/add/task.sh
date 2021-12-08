@@ -8,5 +8,7 @@ curl -X POST ${host}/tasks -d \
     "username": "tackle",
     "name":"Test",
     "addon": "test",
-    "data": { "application": 1 }
+    "data": {
+      "application": 1
+    }
 }'

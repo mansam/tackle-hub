@@ -96,7 +96,7 @@ func (h ArtifactHandler) Create(ctx *gin.Context) {
 		return
 	}
 	uid := uuid.New()
-	artifact.Path = path.Join(
+	artifact.Location = path.Join(
 		"/var/tackle/artifact",
 		artifact.Name,
 		uid.String())

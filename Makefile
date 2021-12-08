@@ -1,5 +1,8 @@
 GOBIN ?= ${GOPATH}/bin
 
+# Build ALL commands.
+cmd: hub addon
+
 # Run go fmt against code
 fmt:
 	go fmt ./cmd/... ./api/... ./model/...

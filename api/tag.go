@@ -93,7 +93,7 @@ func (h TagHandler) Create(ctx *gin.Context) {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusCreated, model)
 }
 
 // Delete godoc

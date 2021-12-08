@@ -94,7 +94,7 @@ func (h StakeholderGroupHandler) Create(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusCreated, model)
 }
 
 // Delete godoc
