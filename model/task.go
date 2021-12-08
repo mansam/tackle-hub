@@ -8,12 +8,13 @@ import (
 
 type TaskReport struct {
 	Model
-	TaskID    uint   `json:"task"`
 	Status    string `json:"status"`
 	Error     string `json:"error"`
 	Total     int    `json:"total"`
 	Completed int    `json:"completed"`
 	Activity  string `json:"activity"`
+	TaskID    uint   `json:"task"`
+	Task      *Task  `json:"-" gorm:"constraint:OnDelete:CASCADE;"`
 }
 
 type Task struct {
