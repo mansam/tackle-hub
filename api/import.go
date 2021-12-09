@@ -110,6 +110,7 @@ func (h *UploadHandler) dependencyFromRow(fileName string, row []string) (app *m
 	app = &model.ApplicationImport{
 		Filename:            fileName,
 		RecordType1:         row[0],
+		ApplicationName:     row[1],
 		Dependency:          row[len(row)-2],
 		DependencyDirection: row[len(row)-1],
 	}
@@ -224,8 +225,17 @@ func (h ImportHandler) Get(ctx *gin.Context) {
 func (h ImportHandler) List(ctx *gin.Context) {
 	var count int64
 	var models []model.ApplicationImport
+	db := h.DB
 	summaryId := ctx.Query("importSummary.id")
-	db := h.DB.Where("import_summary_id = ? AND is_valid = false", summaryId)
+	isValid := ctx.Query("isValid")
+	if summaryId != "" {
+		db = db.Where("import_summary_id = ?", summaryId)
+	}
+	if isValid == "true" {
+		db = db.Where("is_valid")
+	} else if isValid == "false" {
+		db = db.Not("is_valid")
+	}
 	db.Model(model.ApplicationImport{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db = pagination.apply(db)
@@ -295,9 +305,7 @@ func (r *ImportSummary) With(m *model.ImportSummary) {
 			}
 		}
 	}
-	if len(r.ApplicationImports) == r.InvalidCount {
-		r.ImportStatus = "Failed"
-	} else if len(r.ApplicationImports) == r.ValidCount+r.InvalidCount {
+	if len(r.ApplicationImports) == r.ValidCount+r.InvalidCount {
 		r.ImportStatus = "Completed"
 	} else {
 		r.ImportStatus = "In Progress"

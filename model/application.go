@@ -1,6 +1,8 @@
 package model
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Application struct {
 	Model
@@ -11,6 +13,14 @@ type Application struct {
 	Tags              []Tag            `json:"tags" gorm:"many2many:applicationTags"`
 	BusinessServiceID uint             `json:"-"`
 	BusinessService   *BusinessService `json:"businessService"`
+}
+
+type Dependency struct {
+	Model
+	ToID   uint         `json:"to"`
+	To     *Application `json:"-" gorm:"foreignKey:to_id;constraint:OnDelete:CASCADE"`
+	FromID uint         `json:"from"`
+	From   *Application `json:"-" gorm:"foreignKey:from_id;constraint:OnDelete:CASCADE"`
 }
 
 type Review struct {
@@ -35,7 +45,7 @@ type Artifact struct {
 type ImportSummary struct {
 	Model
 	Filename           string              `json:"filename"`
-	ImportStatus       string              `json:"importStatus"`
+	ImportStatus       string              `json:"importStatus" gorm:"column:importStatus"`
 	ApplicationImports []ApplicationImport `json:"-"`
 }
 
@@ -52,7 +62,7 @@ type ApplicationImport struct {
 	IsValid             bool          `json:"isValid"`
 	RecordType1         string        `json:"recordType1"`
 	ImportSummary       ImportSummary `json:"-"`
-	ImportSummaryID     uint          `json:"-"`
+	ImportSummaryID     uint          `json:"-" gorm:"constraint:OnDelete:CASCADE"`
 	Processed           bool          `json:"-"`
 	ImportTags          []ImportTag   `json:"-"`
 }
@@ -61,6 +71,9 @@ func (r *ApplicationImport) AsMap() (m map[string]interface{}) {
 	m = make(map[string]interface{})
 	m["filename"] = r.Filename
 	m["applicationName"] = r.ApplicationName
+	// "Application Name" is necessary in order for
+	// the UI to display the error report correctly.
+	m["Application Name"] = r.ApplicationName
 	m["businessService"] = r.BusinessService
 	m["comments"] = r.Comments
 	m["dependency"] = r.Dependency
@@ -82,6 +95,6 @@ type ImportTag struct {
 	Name                string
 	TagType             string
 	Order               uint
-	ApplicationImportID uint
+	ApplicationImportID uint `gorm:"constraint:OnDelete:CASCADE"`
 	ApplicationImport   *ApplicationImport
 }

@@ -146,7 +146,7 @@ func (h ApplicationHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -178,7 +178,7 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 		h.updateFailed(ctx, err)
 		return
 	}
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 //

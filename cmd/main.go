@@ -31,6 +31,7 @@ func Setup() (db *gorm.DB, err error) {
 	if err != nil {
 		return
 	}
+	db.Exec("PRAGMA foreign_keys = ON")
 	err = db.AutoMigrate(
 		&model.Application{},
 		&model.Artifact{},
@@ -45,7 +46,8 @@ func Setup() (db *gorm.DB, err error) {
 		&model.TagType{},
 		&model.Stakeholder{},
 		&model.TaskReport{},
-		&model.Task{})
+		&model.Task{},
+		&model.Dependency{})
 	if err != nil {
 		return
 	}
@@ -102,6 +104,7 @@ func main() {
 		&api.ImportHandler{},
 		&api.ExportHandler{},
 		&api.SummaryHandler{},
+		&api.DependencyHandler{},
 	}
 	for _, h := range handlerList {
 		h.With(db)

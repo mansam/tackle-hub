@@ -17,6 +17,7 @@ const (
 const (
 	ReviewsRoot = InventoryRoot + "/review"
 	ReviewRoot  = ReviewsRoot + "/:" + ID
+	BulkRoot    = ReviewsRoot + "/bulk"
 )
 
 //
@@ -34,6 +35,7 @@ func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 	e.GET(ReviewRoot, h.Get)
 	e.PUT(ReviewRoot, h.Update)
 	e.DELETE(ReviewRoot, h.Delete)
+	e.POST(BulkRoot, h.Copy)
 }
 
 // Get godoc
@@ -92,7 +94,7 @@ func (h ReviewHandler) List(ctx *gin.Context) {
 // @router /application-inventory/review [post]
 // @param review body model.Review true "Review data"
 func (h ReviewHandler) Create(ctx *gin.Context) {
-	review := UnmarshalledReview{}
+	review := Review{}
 	err := ctx.BindJSON(&review)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -106,6 +108,50 @@ func (h ReviewHandler) Create(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, model)
+}
+
+func (h ReviewHandler) Copy(ctx *gin.Context) {
+	b := Bulk{}
+	err := ctx.BindJSON(&b)
+	if err != nil {
+		h.createFailed(ctx, err)
+		return
+	}
+	m := model.Review{}
+	result := h.DB.First(&m, b.SourceReview)
+	if result.Error != nil {
+		h.createFailed(ctx, result.Error)
+		return
+	}
+	for _, id := range b.TargetApplications {
+		copied := model.Review{
+			BusinessCriticality: m.BusinessCriticality,
+			EffortEstimate:      m.EffortEstimate,
+			ProposedAction:      m.ProposedAction,
+			WorkPriority:        m.WorkPriority,
+			Comments:            m.Comments,
+			ApplicationID:       id,
+		}
+		existing := []model.Review{}
+		result = h.DB.Find(&existing, "application_id = ?", id)
+		if result.Error != nil {
+			h.createFailed(ctx, result.Error)
+			return
+		}
+		if len(existing) == 0 {
+			result = h.DB.Create(&copied)
+			if result.Error != nil {
+				h.createFailed(ctx, result.Error)
+				return
+			}
+		} else {
+			result = h.DB.Model(&model.Review{}).Where("id = ?", existing[0].ID).Updates(&copied)
+			if result.Error != nil {
+				h.createFailed(ctx, result.Error)
+				return
+			}
+		}
+	}
 }
 
 // Delete godoc
@@ -138,7 +184,7 @@ func (h ReviewHandler) Delete(ctx *gin.Context) {
 // @param review body model.Review true "Review data"
 func (h ReviewHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	review := UnmarshalledReview{}
+	review := Review{}
 	err := ctx.BindJSON(&review)
 	if err != nil {
 		h.updateFailed(ctx, err)
@@ -156,7 +202,7 @@ func (h ReviewHandler) Update(ctx *gin.Context) {
 
 //
 // Review request struct.
-type UnmarshalledReview struct {
+type Review struct {
 	BusinessCriticality uint   `json:"businessCriticality"`
 	EffortEstimate      string `json:"effortEstimate"`
 	ProposedAction      string `json:"proposedAction"`
@@ -169,7 +215,7 @@ type UnmarshalledReview struct {
 
 //
 // Model builds a model.
-func (r *UnmarshalledReview) Model() (m *model.Review) {
+func (r *Review) Model() (m *model.Review) {
 	m = &model.Review{
 		BusinessCriticality: r.BusinessCriticality,
 		EffortEstimate:      r.EffortEstimate,
@@ -181,4 +227,11 @@ func (r *UnmarshalledReview) Model() (m *model.Review) {
 		m.ApplicationID = r.Application.ID
 	}
 	return
+}
+
+//
+//
+type Bulk struct {
+	SourceReview       uint   `json:"sourceReview"`
+	TargetApplications []uint `json:"targetApplications"`
 }

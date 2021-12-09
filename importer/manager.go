@@ -2,6 +2,7 @@ package importer
 
 import (
 	"context"
+	"fmt"
 	"github.com/konveyor/tackle-hub/model"
 	"gorm.io/gorm"
 	"time"
@@ -53,6 +54,7 @@ func (m *Manager) application(imp *model.ApplicationImport) (app *model.Applicat
 	businessService := &model.BusinessService{}
 	result := m.DB.Select("id").Where("name LIKE ?", imp.BusinessService).First(businessService)
 	if result.Error != nil {
+		imp.ErrorMessage = fmt.Sprintf("BusinessService '%s' does not exist.", imp.BusinessService)
 		return
 	}
 	app.BusinessService = businessService
@@ -75,6 +77,7 @@ func (m *Manager) application(imp *model.ApplicationImport) (app *model.Applicat
 
 	result = m.DB.Create(app)
 	if result.Error != nil {
+		imp.ErrorMessage = result.Error.Error()
 		return
 	}
 	ok = true
