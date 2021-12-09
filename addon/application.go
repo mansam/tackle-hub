@@ -16,8 +16,8 @@ type Application struct {
 
 //
 // Get an application by ID.
-func (h *Application) Get(id uint) (m *model.Application, err error) {
-	m = &model.Application{}
+func (h *Application) Get(id uint) (m *api.Application, err error) {
+	m = &api.Application{}
 	err = h.client.Get(
 		pathlib.Join(
 			api.ApplicationsRoot,
@@ -27,9 +27,17 @@ func (h *Application) Get(id uint) (m *model.Application, err error) {
 }
 
 //
+// List applications.
+func (h *Application) List() (list []api.Application, err error) {
+	list = []api.Application{}
+	err = h.client.Get(api.ApplicationsRoot, &list)
+	return
+}
+
+//
 // Update an application by ID.
-func (h *Application) Update(m *model.Application) (err error) {
-	m = &model.Application{}
+func (h *Application) Update(m *api.Application) (err error) {
+	m = &api.Application{}
 	err = h.client.Put(
 		pathlib.Join(
 			api.ApplicationsRoot,
@@ -54,22 +62,5 @@ func (h *Artifact) Upload(application uint, kind string, path string) (err error
 	artifact.ApplicationID = application
 	artifact.Kind = kind
 	err = h.client.Post(api.ArtifactsRoot, artifact)
-	return
-}
-
-//
-// Tag API.
-type Tag struct {
-	// hub API client.
-	client *Client
-}
-
-//
-// Create a tag.
-func (h *Tag) Create(tagType uint, name string) (tag *model.Tag, err error) {
-	tag = &model.Tag{}
-	tag.TagTypeID = tagType
-	tag.Name = name
-	err = h.client.Post(api.TagsRoot, tag)
 	return
 }

@@ -62,6 +62,28 @@ func (r *Client) Put(path string, object interface{}) (err error) {
 }
 
 //
+// Delete a resource.
+func (r *Client) Delete(path string) (err error) {
+	request := &http.Request{
+		Method: http.MethodDelete,
+		URL: r.join(path),
+	}
+	reply, err := r.http.Do(request)
+	if err != nil {
+		return
+	}
+	defer func() {
+		_ = reply.Body.Close()
+	}()
+	status := reply.StatusCode
+	if status != http.StatusOK {
+		err = errors.New(http.StatusText(status))
+		return
+	}
+	return
+}
+
+//
 // Post a resource.
 func (r *Client) post(method string, path string, object interface{}) (err error) {
 	bfr, err := json.Marshal(object)

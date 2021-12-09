@@ -10,7 +10,9 @@ import (
 	"bytes"
 	"fmt"
 	hub "github.com/konveyor/tackle-hub/addon"
+	"github.com/konveyor/tackle-hub/model"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -121,10 +123,16 @@ func tag(d *Data) {
 	application, _ := addon.Application.Get(d.Application)
 	//
 	// Create tag.
-	tag, _ := addon.Tag.Create(1, "HasFiles")
+	tag := &model.Tag{
+		Name: "MyTag",
+		TagTypeID: 1,
+	}
+	_ = addon.Tag.Create(tag)
 	//
 	// append tag.
-	application.Tags = append(application.Tags, *tag)
+	application.Tags = append(
+		application.Tags,
+		strconv.Itoa(int(tag.ID)))
 	//
 	// Update application.
 	_ = addon.Application.Update(application)
