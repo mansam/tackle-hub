@@ -56,6 +56,7 @@ func (h UploadHandler) Create(ctx *gin.Context) {
 		ctx.Status(http.StatusBadRequest)
 	}
 	reader := csv.NewReader(fileReader)
+	reader.TrimLeadingSpace = true
 	// skip the header
 	_, err = reader.Read()
 	if err != nil {
@@ -107,6 +108,7 @@ func (h UploadHandler) Create(ctx *gin.Context) {
 }
 
 func (h *UploadHandler) dependencyFromRow(fileName string, row []string) (app *model.ApplicationImport) {
+	// TODO: explain dependency import CSV format here
 	app = &model.ApplicationImport{
 		Filename:            fileName,
 		RecordType1:         row[0],
@@ -118,6 +120,7 @@ func (h *UploadHandler) dependencyFromRow(fileName string, row []string) (app *m
 }
 
 func (h *UploadHandler) importFromRow(fileName string, row []string) (app *model.ApplicationImport) {
+	// TODO: explain application import CSV format here
 	app = &model.ApplicationImport{
 		Filename:        fileName,
 		RecordType1:     row[0],
