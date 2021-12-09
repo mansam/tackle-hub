@@ -35,6 +35,8 @@ type Adapter struct {
 	Application Application
 	// Artifact API.
 	Artifact Artifact
+	// TagType API.
+	TagType TagType
 	// Tag API.
 	Tag Tag
 	// client A REST client.
@@ -75,6 +77,9 @@ func newAdapter() (adapter *Adapter) {
 			client: client,
 		},
 		Artifact: Artifact{
+			client: client,
+		},
+		TagType: TagType{
 			client: client,
 		},
 		Tag: Tag{
