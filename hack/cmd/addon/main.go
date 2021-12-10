@@ -29,6 +29,13 @@ var (
 //
 // main
 func main() {
+	var err error
+	defer func() {
+		if err != nil {
+			fmt.Printf("Addon failed: %s", err.Error())
+			_ = addon.Failed(err.Error())
+		}
+	}()
 	//
 	// Task update: The addon has started.
 	// This MUST be called before reporting any
@@ -43,7 +50,10 @@ func main() {
 	paths, _ := find(d.Path)
 	//
 	// Upload files and create artifacts.
-	upload(d, paths)
+	err = upload(d, paths)
+	if err != nil {
+		return
+	}
 	//
 	// Task update: The addon has succeeded.
 	_ = addon.Succeeded()
@@ -51,30 +61,43 @@ func main() {
 
 //
 // upload artifacts.
-func upload(d *Data, paths []string) {
+func upload(d *Data, paths []string) (err error) {
 	//
 	// Task update: Update the task with total number of
 	// items to be processed by the addon.
-	_ = addon.Total(len(paths))
+	err = addon.Total(len(paths))
+	if err != nil {
+		return
+	}
 	//
 	// Upload artifacts.
 	for _, p := range paths {
 		//
 		// Task update: The current addon activity.
-		_ = addon.Activity("uploading: ", p)
+		err = addon.Activity("uploading: ", p)
+		if err != nil {
+			return
+		}
 		//
 		// Upload the file and create an artifact to be
 		// associated with the application.
-		_ = addon.Artifact.Upload(d.Application, Kind, p)
+		err = addon.Artifact.Upload(d.Application, Kind, p)
+		if err != nil {
+			return
+		}
 		pause()
 		//
 		// Task update: Increment the number of completed
 		// items processed by the addon.
-		_ = addon.Increment()
+		err = addon.Increment()
+		if err != nil {
+			return
+		}
 	}
 	//
 	// Task update: update the current addon activity.
-	_ = addon.Activity("done")
+	err = addon.Activity("done")
+	return
 }
 
 //
@@ -117,7 +140,7 @@ func find(path string) (paths []string, err error) {
 
 //
 // Tag application.
-func tag(d *Data) {
+func tag(d *Data) (err error) {
 	//
 	// Fetch application.
 	application, _ := addon.Application.Get(d.Application)
@@ -127,7 +150,10 @@ func tag(d *Data) {
 		Name: "MyTag",
 		TagTypeID: 1,
 	}
-	_ = addon.Tag.Create(tag)
+	err = addon.Tag.Create(tag)
+	if err != nil {
+		return
+	}
 	//
 	// append tag.
 	application.Tags = append(
@@ -135,12 +161,15 @@ func tag(d *Data) {
 		strconv.Itoa(int(tag.ID)))
 	//
 	// Update application.
-	_ = addon.Application.Update(application)
+	err = addon.Application.Update(application)
+	return
 }
 
 //
 // Data Addon data passed in the secret.
 type Data struct {
+	// Application ID.
 	Application uint `json:"application"`
+	// Path to be listed.
 	Path string `json:"path"`
 }

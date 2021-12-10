@@ -2,6 +2,7 @@ package addon
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/konveyor/tackle-hub/api"
 	"github.com/konveyor/tackle-hub/model"
 	"github.com/konveyor/tackle-hub/task"
@@ -55,9 +56,10 @@ func (h *Task) Succeeded() (err error) {
 
 //
 // Failed report addon failed.
-func (h *Task) Failed(reason string) (err error) {
+// The reason can be a printf style format.
+func (h *Task) Failed(reason string, x ...interface{}) (err error) {
 	h.report.Status = task.Failed
-	h.report.Error = reason
+	h.report.Error = fmt.Sprintf(reason, x...)
 	err = h.putReport()
 	return
 }

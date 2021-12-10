@@ -6,3 +6,10 @@ metadata:
 spec:
   image: quay.io/jortel/tackle-addon
 
+---
+kind: Addon
+apiVersion: tackle.konveyor.io/v1alpha1
+metadata:
+  name: lang
+spec:
+  image: quay.io/jortel/tackle-addon-lang
