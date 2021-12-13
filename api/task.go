@@ -267,7 +267,7 @@ func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 		h.updateFailed(ctx, result.Error)
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, report)
 }
 
 //

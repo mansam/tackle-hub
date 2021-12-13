@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/konveyor/tackle-hub/api"
-	"github.com/konveyor/tackle-hub/model"
 	"github.com/konveyor/tackle-hub/task"
 	pathlib "path"
 	"strconv"
@@ -19,7 +18,7 @@ type Task struct {
 	// Addon Secret
 	secret *task.Secret
 	// Task report.
-	report model.TaskReport
+	report api.TaskReport
 
 }
 
@@ -76,7 +75,7 @@ func (h *Task) Activity(word ...string) (err error) {
 // Total report addon total items.
 func (h *Task) Total(n int) (err error) {
 	h.report.Total = n
-	err = h.postReport()
+	err = h.putReport()
 	return
 }
 
