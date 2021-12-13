@@ -41,11 +41,11 @@ func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 // @description Get a business service by ID.
 // @tags get
 // @produce json
-// @success 200 {object} model.BusinessService
+// @success 200 {object} BusinessService
 // @router /controls/business-service/:id [get]
 // @param id path string true "Business Service ID"
 func (h BusinessServiceHandler) Get(ctx *gin.Context) {
-	model := model.BusinessService{}
+	model := BusinessService{}
 	id := ctx.Param(ID)
 	db := h.preLoad(h.DB, "Stakeholder")
 	result := db.First(&model, id)
@@ -62,12 +62,12 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 // @description List all business services.
 // @tags list
 // @produce json
-// @success 200 {object} model.BusinessService
+// @success 200 {object} BusinessService
 // @router /controls/business-service [get]
 func (h BusinessServiceHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.BusinessService
-	h.DB.Model(model.BusinessService{}).Count(&count)
+	var models []BusinessService
+	h.DB.Model(BusinessService{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Stakeholder")
@@ -86,11 +86,11 @@ func (h BusinessServiceHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} model.BusinessService
+// @success 200 {object} BusinessService
 // @router /controls/business-service [post]
-// @param business_service body model.BusinessService true "Business service data"
+// @param business_service body BusinessService true "Business service data"
 func (h BusinessServiceHandler) Create(ctx *gin.Context) {
-	model := model.BusinessService{}
+	model := BusinessService{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -109,12 +109,12 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 // @summary Delete a business service.
 // @description Delete a business service.
 // @tags delete
-// @success 200 {object} model.BusinessService
+// @success 200 {object} BusinessService
 // @router /controls/business-service/:id [delete]
 // @param id path string true "Business service ID"
 func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&model.BusinessService{}, id)
+	result := h.DB.Delete(&BusinessService{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -129,19 +129,19 @@ func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} model.BusinessService
+// @success 200 {object} BusinessService
 // @router /controls/business-service/:id [put]
 // @param id path string true "Business service ID"
-// @param business_service body model.BusinessService true "Business service data"
+// @param business_service body BusinessService true "Business service data"
 func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := model.BusinessService{}
+	updates := BusinessService{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&model.BusinessService{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&BusinessService{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
@@ -149,3 +149,7 @@ func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 
 	ctx.Status(http.StatusOK)
 }
+
+//
+// BusinessService REST resource.
+type BusinessService = model.BusinessService

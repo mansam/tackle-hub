@@ -41,11 +41,11 @@ func (h StakeholderHandler) AddRoutes(e *gin.Engine) {
 // @description Get a stakeholder by ID.
 // @tags get
 // @produce json
-// @success 200 {object} model.Stakeholder
+// @success 200 {object} Stakeholder
 // @router /controls/stakeholder/:id [get]
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Get(ctx *gin.Context) {
-	model := model.Stakeholder{}
+	model := Stakeholder{}
 	id := ctx.Param(ID)
 	db := h.preLoad(
 		h.DB,
@@ -66,12 +66,12 @@ func (h StakeholderHandler) Get(ctx *gin.Context) {
 // @description List all stakeholders.
 // @tags get
 // @produce json
-// @success 200 {object} model.Stakeholder
+// @success 200 {object} Stakeholder
 // @router /controls/stakeholder [get]
 func (h StakeholderHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.Stakeholder
-	h.DB.Model(model.Stakeholder{}).Count(&count)
+	var models []Stakeholder
+	h.DB.Model(Stakeholder{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(
@@ -94,11 +94,11 @@ func (h StakeholderHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} model.Stakeholder
+// @success 200 {object} Stakeholder
 // @router /controls/stakeholder [post]
-// @param stakeholder body model.Stakeholder true "Stakeholder data"
+// @param stakeholder body Stakeholder true "Stakeholder data"
 func (h StakeholderHandler) Create(ctx *gin.Context) {
-	model := model.Stakeholder{}
+	model := Stakeholder{}
 	err := ctx.BindJSON(&model)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -117,12 +117,12 @@ func (h StakeholderHandler) Create(ctx *gin.Context) {
 // @summary Delete a stakeholder.
 // @description Delete a stakeholder.
 // @tags delete
-// @success 200 {object} model.Stakeholder
+// @success 200 {object} Stakeholder
 // @router /controls/stakeholder/:id [delete]
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&model.Stakeholder{}, id)
+	result := h.DB.Delete(&Stakeholder{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -137,19 +137,19 @@ func (h StakeholderHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} model.Stakeholder
+// @success 200 {object} Stakeholder
 // @router /controls/stakeholder/:id [put]
 // @param id path string true "Stakeholder ID"
-// @param stakeholder body model.Stakeholder true "Stakeholder data"
+// @param stakeholder body Stakeholder true "Stakeholder data"
 func (h StakeholderHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := model.Stakeholder{}
+	updates := Stakeholder{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&model.Stakeholder{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&Stakeholder{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
@@ -157,3 +157,7 @@ func (h StakeholderHandler) Update(ctx *gin.Context) {
 
 	ctx.Status(http.StatusOK)
 }
+
+//
+// Stakeholder REST resource.
+type Stakeholder = model.Stakeholder

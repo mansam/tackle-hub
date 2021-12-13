@@ -48,11 +48,11 @@ func (h TaskHandler) AddRoutes(e *gin.Engine) {
 // @description Get a task by ID.
 // @tags get
 // @produce json
-// @success 200 {object} model.Task
+// @success 200 {object} Task
 // @router /tasks/:id [get]
 // @param id path string true "Task ID"
 func (h TaskHandler) Get(ctx *gin.Context) {
-	task := &model.Task{}
+	task := &Task{}
 	id := ctx.Param(ID)
 	db := h.DB.Preload("Report")
 	result := db.First(task, id)
@@ -69,10 +69,10 @@ func (h TaskHandler) Get(ctx *gin.Context) {
 // @description List all tasks.
 // @tags get
 // @produce json
-// @success 200 {object} model.Task
+// @success 200 {object} Task
 // @router /tasks [get]
 func (h TaskHandler) List(ctx *gin.Context) {
-	var list []model.Task
+	var list []Task
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = db.Preload("Report")
@@ -91,11 +91,11 @@ func (h TaskHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} model.Task
+// @success 200 {object} Task
 // @router /tasks [post]
-// @param task body model.Task true "Task data"
+// @param task body Task true "Task data"
 func (h TaskHandler) Create(ctx *gin.Context) {
-	task := model.Task{}
+	task := Task{}
 	err := ctx.BindJSON(&task)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -135,7 +135,7 @@ func (h TaskHandler) AddonCreate(ctx *gin.Context) {
 		h.createFailed(ctx, err)
 		return
 	}
-	task := model.Task{}
+	task := Task{}
 	task.Name = addon.Name
 	task.Addon = addon.Name
 	task.Image = addon.Spec.Image
@@ -153,12 +153,12 @@ func (h TaskHandler) AddonCreate(ctx *gin.Context) {
 // @summary Delete a task.
 // @description Delete a task.
 // @tags delete
-// @success 200 {object} model.Task
+// @success 200 {object} Task
 // @router /tasks/:id [delete]
 // @param id path string true "Task ID"
 func (h TaskHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	task := &model.Task{}
+	task := &Task{}
 	result := h.DB.First(task, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
@@ -190,19 +190,19 @@ func (h TaskHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} model.Task
+// @success 200 {object} Task
 // @router /tasks/:id [put]
 // @param id path string true "Task ID"
-// @param task body model.Task true "Task data"
+// @param task body Task true "Task data"
 func (h TaskHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := model.Task{}
+	updates := Task{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&model.Task{}).Where("id", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&Task{}).Where("id", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
@@ -217,13 +217,13 @@ func (h TaskHandler) Update(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} model.TaskReport
+// @success 200 {object} TaskReport
 // @router /tasks/:id [put]
 // @param id path string true "TaskReport ID"
-// @param task body model.TaskReport true "TaskReport data"
+// @param task body TaskReport true "TaskReport data"
 func (h TaskHandler) CreateReport(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	report := &model.TaskReport{}
+	report := &TaskReport{}
 	err := ctx.BindJSON(report)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -245,13 +245,13 @@ func (h TaskHandler) CreateReport(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} model.TaskReport
+// @success 200 {object} TaskReport
 // @router /tasks/:id [put]
 // @param id path string true "TaskReport ID"
-// @param task body model.TaskReport true "TaskReport data"
+// @param task body TaskReport true "TaskReport data"
 func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	report := &model.TaskReport{}
+	report := &TaskReport{}
 	err := ctx.BindJSON(report)
 	if err != nil {
 		h.updateFailed(ctx, err)
@@ -259,7 +259,7 @@ func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 	}
 	task, _ := strconv.Atoi(id)
 	report.TaskID = uint(task)
-	db := h.DB.Model(&model.TaskReport{})
+	db := h.DB.Model(&TaskReport{})
 	db = db.Where("task_id", task)
 	db = db.Omit("id")
 	result := db.Updates(report)
@@ -267,5 +267,13 @@ func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 		h.updateFailed(ctx, result.Error)
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, report)
 }
+
+//
+// Task REST resource.
+type Task = model.Task
+
+//
+// TaskReport REST resource.
+type TaskReport = model.TaskReport

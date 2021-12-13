@@ -10,7 +10,7 @@ import (
 	"bytes"
 	"fmt"
 	hub "github.com/konveyor/tackle-hub/addon"
-	"github.com/konveyor/tackle-hub/model"
+	"github.com/konveyor/tackle-hub/api"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -146,7 +146,7 @@ func tag(d *Data) (err error) {
 	application, _ := addon.Application.Get(d.Application)
 	//
 	// Create tag.
-	tag := &model.Tag{
+	tag := &api.Tag{
 		Name: "MyTag",
 		TagTypeID: 1,
 	}

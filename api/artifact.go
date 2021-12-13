@@ -40,11 +40,11 @@ func (h ArtifactHandler) AddRoutes(e *gin.Engine) {
 // @description Get a artifact by ID.
 // @artifacts get
 // @produce json
-// @success 200 {object} model.Artifact
+// @success 200 {object} Artifact
 // @router /controls/artifact/:id [get]
 // @param id path string true "Artifact ID"
 func (h ArtifactHandler) Get(ctx *gin.Context) {
-	artifact := model.Artifact{}
+	artifact := Artifact{}
 	id := ctx.Param(ID)
 	result := h.DB.First(&artifact, id)
 	if result.Error != nil {
@@ -60,11 +60,11 @@ func (h ArtifactHandler) Get(ctx *gin.Context) {
 // @description List all artifacts.
 // @artifacts get
 // @produce json
-// @success 200 {object} model.Artifact
+// @success 200 {object} Artifact
 // @router /controls/artifact [get]
 func (h ArtifactHandler) List(ctx *gin.Context) {
 	appId := ctx.Param(ID)
-	var list []model.Artifact
+	var list []Artifact
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	if len(appId) > 0 {
@@ -85,11 +85,11 @@ func (h ArtifactHandler) List(ctx *gin.Context) {
 // @artifacts create
 // @accept json
 // @produce json
-// @success 200 {object} model.Artifact
+// @success 200 {object} Artifact
 // @router /controls/artifact [post]
-// @param artifact body model.Artifact true "Artifact data"
+// @param artifact body Artifact true "Artifact data"
 func (h ArtifactHandler) Create(ctx *gin.Context) {
-	artifact := model.Artifact{}
+	artifact := Artifact{}
 	err := ctx.BindJSON(&artifact)
 	if err != nil {
 		h.createFailed(ctx, err)
@@ -115,12 +115,12 @@ func (h ArtifactHandler) Create(ctx *gin.Context) {
 // @summary Delete a artifact.
 // @description Delete a artifact.
 // @artifacts delete
-// @success 200 {object} model.Artifact
+// @success 200 {object} Artifact
 // @router /controls/artifact/:id [delete]
 // @param id path string true "Artifact ID"
 func (h ArtifactHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&model.Artifact{}, id)
+	result := h.DB.Delete(&Artifact{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -135,19 +135,19 @@ func (h ArtifactHandler) Delete(ctx *gin.Context) {
 // @artifacts update
 // @accept json
 // @produce json
-// @success 200 {object} model.Artifact
+// @success 200 {object} Artifact
 // @router /controls/artifact/:id [put]
 // @param id path string true "Artifact ID"
-// @param artifact body model.Artifact true "Artifact data"
+// @param artifact body Artifact true "Artifact data"
 func (h ArtifactHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := model.Artifact{}
+	updates := Artifact{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&model.Artifact{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&Artifact{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
@@ -155,3 +155,7 @@ func (h ArtifactHandler) Update(ctx *gin.Context) {
 
 	ctx.Status(http.StatusOK)
 }
+
+//
+// Artifact REST resource.
+type Artifact = model.Artifact

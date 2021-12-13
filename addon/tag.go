@@ -2,7 +2,6 @@ package addon
 
 import (
 	"github.com/konveyor/tackle-hub/api"
-	"github.com/konveyor/tackle-hub/model"
 	pathlib "path"
 	"strconv"
 )
@@ -16,15 +15,15 @@ type Tag struct {
 
 //
 // Create a tag.
-func (h *Tag) Create(m *model.Tag) (err error) {
+func (h *Tag) Create(m *api.Tag) (err error) {
 	err = h.client.Post(api.TagsRoot, m)
 	return
 }
 
 //
 // Get a tag by ID.
-func (h *Tag) Get(id uint) (m *model.Tag, err error) {
-	m = &model.Tag{}
+func (h *Tag) Get(id uint) (m *api.Tag, err error) {
+	m = &api.Tag{}
 	err = h.client.Get(
 		pathlib.Join(
 			api.TagsRoot,
@@ -35,15 +34,15 @@ func (h *Tag) Get(id uint) (m *model.Tag, err error) {
 
 //
 // List tags.
-func (h *Tag) List() (list []model.Tag, err error) {
-	list = []model.Tag{}
+func (h *Tag) List() (list []api.Tag, err error) {
+	list = []api.Tag{}
 	err = h.client.Get(api.TagsRoot, &list)
 	return
 }
 
 //
 // Delete a tag.
-func (h *Tag) Delete(m *model.Tag) (err error) {
+func (h *Tag) Delete(m *api.Tag) (err error) {
 	err = h.client.Delete(
 		pathlib.Join(
 			api.TagsRoot,
@@ -60,15 +59,15 @@ type TagType struct {
 
 //
 // Create a tag-type.
-func (h *TagType) Create(m *model.TagType) (err error) {
+func (h *TagType) Create(m *api.TagType) (err error) {
 	err = h.client.Post(api.TagTypesRoot, m)
 	return
 }
 
 //
 // Get a tag-type by ID.
-func (h *TagType) Get(id uint) (m *model.TagType, err error) {
-	m = &model.TagType{}
+func (h *TagType) Get(id uint) (m *api.TagType, err error) {
+	m = &api.TagType{}
 	err = h.client.Get(
 		pathlib.Join(
 			api.TagTypesRoot,
@@ -79,15 +78,15 @@ func (h *TagType) Get(id uint) (m *model.TagType, err error) {
 
 //
 // List tag-types.
-func (h *TagType) List() (list []model.TagType, err error) {
-	list = []model.TagType{}
+func (h *TagType) List() (list []api.TagType, err error) {
+	list = []api.TagType{}
 	err = h.client.Get(api.TagTypesRoot, &list)
 	return
 }
 
 //
 // Delete a tag-type.
-func (h *TagType) Delete(m *model.TagType) (err error) {
+func (h *TagType) Delete(m *api.TagType) (err error) {
 	err = h.client.Delete(
 		pathlib.Join(
 			api.TagTypesRoot,
