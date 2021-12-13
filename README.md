@@ -1,3 +1,3 @@
 # tackle-hub
 
-![Diagram](tackle-hub.jpg)
+![Diagram](https://github.com/mansam/tackle-hub/blob/main/tackle-hub.png)
