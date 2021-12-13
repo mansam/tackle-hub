@@ -13,10 +13,10 @@ type Application struct {
 
 type Review struct {
 	Model
-	BusinessCriticality uint         `json:"businessCriticality" gorm:"notnull"`
-	EffortEstimate      string       `json:"effortEstimate" gorm:"notnull"`
-	ProposedAction      string       `json:"proposedAction" gorm:"notnull"`
-	WorkPriority        uint         `json:"workPriority" gorm:"notnull"`
+	BusinessCriticality uint         `json:"businessCriticality" gorm:"not null"`
+	EffortEstimate      string       `json:"effortEstimate" gorm:"not null"`
+	ProposedAction      string       `json:"proposedAction" gorm:"not null"`
+	WorkPriority        uint         `json:"workPriority" gorm:"not null"`
 	Comments            string       `json:"comments"`
 	Application         *Application `json:"application"`
 	ApplicationID       uint         `json:"-"`

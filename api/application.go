@@ -8,6 +8,12 @@ import (
 )
 
 //
+// Kind
+const (
+	ApplicationKind = "application"
+)
+
+//
 // Routes
 const (
 	ApplicationsRoot = InventoryRoot + "/application"
@@ -66,7 +72,9 @@ func (h ApplicationHandler) Get(ctx *gin.Context) {
 // @success 200 {object} []api.Application
 // @router /application-inventory/application [get]
 func (h ApplicationHandler) List(ctx *gin.Context) {
-	var list []model.Application
+	var count int64
+	var models []model.Application
+	h.DB.Model(model.Application{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.BaseHandler.preLoad(
@@ -74,21 +82,19 @@ func (h ApplicationHandler) List(ctx *gin.Context) {
 		"Tags",
 		"Review",
 		"BusinessService")
-	result := db.Find(&list)
+	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
-	rList := []Application{}
-	for i := range list {
+	resources := []Application{}
+	for i := range models {
 		r := Application{}
-		r.With(&list[i])
-		rList = append(
-			rList,
-			r)
+		r.With(&models[i])
+		resources = append(resources, r)
 	}
 
-	ctx.JSON(http.StatusOK, rList)
+	h.listResponse(ctx, ApplicationKind, resources, int(count))
 }
 
 // Create godoc
