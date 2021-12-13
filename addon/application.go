@@ -2,7 +2,6 @@ package addon
 
 import (
 	"github.com/konveyor/tackle-hub/api"
-	"github.com/konveyor/tackle-hub/model"
 	pathlib "path"
 	"strconv"
 )
@@ -56,7 +55,7 @@ type Artifact struct {
 //
 // Upload an artifact.
 func (h *Artifact) Upload(application uint, kind string, path string) (err error) {
-	artifact := &model.Artifact{}
+	artifact := &api.Artifact{}
 	artifact.CreateUser = "addon"
 	artifact.Name = pathlib.Base(path)
 	artifact.ApplicationID = application
