@@ -128,7 +128,6 @@ func (h JobFunctionHandler) Delete(ctx *gin.Context) {
 // @description Update a job function.
 // @tags update
 // @accept json
-// @produce json
 // @success 204
 // @router /controls/job-function/:id [put]
 // @param id path string true "Job Function ID"

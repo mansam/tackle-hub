@@ -128,7 +128,6 @@ func (h ReviewHandler) Delete(ctx *gin.Context) {
 // @description Update a review.
 // @tags update
 // @accept json
-// @produce json
 // @success 204
 // @router /application-inventory/review/:id [put]
 // @param id path string true "Review ID"

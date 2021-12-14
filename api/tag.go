@@ -127,7 +127,6 @@ func (h TagHandler) Delete(ctx *gin.Context) {
 // @description Update a tag.
 // @tags update
 // @accept json
-// @produce json
 // @success 204
 // @router /controls/tag/:id [put]
 // @param id path string true "Tag ID"

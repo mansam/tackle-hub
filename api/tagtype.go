@@ -128,7 +128,6 @@ func (h TagTypeHandler) Delete(ctx *gin.Context) {
 // @description Update a tag type.
 // @tags update
 // @accept json
-// @produce json
 // @success 204
 // @router /controls/tag-type/:id [put]
 // @param id path string true "Tag Type ID"

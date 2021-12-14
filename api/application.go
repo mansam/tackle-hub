@@ -152,7 +152,6 @@ func (h ApplicationHandler) Delete(ctx *gin.Context) {
 // @description Update an application.
 // @tags update
 // @accept json
-// @produce json
 // @success 204
 // @router /application-inventory/application/:id [put]
 // @param id path int true "Application id"

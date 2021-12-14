@@ -130,7 +130,6 @@ func (h DependencyHandler) Create(ctx *gin.Context) {
 // @description Delete a dependency.
 // @tags delete
 // @accept json
-// @produce json
 // @success 204
 // @router /application-inventory/applications-dependency/:id [delete]
 // @param id path string true "Dependency id"

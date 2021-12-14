@@ -136,7 +136,6 @@ func (h StakeholderHandler) Delete(ctx *gin.Context) {
 // @description Update a stakeholder.
 // @tags update
 // @accept json
-// @produce json
 // @success 204
 // @router /controls/stakeholder/:id [put]
 // @param id path string true "Stakeholder ID"

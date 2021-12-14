@@ -196,7 +196,6 @@ func (h TaskHandler) Delete(ctx *gin.Context) {
 // @description Update a task.
 // @tags update
 // @accept json
-// @produce json
 // @success 204
 // @router /tasks/:id [put]
 // @param id path string true "Task ID"

@@ -109,7 +109,7 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 // @summary Delete a business service.
 // @description Delete a business service.
 // @tags delete
-// @success 204 {object} api.BusinessService
+// @success 204
 // @router /controls/business-service/:id [delete]
 // @param id path string true "Business service ID"
 func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
@@ -128,8 +128,7 @@ func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 // @description Update a business service.
 // @tags update
 // @accept json
-// @produce json
-// @success 204 {object} api.BusinessService
+// @success 204
 // @router /controls/business-service/:id [put]
 // @param id path string true "Business service ID"
 // @param business_service body api.BusinessService true "Business service data"

@@ -134,7 +134,6 @@ func (h ArtifactHandler) Delete(ctx *gin.Context) {
 // @description Update a artifact.
 // @artifacts update
 // @accept json
-// @produce json
 // @success 204
 // @router /controls/artifact/:id [put]
 // @param id path string true "Artifact ID"
