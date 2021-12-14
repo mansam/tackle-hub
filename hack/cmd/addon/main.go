@@ -29,19 +29,17 @@ var (
 // main
 func main() {
 	var err error
-	//
-	// Get the addon data associated with the task.
-	d := &Data{}
-	_ = addon.DataWith(d)
 	defer func() {
 		if err != nil {
 			fmt.Printf("Addon failed: %s\n", err.Error())
 			_ = addon.Failed(err.Error())
-		}
-		if d.Delay > 0 {
-			time.Sleep(time.Second * time.Duration(d.Delay))
+			os.Exit(1)
 		}
 	}()
+	//
+	// Get the addon data associated with the task.
+	d := &Data{}
+	_ = addon.DataWith(d)
 	//
 	// Task update: The addon has started.
 	// This MUST be called before reporting any

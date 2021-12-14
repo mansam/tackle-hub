@@ -3,6 +3,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: bucket
+  namespace: tackle-hub
 spec:
   storageClassName: standard-csi
   accessModes:
@@ -16,6 +17,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tackle-hub
+  namespace: tackle-hub
   labels:
     app: tackle-hub
 spec:
@@ -35,7 +37,7 @@ spec:
         image: quay.io/jortel/tackle-hub:latest
         env:
           - name: "HUB_BASE_URL"
-            value: "http://tackle-hub.tackle-operator.svc.cluster.local"
+            value: "http://tackle-hub.tackle-hub.svc.cluster.local"
           - name: "SECRET_PATH"
             value: "/var/run/secrets/konveyor.io/tackle/addon.json"
           - name: "BUCKET_PATH"
@@ -53,6 +55,9 @@ apiVersion: v1
 kind: Service
 metadata:
   name: tackle-hub
+  namespace: tackle-hub
+  labels:
+    app: tackle-hub
 spec:
   selector:
     app: tackle-hub
@@ -66,8 +71,11 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: tackle-hub
+  namespace: tackle-hub
+  labels:
+    app: tackle-hub
 spec:
-  host: konveyor-tackle-hub.apps.cluster-slucid.v2v.bos.redhat.com
+  host: konveyor-tackle-hub.apps.cluster-jortel.v2v.bos.redhat.com
   to:
     kind: Service
     name: tackle-hub
