@@ -7,6 +7,7 @@ import (
 	"github.com/konveyor/tackle-hub/settings"
 	"gorm.io/gorm"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -25,8 +26,9 @@ const (
 //
 // Params
 const (
-	ID   = "id"
-	Name = "name"
+	ID       = "id"
+	Name     = "name"
+	Wildcard = "Wildcard"
 )
 
 //
@@ -60,6 +62,14 @@ func (h *BaseHandler) With(db *gorm.DB) {
 // getFailed handles Get() errors.
 func (h *BaseHandler) getFailed(ctx *gin.Context, err error) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
+		ctx.JSON(
+			http.StatusNotFound,
+			gin.H{
+				"error": err.Error(),
+			})
+		return
+	}
+	if errors.Is(err, os.ErrNotExist) {
 		ctx.JSON(
 			http.StatusNotFound,
 			gin.H{

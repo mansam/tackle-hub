@@ -8,6 +8,7 @@ import (
 const (
 	EnvAddonSecretPath  = "ADDON_SECRET_PATH"
 	EnvHubBaseURL = "HUB_BASE_URL"
+	EvnArtifactMountPath = "ARTIFACT_MOUNT_PATH"
 )
 
 //
@@ -37,7 +38,7 @@ func (r *Addon) Load() (err error) {
 	}
 	r.Secret.Path, found = os.LookupEnv(EnvAddonSecretPath)
 	if !found {
-		r.Secret.Path = "/tmp/hub/secret.json"
+		r.Secret.Path = "/tmp/secret.json"
 	}
 
 	return

@@ -33,8 +33,8 @@ type Adapter struct {
 	Task
 	// Application API.
 	Application Application
-	// Artifact API.
-	Artifact Artifact
+	// Bucket API.
+	Bucket Bucket
 	// TagType API.
 	TagType TagType
 	// Tag API.
@@ -76,7 +76,7 @@ func newAdapter() (adapter *Adapter) {
 		Application: Application{
 			client: client,
 		},
-		Artifact: Artifact{
+		Bucket: Bucket{
 			client: client,
 		},
 		TagType: TagType{

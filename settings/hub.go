@@ -7,6 +7,7 @@ import (
 const (
 	EnvNamespace = "NAMESPACE"
 	EnvDbPath  = "DB_PATH"
+	EnvBucketPath = "ARTIFACT_PATH"
 )
 
 type Hub struct {
@@ -14,6 +15,10 @@ type Hub struct {
 	Namespace string
 	// DB settings.
 	DB struct {
+		Path string
+	}
+	// Bucket settings.
+	Bucket struct {
 		Path string
 	}
 }
@@ -27,6 +32,10 @@ func (r *Hub) Load() (err error) {
 	r.DB.Path, found = os.LookupEnv(EnvDbPath)
 	if !found {
 		r.DB.Path = "/tmp/tackle.db"
+	}
+	r.Bucket.Path, found = os.LookupEnv(EnvBucketPath)
+	if !found {
+		r.Bucket.Path = "/tmp/bucket"
 	}
 
 	return

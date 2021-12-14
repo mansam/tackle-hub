@@ -1,9 +1,20 @@
 ---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: tackle-hub
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tackle-hub
-  name: tackle-operator
   labels:
     app: tackle-hub
 spec:
@@ -26,13 +37,21 @@ spec:
             value: "http://tackle-hub.tackle-operator.svc.cluster.local"
           - name: "SECRET_PATH"
             value: "/var/run/secrets/konveyor.io/tackle/addon.json"
+          - name: "ARTIFACT_ROOT_PATH"
+            value: "/var/run/tackle/artifact"
+        volumeMounts:
+          - name: artifact
+            mountPath: /var/run/tackle/artifact
+      volumes:
+        - name: artifact
+          persistentVolumeClaim:
+            claimName: tackle-hub
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: tackle-hub
-  name: tackle-operator
 spec:
   selector:
     app: tackle-hub
@@ -46,7 +65,6 @@ apiVersion: v1
 kind: Route
 metadata:
   name: tackle-hub
-  name: tackle-operator
 spec:
   host: konveyor-tackle-hub.apps.cluster-jortel.v2v.bos.redhat.com
   to:
