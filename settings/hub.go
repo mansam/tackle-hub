@@ -7,7 +7,8 @@ import (
 const (
 	EnvNamespace = "NAMESPACE"
 	EnvDbPath  = "DB_PATH"
-	EnvBucketPath = "ARTIFACT_PATH"
+	EnvBucketPath = "BUCKET_PATH"
+	EnvBucketPVC = "BUCKET_PVC"
 )
 
 type Hub struct {
@@ -20,6 +21,7 @@ type Hub struct {
 	// Bucket settings.
 	Bucket struct {
 		Path string
+		PVC string
 	}
 }
 
@@ -36,6 +38,10 @@ func (r *Hub) Load() (err error) {
 	r.Bucket.Path, found = os.LookupEnv(EnvBucketPath)
 	if !found {
 		r.Bucket.Path = "/tmp/bucket"
+	}
+	r.Bucket.PVC, found = os.LookupEnv(EnvBucketPVC)
+	if !found {
+		r.Bucket.PVC = "bucket"
 	}
 
 	return

@@ -8,7 +8,6 @@ import (
 const (
 	EnvAddonSecretPath  = "ADDON_SECRET_PATH"
 	EnvHubBaseURL = "HUB_BASE_URL"
-	EvnArtifactMountPath = "ARTIFACT_MOUNT_PATH"
 )
 
 //

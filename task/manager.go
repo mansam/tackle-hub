@@ -219,10 +219,18 @@ func (r *Task) template(secret *core.Secret) (template core.PodTemplateSpec) {
 			},
 			Volumes: []core.Volume{
 				{
-					Name: "hub",
+					Name: "secret",
 					VolumeSource: core.VolumeSource{
 						Secret: &core.SecretVolumeSource{
 							SecretName: secret.Name,
+						},
+					},
+				},
+				{
+					Name: "bucket",
+					VolumeSource: core.VolumeSource{
+						PersistentVolumeClaim: &core.PersistentVolumeClaimVolumeSource{
+							ClaimName: Settings.Hub.Bucket.PVC,
 						},
 					},
 				},
@@ -248,11 +256,19 @@ func (r *Task) container() (container core.Container) {
 				Name: settings.EnvAddonSecretPath,
 				Value: Settings.Addon.Secret.Path,
 			},
+			{
+				Name: settings.EnvBucketPath,
+				Value: Settings.Hub.Bucket.Path,
+			},
 		},
 		VolumeMounts: []core.VolumeMount{
 			{
-				Name:      "hub",
+				Name:      "secret",
 				MountPath: path.Dir(Settings.Addon.Secret.Path),
+			},
+			{
+				Name:      "bucket",
+				MountPath: Settings.Hub.Bucket.Path,
 			},
 		},
 	}
