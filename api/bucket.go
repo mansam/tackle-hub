@@ -103,7 +103,12 @@ func (h BucketHandler) Create(ctx *gin.Context) {
 	bucket.Path = pathlib.Join(
 		Settings.Hub.Bucket.Path,
 		uid.String())
-	err = os.MkdirAll(bucket.Path, 0777)
+	err = os.Mkdir(bucket.Path, 0777)
+	if err != nil {
+		h.createFailed(ctx, err)
+		return
+	}
+	err = os.Chmod(bucket.Path, 0777)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
