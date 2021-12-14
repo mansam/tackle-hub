@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/controller/pkg/logging"
 	"github.com/konveyor/tackle-hub/api"
@@ -15,6 +16,12 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 )
 
+//
+// DB constants
+const (
+	ConnectionString = "file:%s?_foreign_keys=yes"
+)
+
 var Settings = &settings.Settings
 
 var log = logging.WithName("hub")
@@ -26,7 +33,7 @@ func init() {
 //
 // Setup the DB and models.
 func Setup() (db *gorm.DB, err error) {
-	db, err = gorm.Open(sqlite.Open(Settings.DB.Path), &gorm.Config{})
+	db, err = gorm.Open(sqlite.Open(fmt.Sprintf(ConnectionString, Settings.DB.Path)), &gorm.Config{})
 	if err != nil {
 		return
 	}
