@@ -29,17 +29,20 @@ var (
 // main
 func main() {
 	var err error
-	defer func() {
-		if err != nil {
-			fmt.Printf("Addon failed: %s\n", err.Error())
-			_ = addon.Failed(err.Error())
-			os.Exit(1)
-		}
-	}()
 	//
 	// Get the addon data associated with the task.
 	d := &Data{}
 	_ = addon.DataWith(d)
+	//
+	// Error handler.
+	defer func() {
+		if err != nil {
+			fmt.Printf("Addon failed: %s\n", err.Error())
+			_ = addon.Failed(err.Error())
+			d.delay()
+			os.Exit(1)
+		}
+	}()
 	//
 	// Task update: The addon has started.
 	// This MUST be called before reporting any
@@ -232,6 +235,15 @@ type Data struct {
 	Application uint `json:"application"`
 	// Path to be listed.
 	Path string `json:"path"`
-	// Delay seconds.
+	// Delay on error (minutes).
 	Delay int `json:"delay"`
+}
+
+//
+// Delay as specified.
+func (d *Data) delay() {
+	if d.Delay > 0 {
+		duration := time.Minute * time.Duration(d.Delay)
+		time.Sleep(duration)
+	}
 }
