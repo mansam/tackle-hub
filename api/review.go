@@ -17,6 +17,7 @@ const (
 const (
 	ReviewsRoot = InventoryRoot + "/review"
 	ReviewRoot  = ReviewsRoot + "/:" + ID
+	BulkRoot    = ReviewsRoot + "/bulk"
 )
 
 //
@@ -34,6 +35,7 @@ func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 	e.GET(ReviewRoot, h.Get)
 	e.PUT(ReviewRoot, h.Update)
 	e.DELETE(ReviewRoot, h.Delete)
+	e.POST(BulkRoot, h.CopyReview)
 }
 
 // Get godoc
@@ -149,6 +151,108 @@ func (h ReviewHandler) Update(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
+// CopyReview godoc
+// @summary Copy a review from one application to others.
+// @description Copy a review from one application to others.
+// @tags copy
+// @accept json
+// @success 204
+// @router /application-inventory/review/bulk [post]
+// @param copy_request body api.CopyRequest true "Review copy request data"
+func (h ReviewHandler) CopyReview(ctx *gin.Context) {
+	c := CopyRequest{}
+	err := ctx.BindJSON(&c)
+	if err != nil {
+		h.createFailed(ctx, err)
+		return
+	}
+
+	m := model.Review{}
+	result := h.DB.First(&m, c.SourceReview)
+	if result.Error != nil {
+		h.createFailed(ctx, result.Error)
+		return
+	}
+	for _, id := range c.TargetApplications {
+		copied := model.Review{
+			BusinessCriticality: m.BusinessCriticality,
+			EffortEstimate:      m.EffortEstimate,
+			ProposedAction:      m.ProposedAction,
+			WorkPriority:        m.WorkPriority,
+			Comments:            m.Comments,
+			ApplicationID:       id,
+		}
+		existing := []model.Review{}
+		result = h.DB.Find(&existing, "application_id = ?", id)
+		if result.Error != nil {
+			h.createFailed(ctx, result.Error)
+			return
+		}
+		// if the application doesn't already have a review, create one.
+		if len(existing) == 0 {
+			result = h.DB.Create(&copied)
+			if result.Error != nil {
+				h.createFailed(ctx, result.Error)
+				return
+			}
+		// if the application already has a review, replace it with the copied review.
+		} else {
+			result = h.DB.Model(&model.Review{}).Where("id = ?", existing[0].ID).Updates(&copied)
+			if result.Error != nil {
+				h.createFailed(ctx, result.Error)
+				return
+			}
+		}
+	}
+	ctx.Status(http.StatusNoContent)
+}
+
 //
 // Review REST resource.
-type Review = model.Review
+type Review struct {
+	BusinessCriticality uint   `json:"businessCriticality"`
+	EffortEstimate      string `json:"effortEstimate"`
+	ProposedAction      string `json:"proposedAction"`
+	WorkPriority        uint   `json:"workPriority"`
+	Comments            string `json:"comments"`
+	Application         *struct {
+		ID uint `json:"id"`
+	} `json:"application"`
+}
+
+// With updates the resource with the model.
+func (r *Review) With(m *model.Review) {
+	r.BusinessCriticality = m.BusinessCriticality
+	r.EffortEstimate = m.EffortEstimate
+	r.ProposedAction = m.ProposedAction
+	r.WorkPriority = m.WorkPriority
+	r.Comments = m.Comments
+	r.Application = &struct {
+		ID uint `json:"id"`
+	}{
+		ID: m.ApplicationID,
+	}
+}
+
+//
+// Model builds a model.
+func (r *Review) Model() (m *model.Review) {
+	m = &model.Review{
+		BusinessCriticality: r.BusinessCriticality,
+		EffortEstimate:      r.EffortEstimate,
+		ProposedAction:      r.ProposedAction,
+		WorkPriority:        r.WorkPriority,
+		Comments:            r.Comments,
+	}
+	if r.Application != nil {
+		m.ApplicationID = r.Application.ID
+	}
+	return
+}
+
+//
+// CopyRequest REST resource.
+type CopyRequest struct {
+	SourceReview       uint   `json:"sourceReview"`
+	TargetApplications []uint `json:"targetApplications"`
+}
