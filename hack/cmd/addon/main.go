@@ -36,14 +36,19 @@ func main() {
 		}
 	}()
 	//
+	// Get the addon data associated with the task.
+	d := &Data{}
+	_ = addon.DataWith(d)
+	//
+	// Delay.
+	if d.Delay > 0 {
+		time.Sleep(time.Second * time.Duration(d.Delay))
+	}
+	//
 	// Task update: The addon has started.
 	// This MUST be called before reporting any
 	// other progress.
 	_ = addon.Started()
-	//
-	// Get the addon data associated with the task.
-	d := &Data{}
-	_ = addon.DataWith(d)
 	//
 	// Find files.
 	paths, _ := find(d.Path, 25)
@@ -112,7 +117,7 @@ func createBucket(d *Data, paths []string) (err error) {
 		if err != nil {
 			return
 		}
-		pause()
+		time.Sleep(time.Second)
 		//
 		// Task update: Increment the number of completed
 		// items processed by the addon.
@@ -137,7 +142,7 @@ func createBucket(d *Data, paths []string) (err error) {
 // Build index.html
 func buildIndex(bucket *api.Bucket) (err error) {
 	err = addon.Activity("Building index.")
-	pause()
+	time.Sleep(time.Second)
 	dir := bucket.Path
 	path := pathlib.Join(dir, "index.html")
 	f, err := os.Create(path)
@@ -155,7 +160,7 @@ func buildIndex(bucket *api.Bucket) (err error) {
 	for _, name := range list {
 		body = append(
 			body,
-			"<li><a href=\"" + name.Name() + "\">" + name.Name() + "</a>")
+			"<li><a href=\""+name.Name()+"\">"+name.Name()+"</a>")
 	}
 
 	body = append(body, "</ul>")
@@ -163,12 +168,6 @@ func buildIndex(bucket *api.Bucket) (err error) {
 	_, _ = f.WriteString(strings.Join(body, "\n"))
 
 	return
-}
-
-//
-// pause
-func pause() {
-	time.Sleep(time.Second)
 }
 
 //
@@ -237,4 +236,6 @@ type Data struct {
 	Application uint `json:"application"`
 	// Path to be listed.
 	Path string `json:"path"`
+	// Delay seconds.
+	Delay int `json:"delay"`
 }

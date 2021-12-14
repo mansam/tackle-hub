@@ -67,7 +67,7 @@ kind: Route
 metadata:
   name: tackle-hub
 spec:
-  host: konveyor-tackle-hub.apps.cluster-jortel.v2v.bos.redhat.com
+  host: konveyor-tackle-hub.apps.cluster-slucid.v2v.bos.redhat.com
   to:
     kind: Service
     name: tackle-hub
