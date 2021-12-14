@@ -36,11 +36,11 @@ func (h ArtifactHandler) AddRoutes(e *gin.Engine) {
 }
 
 // Get godoc
-// @summary Get a artifact by ID.
-// @description Get a artifact by ID.
+// @summary Get an artifact by ID.
+// @description Get an artifact by ID.
 // @artifacts get
 // @produce json
-// @success 200 {object} Artifact
+// @success 200 {object} api.Artifact
 // @router /controls/artifact/:id [get]
 // @param id path string true "Artifact ID"
 func (h ArtifactHandler) Get(ctx *gin.Context) {
@@ -60,7 +60,7 @@ func (h ArtifactHandler) Get(ctx *gin.Context) {
 // @description List all artifacts.
 // @artifacts get
 // @produce json
-// @success 200 {object} Artifact
+// @success 200 {object} api.Artifact
 // @router /controls/artifact [get]
 func (h ArtifactHandler) List(ctx *gin.Context) {
 	appId := ctx.Param(ID)
@@ -80,14 +80,14 @@ func (h ArtifactHandler) List(ctx *gin.Context) {
 }
 
 // Create godoc
-// @summary Create a artifact.
-// @description Create a artifact.
+// @summary Create an artifact.
+// @description Create an artifact.
 // @artifacts create
 // @accept json
 // @produce json
-// @success 200 {object} Artifact
+// @success 201 {object} api.Artifact
 // @router /controls/artifact [post]
-// @param artifact body Artifact true "Artifact data"
+// @param artifact body api.Artifact true "Artifact data"
 func (h ArtifactHandler) Create(ctx *gin.Context) {
 	artifact := Artifact{}
 	err := ctx.BindJSON(&artifact)
@@ -115,7 +115,7 @@ func (h ArtifactHandler) Create(ctx *gin.Context) {
 // @summary Delete a artifact.
 // @description Delete a artifact.
 // @artifacts delete
-// @success 200 {object} Artifact
+// @success 204
 // @router /controls/artifact/:id [delete]
 // @param id path string true "Artifact ID"
 func (h ArtifactHandler) Delete(ctx *gin.Context) {
@@ -126,7 +126,7 @@ func (h ArtifactHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -135,10 +135,10 @@ func (h ArtifactHandler) Delete(ctx *gin.Context) {
 // @artifacts update
 // @accept json
 // @produce json
-// @success 200 {object} Artifact
+// @success 204
 // @router /controls/artifact/:id [put]
 // @param id path string true "Artifact ID"
-// @param artifact body Artifact true "Artifact data"
+// @param artifact body api.Artifact true "Artifact data"
 func (h ArtifactHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 	updates := Artifact{}
@@ -153,7 +153,7 @@ func (h ArtifactHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 //

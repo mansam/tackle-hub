@@ -41,7 +41,7 @@ func (h StakeholderHandler) AddRoutes(e *gin.Engine) {
 // @description Get a stakeholder by ID.
 // @tags get
 // @produce json
-// @success 200 {object} Stakeholder
+// @success 200 {object} api.Stakeholder
 // @router /controls/stakeholder/:id [get]
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Get(ctx *gin.Context) {
@@ -66,7 +66,7 @@ func (h StakeholderHandler) Get(ctx *gin.Context) {
 // @description List all stakeholders.
 // @tags get
 // @produce json
-// @success 200 {object} Stakeholder
+// @success 200 {object} []api.Stakeholder
 // @router /controls/stakeholder [get]
 func (h StakeholderHandler) List(ctx *gin.Context) {
 	var count int64
@@ -94,9 +94,9 @@ func (h StakeholderHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} Stakeholder
+// @success 201 {object} api.Stakeholder
 // @router /controls/stakeholder [post]
-// @param stakeholder body Stakeholder true "Stakeholder data"
+// @param stakeholder body api.Stakeholder true "Stakeholder data"
 func (h StakeholderHandler) Create(ctx *gin.Context) {
 	model := Stakeholder{}
 	err := ctx.BindJSON(&model)
@@ -117,7 +117,7 @@ func (h StakeholderHandler) Create(ctx *gin.Context) {
 // @summary Delete a stakeholder.
 // @description Delete a stakeholder.
 // @tags delete
-// @success 200 {object} Stakeholder
+// @success 204
 // @router /controls/stakeholder/:id [delete]
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Delete(ctx *gin.Context) {
@@ -128,7 +128,7 @@ func (h StakeholderHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -137,10 +137,10 @@ func (h StakeholderHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} Stakeholder
+// @success 204
 // @router /controls/stakeholder/:id [put]
 // @param id path string true "Stakeholder ID"
-// @param stakeholder body Stakeholder true "Stakeholder data"
+// @param stakeholder body api.Stakeholder true "Stakeholder data"
 func (h StakeholderHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 	updates := Stakeholder{}
@@ -155,7 +155,7 @@ func (h StakeholderHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 //

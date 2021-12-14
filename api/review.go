@@ -41,7 +41,7 @@ func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 // @description Get a review by ID.
 // @tags get
 // @produce json
-// @success 200 {object} Review
+// @success 200 {object} []api.Review
 // @router /application-inventory/review/:id [get]
 // @param id path string true "Review ID"
 func (h ReviewHandler) Get(ctx *gin.Context) {
@@ -62,7 +62,7 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 // @description List all reviews.
 // @tags get
 // @produce json
-// @success 200 {object} Review
+// @success 200 {object} []api.Review
 // @router /application-inventory/review [get]
 func (h ReviewHandler) List(ctx *gin.Context) {
 	var count int64
@@ -86,9 +86,9 @@ func (h ReviewHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} Review
+// @success 201 {object} api.Review
 // @router /application-inventory/review [post]
-// @param review body Review true "Review data"
+// @param review body api.Review true "Review data"
 func (h ReviewHandler) Create(ctx *gin.Context) {
 	model := Review{}
 	err := ctx.BindJSON(&model)
@@ -109,7 +109,7 @@ func (h ReviewHandler) Create(ctx *gin.Context) {
 // @summary Delete a review.
 // @description Delete a review.
 // @tags delete
-// @success 200 {object} Review
+// @success 204
 // @router /application-inventory/review/:id [delete]
 // @param id path string true "Review ID"
 func (h ReviewHandler) Delete(ctx *gin.Context) {
@@ -120,7 +120,7 @@ func (h ReviewHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -129,10 +129,10 @@ func (h ReviewHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} Review
+// @success 204
 // @router /application-inventory/review/:id [put]
 // @param id path string true "Review ID"
-// @param review body Review true "Review data"
+// @param review body api.Review true "Review data"
 func (h ReviewHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 	updates := Review{}
@@ -147,7 +147,7 @@ func (h ReviewHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 //

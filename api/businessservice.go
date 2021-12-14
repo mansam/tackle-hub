@@ -41,7 +41,7 @@ func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 // @description Get a business service by ID.
 // @tags get
 // @produce json
-// @success 200 {object} BusinessService
+// @success 200 {object} api.BusinessService
 // @router /controls/business-service/:id [get]
 // @param id path string true "Business Service ID"
 func (h BusinessServiceHandler) Get(ctx *gin.Context) {
@@ -62,7 +62,7 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 // @description List all business services.
 // @tags list
 // @produce json
-// @success 200 {object} BusinessService
+// @success 200 {object} api.BusinessService
 // @router /controls/business-service [get]
 func (h BusinessServiceHandler) List(ctx *gin.Context) {
 	var count int64
@@ -86,9 +86,9 @@ func (h BusinessServiceHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} BusinessService
+// @success 201 {object} api.BusinessService
 // @router /controls/business-service [post]
-// @param business_service body BusinessService true "Business service data"
+// @param business_service body api.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 	model := BusinessService{}
 	err := ctx.BindJSON(&model)
@@ -109,7 +109,7 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 // @summary Delete a business service.
 // @description Delete a business service.
 // @tags delete
-// @success 200 {object} BusinessService
+// @success 204 {object} api.BusinessService
 // @router /controls/business-service/:id [delete]
 // @param id path string true "Business service ID"
 func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
@@ -120,7 +120,7 @@ func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -129,10 +129,10 @@ func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} BusinessService
+// @success 204 {object} api.BusinessService
 // @router /controls/business-service/:id [put]
 // @param id path string true "Business service ID"
-// @param business_service body BusinessService true "Business service data"
+// @param business_service body api.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 	updates := BusinessService{}
@@ -147,7 +147,7 @@ func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 //

@@ -103,7 +103,7 @@ func (h ApplicationHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} api.Application
+// @success 201 {object} api.Application
 // @router /application-inventory/application [post]
 // @param application body model.Application true "Application data"
 func (h ApplicationHandler) Create(ctx *gin.Context) {
@@ -133,7 +133,7 @@ func (h ApplicationHandler) Create(ctx *gin.Context) {
 // @summary Delete an application.
 // @description Delete an application.
 // @tags delete
-// @success 200
+// @success 204
 // @router /application-inventory/application/:id [delete]
 // @param id path int true "Application id"
 func (h ApplicationHandler) Delete(ctx *gin.Context) {
@@ -144,7 +144,7 @@ func (h ApplicationHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -153,7 +153,7 @@ func (h ApplicationHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} api.Application
+// @success 204
 // @router /application-inventory/application/:id [put]
 // @param id path int true "Application id"
 // @param application body api.Application true "Application data"
@@ -171,7 +171,7 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 //

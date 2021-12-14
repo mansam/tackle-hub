@@ -40,13 +40,14 @@ func Setup() (db *gorm.DB, err error) {
 	err = db.AutoMigrate(
 		&model.Application{},
 		&model.Artifact{},
-		&model.Review{},
 		&model.BusinessService{},
-		&model.StakeholderGroup{},
+		&model.Dependency{},
 		&model.JobFunction{},
+		&model.Review{},
+		&model.Stakeholder{},
+		&model.StakeholderGroup{},
 		&model.Tag{},
 		&model.TagType{},
-		&model.Stakeholder{},
 		&model.TaskReport{},
 		&model.Task{})
 	if err != nil {
@@ -88,13 +89,14 @@ func main() {
 	handlerList := []api.Handler{
 		&api.ApplicationHandler{},
 		&api.ArtifactHandler{},
-		&api.ReviewHandler{},
 		&api.BusinessServiceHandler{},
-		&api.StakeholderGroupHandler{},
+		&api.DependencyHandler{},
 		&api.JobFunctionHandler{},
+		&api.ReviewHandler{},
 		&api.TagHandler{},
 		&api.TagTypeHandler{},
 		&api.StakeholderHandler{},
+		&api.StakeholderGroupHandler{},
 		&api.TaskHandler{
 			Client: client,
 		},
