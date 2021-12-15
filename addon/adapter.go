@@ -52,6 +52,7 @@ func (h *Adapter) Client() *Client {
 //
 // newAdapter builds a new Addon Adapter object.
 func newAdapter() (adapter *Adapter) {
+	//
 	// Load secret.
 	secret := &task.Secret{}
 	b, err := os.ReadFile(Settings.Addon.Secret.Path)
@@ -62,11 +63,13 @@ func newAdapter() (adapter *Adapter) {
 	if err != nil {
 		panic(err)
 	}
+	//
 	// Build REST client.
 	client := &Client{
 		baseURL: Settings.Addon.Hub.URL,
 		http: &http.Client{},
 	}
+	//
 	// Build Adapter.
 	adapter = &Adapter{
 		Task: Task{

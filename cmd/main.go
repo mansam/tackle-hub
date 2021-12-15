@@ -14,6 +14,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"k8s.io/client-go/kubernetes/scheme"
+	"syscall"
 )
 
 //
@@ -75,6 +76,7 @@ func main() {
 			log.Trace(err)
 		}
 	}()
+	syscall.Umask(0)
 	err = buildScheme()
 	if err != nil {
 		return
