@@ -18,7 +18,7 @@ type StakeholderGroup struct {
 
 type Stakeholder struct {
 	Model
-	Name             string             `json:"displayName" gorm:"column:displayName; not null"`
+	DisplayName      string             `json:"displayName" gorm:"column:displayName;not null"`
 	Email            string             `json:"email" gorm:"not null"`
 	Groups           []StakeholderGroup `json:"stakeholderGroups" gorm:"many2many:sgStakeholder"`
 	BusinessServices []BusinessService  `json:"businessServices"`

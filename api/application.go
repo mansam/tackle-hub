@@ -48,7 +48,7 @@ func (h ApplicationHandler) AddRoutes(e *gin.Engine) {
 func (h ApplicationHandler) Get(ctx *gin.Context) {
 	m := &model.Application{}
 	id := ctx.Param(ID)
-	db := h.BaseHandler.preLoad(
+	db := h.preLoad(
 		h.DB,
 		"Tags",
 		"Review",
@@ -164,9 +164,15 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&model.Application{}).Where("id = ?", id).Omit("id").Updates(r)
+	m := r.Model()
+	result := h.DB.Model(&model.Application{}).Where("id = ?", id).Omit("id").Updates(m)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
+		return
+	}
+	err = h.DB.Model(m).Association("Tags").Replace("Tags", m.Tags)
+	if err != nil {
+		h.updateFailed(ctx, err)
 		return
 	}
 
