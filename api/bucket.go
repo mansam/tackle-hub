@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/konveyor/tackle-hub/model"
-	"mime"
 	"net/http"
 	"os"
 	pathlib "path"
@@ -215,8 +214,10 @@ func (h BucketHandler) Update(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
+//
+// GetContent streams file file content.
 func (h BucketHandler) GetContent(ctx *gin.Context) {
-	path := ctx.Param(Wildcard)
+	rPath := ctx.Param(Wildcard)
 	bucket := Bucket{}
 	id := ctx.Param(ID)
 	result := h.DB.First(&bucket, id)
@@ -224,17 +225,11 @@ func (h BucketHandler) GetContent(ctx *gin.Context) {
 		h.getFailed(ctx, result.Error)
 		return
 	}
-	b, err := os.ReadFile(pathlib.Join(
+	ctx.File(pathlib.Join(
 		bucket.Path,
-		path))
-	if err != nil {
-		h.getFailed(ctx, err)
-		return
-	}
-	ctx.Data(
-		http.StatusOK,
-		mime.TypeByExtension(pathlib.Ext(path)),
-		b)
+		rPath))
+
+	ctx.Status(http.StatusOK)
 }
 
 //
