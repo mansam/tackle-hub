@@ -195,7 +195,7 @@ func (h ReviewHandler) CopyReview(ctx *gin.Context) {
 				h.createFailed(ctx, result.Error)
 				return
 			}
-		// if the application already has a review, replace it with the copied review.
+			// if the application already has a review, replace it with the copied review.
 		} else {
 			result = h.DB.Model(&model.Review{}).Where("id = ?", existing[0].ID).Updates(&copied)
 			if result.Error != nil {

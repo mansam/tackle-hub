@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/controller/pkg/logging"
 	"github.com/konveyor/tackle-hub/api"
+	"github.com/konveyor/tackle-hub/importer"
 	"github.com/konveyor/tackle-hub/k8s"
 	crd "github.com/konveyor/tackle-hub/k8s/api"
 	"github.com/konveyor/tackle-hub/model"
@@ -44,6 +45,9 @@ func Setup() (db *gorm.DB, err error) {
 		&model.BusinessService{},
 		&model.Dependency{},
 		&model.JobFunction{},
+		&model.Import{},
+		&model.ImportSummary{},
+		&model.ImportTag{},
 		&model.Review{},
 		&model.Stakeholder{},
 		&model.StakeholderGroup{},
@@ -93,12 +97,13 @@ func main() {
 		&api.BucketHandler{},
 		&api.BusinessServiceHandler{},
 		&api.DependencyHandler{},
+		&api.ImportHandler{},
 		&api.JobFunctionHandler{},
 		&api.ReviewHandler{},
-		&api.TagHandler{},
-		&api.TagTypeHandler{},
 		&api.StakeholderHandler{},
 		&api.StakeholderGroupHandler{},
+		&api.TagHandler{},
+		&api.TagTypeHandler{},
 		&api.TaskHandler{
 			Client: client,
 		},
@@ -115,5 +120,9 @@ func main() {
 		DB:     db,
 	}
 	taskManager.Run(context.Background())
+	importManager := importer.Manager{
+		DB: db,
+	}
+	importManager.Run(context.Background())
 	err = router.Run()
 }

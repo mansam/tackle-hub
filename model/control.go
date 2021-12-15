@@ -2,10 +2,10 @@ package model
 
 type BusinessService struct {
 	Model
-	Name          string       `json:"name" gorm:"not null; unique"`
-	Description   string       `json:"description"`
-	StakeholderID uint         `json:"-"`
-	Stakeholder   *Stakeholder `json:"owner"`
+	Name        string       `json:"name" gorm:"not null; unique"`
+	Description string       `json:"description"`
+	OwnerID     *uint        `json:"-"`
+	Owner       *Stakeholder `json:"owner"`
 }
 
 type StakeholderGroup struct {
@@ -18,10 +18,10 @@ type StakeholderGroup struct {
 
 type Stakeholder struct {
 	Model
-	Name             string             `json:"displayName" gorm:"column:displayName; not null"`
+	DisplayName      string             `json:"displayName" gorm:"column:displayName;not null"`
 	Email            string             `json:"email" gorm:"not null"`
 	Groups           []StakeholderGroup `json:"stakeholderGroups" gorm:"many2many:sgStakeholder"`
-	BusinessServices []BusinessService  `json:"businessServices"`
+	BusinessServices []BusinessService  `json:"businessServices" gorm:"foreignKey:owner_id"`
 	JobFunctionID    uint               `json:"-" gorm:"not null"`
 	JobFunction      *JobFunction       `json:"jobFunction"`
 }

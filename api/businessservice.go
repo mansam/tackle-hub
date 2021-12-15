@@ -47,7 +47,7 @@ func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 	model := BusinessService{}
 	id := ctx.Param(ID)
-	db := h.preLoad(h.DB, "Stakeholder")
+	db := h.preLoad(h.DB, "Owner")
 	result := db.First(&model, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
@@ -66,11 +66,11 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 // @router /controls/business-service [get]
 func (h BusinessServiceHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []BusinessService
+	var models []model.BusinessService
 	h.DB.Model(BusinessService{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
-	db = h.preLoad(db, "Stakeholder")
+	db = h.preLoad(db, "Owner")
 	result := db.Find(&models)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
@@ -90,13 +90,14 @@ func (h BusinessServiceHandler) List(ctx *gin.Context) {
 // @router /controls/business-service [post]
 // @param business_service body api.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Create(ctx *gin.Context) {
-	model := BusinessService{}
-	err := ctx.BindJSON(&model)
+	resource := BusinessService{}
+	err := ctx.BindJSON(&resource)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
-	result := h.DB.Create(&model)
+	model := resource.Model()
+	result := h.DB.Create(model)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
@@ -134,13 +135,15 @@ func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 // @param business_service body api.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := BusinessService{}
-	err := ctx.BindJSON(&updates)
+	resource := BusinessService{}
+	err := ctx.BindJSON(&resource)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&BusinessService{}).Where("id = ?", id).Omit("id").Updates(updates)
+
+	updates := resource.Model()
+	result := h.DB.Model(&model.BusinessService{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
@@ -151,4 +154,21 @@ func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 
 //
 // BusinessService REST resource.
-type BusinessService = model.BusinessService
+type BusinessService struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Owner       struct {
+		ID *uint `json:"id"`
+	} `json:"owner"`
+}
+
+//
+// Model builds a model.
+func (r *BusinessService) Model() (m *model.BusinessService) {
+	m = &model.BusinessService{
+		Name:        r.Name,
+		Description: r.Description,
+		OwnerID:     r.Owner.ID,
+	}
+	return
+}
