@@ -245,6 +245,10 @@ func (h BucketHandler) create(bucket *Bucket) (err error) {
 	}
 	result := h.DB.Create(&bucket)
 	err = result.Error
+	if err != nil {
+		_ = os.Remove(bucket.Path)
+	}
+
 	return
 }
 
