@@ -37,7 +37,7 @@ func (r *Addon) Load() (err error) {
 	}
 	r.Secret.Path, found = os.LookupEnv(EnvAddonSecretPath)
 	if !found {
-		r.Secret.Path = "/tmp/hub/secret.json"
+		r.Secret.Path = "/tmp/secret.json"
 	}
 
 	return

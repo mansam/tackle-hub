@@ -7,6 +7,8 @@ import (
 const (
 	EnvNamespace = "NAMESPACE"
 	EnvDbPath  = "DB_PATH"
+	EnvBucketPath = "BUCKET_PATH"
+	EnvBucketPVC = "BUCKET_PVC"
 )
 
 type Hub struct {
@@ -15,6 +17,11 @@ type Hub struct {
 	// DB settings.
 	DB struct {
 		Path string
+	}
+	// Bucket settings.
+	Bucket struct {
+		Path string
+		PVC string
 	}
 }
 
@@ -27,6 +34,14 @@ func (r *Hub) Load() (err error) {
 	r.DB.Path, found = os.LookupEnv(EnvDbPath)
 	if !found {
 		r.DB.Path = "/tmp/tackle.db"
+	}
+	r.Bucket.Path, found = os.LookupEnv(EnvBucketPath)
+	if !found {
+		r.Bucket.Path = "/tmp/bucket"
+	}
+	r.Bucket.PVC, found = os.LookupEnv(EnvBucketPVC)
+	if !found {
+		r.Bucket.PVC = "bucket"
 	}
 
 	return

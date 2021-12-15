@@ -44,22 +44,3 @@ func (h *Application) Update(m *api.Application) (err error) {
 		m)
 	return
 }
-
-//
-// Artifact API.
-type Artifact struct {
-	// hub API client.
-	client *Client
-}
-
-//
-// Upload an artifact.
-func (h *Artifact) Upload(application uint, kind string, path string) (err error) {
-	artifact := &api.Artifact{}
-	artifact.CreateUser = "addon"
-	artifact.Name = pathlib.Base(path)
-	artifact.ApplicationID = application
-	artifact.Kind = kind
-	err = h.client.Post(api.ArtifactsRoot, artifact)
-	return
-}

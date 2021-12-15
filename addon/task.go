@@ -7,7 +7,6 @@ import (
 	"github.com/konveyor/tackle-hub/task"
 	pathlib "path"
 	"strconv"
-	"strings"
 )
 
 //
@@ -65,8 +64,9 @@ func (h *Task) Failed(reason string, x ...interface{}) (err error) {
 
 //
 // Activity report addon activity.
-func (h *Task) Activity(word ...string) (err error) {
-	h.report.Activity = strings.Join(word, " ")
+// The description can be a printf style format.
+func (h *Task) Activity(description string, x ...interface{}) (err error) {
+	h.report.Activity = fmt.Sprintf(description, x...)
 	err = h.putReport()
 	return
 }

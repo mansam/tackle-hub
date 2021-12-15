@@ -14,6 +14,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"k8s.io/client-go/kubernetes/scheme"
+	"syscall"
 )
 
 //
@@ -39,7 +40,7 @@ func Setup() (db *gorm.DB, err error) {
 	}
 	err = db.AutoMigrate(
 		&model.Application{},
-		&model.Artifact{},
+		&model.Bucket{},
 		&model.BusinessService{},
 		&model.Dependency{},
 		&model.JobFunction{},
@@ -74,6 +75,7 @@ func main() {
 			log.Trace(err)
 		}
 	}()
+	syscall.Umask(0)
 	err = buildScheme()
 	if err != nil {
 		return
@@ -88,7 +90,7 @@ func main() {
 	router.Use(gin.Recovery())
 	handlerList := []api.Handler{
 		&api.ApplicationHandler{},
-		&api.ArtifactHandler{},
+		&api.BucketHandler{},
 		&api.BusinessServiceHandler{},
 		&api.DependencyHandler{},
 		&api.JobFunctionHandler{},
