@@ -30,9 +30,10 @@ type BucketHandler struct {
 func (h BucketHandler) AddRoutes(e *gin.Engine) {
 	e.GET(BucketsRoot, h.List)
 	e.GET(BucketsRoot+"/", h.List)
-	e.GET(AppBucketsRoot, h.List)
-	e.GET(AppBucketsRoot+"/", h.List)
+	e.GET(AppBucketsRoot, h.ListByApplication)
+	e.GET(AppBucketsRoot+"/", h.ListByApplication)
 	e.POST(BucketsRoot, h.Create)
+	e.POST(AppBucketsRoot, h.CreateForApplication)
 	e.GET(BucketRoot, h.Get)
 	e.PUT(BucketRoot, h.Update)
 	e.DELETE(BucketRoot, h.Delete)
@@ -67,13 +68,32 @@ func (h BucketHandler) Get(ctx *gin.Context) {
 // @success 200 {object} Bucket
 // @router /controls/bucket [get]
 func (h BucketHandler) List(ctx *gin.Context) {
-	appId := ctx.Param(ID)
 	var list []Bucket
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
-	if len(appId) > 0 {
-		db = db.Where("application_id", appId)
+	result := db.Find(&list)
+	if result.Error != nil {
+		h.listFailed(ctx, result.Error)
+		return
 	}
+
+	ctx.JSON(http.StatusOK, list)
+}
+
+// ListByApplication godoc
+// @summary List all buckets.
+// @description List all buckets.
+// @buckets get
+// @produce json
+// @success 200 {object} Bucket
+// @router /controls/bucket [get]
+func (h BucketHandler) ListByApplication(ctx *gin.Context) {
+
+	var list []Bucket
+	appId := ctx.Param(ID)
+	pagination := NewPagination(ctx)
+	db := pagination.apply(h.DB)
+	db = db.Where("application_id", appId)
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
@@ -93,24 +113,48 @@ func (h BucketHandler) List(ctx *gin.Context) {
 // @router /controls/bucket [post]
 // @param bucket body Bucket true "Bucket data"
 func (h BucketHandler) Create(ctx *gin.Context) {
-	bucket := Bucket{}
-	err := ctx.BindJSON(&bucket)
+	bucket := &Bucket{}
+	err := ctx.BindJSON(bucket)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
-	uid := uuid.New()
-	bucket.Path = pathlib.Join(
-		Settings.Hub.Bucket.Path,
-		uid.String())
-	err = os.MkdirAll(bucket.Path, 0777)
+	err = h.create(bucket)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
-	result := h.DB.Create(&bucket)
+
+	ctx.JSON(http.StatusCreated, bucket)
+}
+
+// CreateForApplication godoc
+// @summary Create a bucket for an application.
+// @description Create a bucket for an application.
+// @buckets create
+// @accept json
+// @produce json
+// @success 200 {object} Bucket
+// @router /controls/bucket [post]
+// @param bucket body Bucket true "Bucket data"
+func (h BucketHandler) CreateForApplication(ctx *gin.Context) {
+	bucket := &Bucket{}
+	err := ctx.BindJSON(bucket)
+	if err != nil {
+		h.createFailed(ctx, err)
+		return
+	}
+	appID := ctx.Param(ID)
+	application := &model.Application{}
+	result := h.DB.First(application, appID)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
+		return
+	}
+	bucket.ApplicationID = application.ID
+	err = h.create(bucket)
+	if err != nil {
+		h.createFailed(ctx, err)
 		return
 	}
 
@@ -191,6 +235,22 @@ func (h BucketHandler) GetContent(ctx *gin.Context) {
 		http.StatusOK,
 		mime.TypeByExtension(pathlib.Ext(path)),
 		b)
+}
+
+//
+// create a bucket.
+func (h BucketHandler) create(bucket *Bucket) (err error) {
+	uid := uuid.New()
+	bucket.Path = pathlib.Join(
+		Settings.Hub.Bucket.Path,
+		uid.String())
+	err = os.MkdirAll(bucket.Path, 0777)
+	if err != nil {
+		return
+	}
+	result := h.DB.Create(&bucket)
+	err = result.Error
+	return
 }
 
 //
