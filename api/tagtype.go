@@ -41,7 +41,7 @@ func (h TagTypeHandler) AddRoutes(e *gin.Engine) {
 // @description Get a tag type by ID.
 // @tags get
 // @produce json
-// @success 200 {object} TagType
+// @success 200 {object} api.TagType
 // @router /controls/tag-type/:id [get]
 // @param id path string true "Tag Type ID"
 func (h TagTypeHandler) Get(ctx *gin.Context) {
@@ -62,7 +62,7 @@ func (h TagTypeHandler) Get(ctx *gin.Context) {
 // @description List all tag types.
 // @tags get
 // @produce json
-// @success 200 {object} TagType
+// @success 200 {object} []api.TagType
 // @router /controls/tag-type [get]
 func (h TagTypeHandler) List(ctx *gin.Context) {
 	var count int64
@@ -86,9 +86,9 @@ func (h TagTypeHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} TagType
+// @success 201 {object} api.TagType
 // @router /controls/tag-type [post]
-// @param tag_type body TagType true "Tag Type data"
+// @param tag_type body api.TagType true "Tag Type data"
 func (h TagTypeHandler) Create(ctx *gin.Context) {
 	model := TagType{}
 	err := ctx.BindJSON(&model)
@@ -109,7 +109,7 @@ func (h TagTypeHandler) Create(ctx *gin.Context) {
 // @summary Delete a tag type.
 // @description Delete a tag type.
 // @tags delete
-// @success 200 {object} TagType
+// @success 204
 // @router /controls/tag-type/:id [delete]
 // @param id path string true "Tag Type ID"
 func (h TagTypeHandler) Delete(ctx *gin.Context) {
@@ -120,7 +120,7 @@ func (h TagTypeHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -128,11 +128,10 @@ func (h TagTypeHandler) Delete(ctx *gin.Context) {
 // @description Update a tag type.
 // @tags update
 // @accept json
-// @produce json
-// @success 200 {object} TagType
+// @success 204
 // @router /controls/tag-type/:id [put]
 // @param id path string true "Tag Type ID"
-// @param tag_type body TagType true "Tag Type data"
+// @param tag_type body api.TagType true "Tag Type data"
 func (h TagTypeHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 	updates := TagType{}
@@ -147,7 +146,7 @@ func (h TagTypeHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 //

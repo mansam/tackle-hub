@@ -48,7 +48,7 @@ func (h TaskHandler) AddRoutes(e *gin.Engine) {
 // @description Get a task by ID.
 // @tags get
 // @produce json
-// @success 200 {object} Task
+// @success 200 {object} api.Task
 // @router /tasks/:id [get]
 // @param id path string true "Task ID"
 func (h TaskHandler) Get(ctx *gin.Context) {
@@ -69,7 +69,7 @@ func (h TaskHandler) Get(ctx *gin.Context) {
 // @description List all tasks.
 // @tags get
 // @produce json
-// @success 200 {object} Task
+// @success 200 {object} []api.Task
 // @router /tasks [get]
 func (h TaskHandler) List(ctx *gin.Context) {
 	var list []Task
@@ -91,9 +91,9 @@ func (h TaskHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} Task
+// @success 201 {object} api.Task
 // @router /tasks [post]
-// @param task body Task true "Task data"
+// @param task body api.Task true "Task data"
 func (h TaskHandler) Create(ctx *gin.Context) {
 	task := Task{}
 	err := ctx.BindJSON(&task)
@@ -111,8 +111,15 @@ func (h TaskHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, task)
 }
 
-//
-// AddonCreate create an addon task.
+// AddonCreate godoc
+// @summary Create an addon task.
+// @description Create an addon task.
+// @tags create
+// @accept json
+// @produce json
+// @success 201 {object} api.Task
+// @router /addons/:name/tasks [post]
+// @param task body api.Task true "Task data"
 func (h TaskHandler) AddonCreate(ctx *gin.Context) {
 	name := ctx.Param(Name)
 	addon := &crd.Addon{}
@@ -153,7 +160,7 @@ func (h TaskHandler) AddonCreate(ctx *gin.Context) {
 // @summary Delete a task.
 // @description Delete a task.
 // @tags delete
-// @success 200 {object} Task
+// @success 204
 // @router /tasks/:id [delete]
 // @param id path string true "Task ID"
 func (h TaskHandler) Delete(ctx *gin.Context) {
@@ -181,7 +188,7 @@ func (h TaskHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -189,8 +196,7 @@ func (h TaskHandler) Delete(ctx *gin.Context) {
 // @description Update a task.
 // @tags update
 // @accept json
-// @produce json
-// @success 200 {object} Task
+// @success 204
 // @router /tasks/:id [put]
 // @param id path string true "Task ID"
 // @param task body Task true "Task data"
@@ -208,7 +214,7 @@ func (h TaskHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // CreateReport godoc
@@ -217,10 +223,10 @@ func (h TaskHandler) Update(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} TaskReport
+// @success 201 {object} api.TaskReport
 // @router /tasks/:id [put]
 // @param id path string true "TaskReport ID"
-// @param task body TaskReport true "TaskReport data"
+// @param task body api.TaskReport true "TaskReport data"
 func (h TaskHandler) CreateReport(ctx *gin.Context) {
 	id := ctx.Param(ID)
 	report := &TaskReport{}
@@ -245,10 +251,10 @@ func (h TaskHandler) CreateReport(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @produce json
-// @success 200 {object} TaskReport
+// @success 200 {object} api.TaskReport
 // @router /tasks/:id [put]
 // @param id path string true "TaskReport ID"
-// @param task body TaskReport true "TaskReport data"
+// @param task body api.TaskReport true "TaskReport data"
 func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 	id := ctx.Param(ID)
 	report := &TaskReport{}

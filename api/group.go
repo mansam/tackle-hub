@@ -41,7 +41,7 @@ func (h StakeholderGroupHandler) AddRoutes(e *gin.Engine) {
 // @description Get a stakeholder group by ID.
 // @tags get
 // @produce json
-// @success 200 {object} models.StakeholderGroup
+// @success 200 {object} api.StakeholderGroup
 // @router /controls/stakeholder-group/:id [get]
 // @param id path string true "Stakeholder Group ID"
 func (h StakeholderGroupHandler) Get(ctx *gin.Context) {
@@ -62,7 +62,7 @@ func (h StakeholderGroupHandler) Get(ctx *gin.Context) {
 // @description List all stakeholder groups.
 // @tags get
 // @produce json
-// @success 200 {object} models.StakeholderGroup
+// @success 200 {object} []api.StakeholderGroup
 // @router /controls/stakeholder-group [get]
 func (h StakeholderGroupHandler) List(ctx *gin.Context) {
 	var count int64
@@ -86,9 +86,9 @@ func (h StakeholderGroupHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} models.StakeholderGroup
+// @success 201 {object} api.StakeholderGroup
 // @router /controls/stakeholder-group [post]
-// @param stakeholder_group body models.StakeholderGroup true "Stakeholder Group data"
+// @param stakeholder_group body api.StakeholderGroup true "Stakeholder Group data"
 func (h StakeholderGroupHandler) Create(ctx *gin.Context) {
 	model := StakeholderGroup{}
 	err := ctx.BindJSON(&model)
@@ -109,7 +109,7 @@ func (h StakeholderGroupHandler) Create(ctx *gin.Context) {
 // @summary Delete a stakeholder group.
 // @description Delete a stakeholder group.
 // @tags delete
-// @success 200 {object} models.StakeholderGroup
+// @success 204
 // @router /controls/stakeholder-group/:id [delete]
 // @param id path string true "Stakeholder Group ID"
 func (h StakeholderGroupHandler) Delete(ctx *gin.Context) {
@@ -120,7 +120,7 @@ func (h StakeholderGroupHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -128,11 +128,10 @@ func (h StakeholderGroupHandler) Delete(ctx *gin.Context) {
 // @description Update a stakeholder group.
 // @tags update
 // @accept json
-// @produce json
-// @success 200 {object} models.StakeholderGroup
+// @success 204
 // @router /controls/stakeholder-group/:id [put]
 // @param id path string true "Stakeholder Group ID"
-// @param stakeholder_group body models.StakeholderGroup true "Stakeholder Group data"
+// @param stakeholder_group body api.StakeholderGroup true "Stakeholder Group data"
 func (h StakeholderGroupHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 	updates := StakeholderGroup{}
@@ -147,7 +146,7 @@ func (h StakeholderGroupHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 //

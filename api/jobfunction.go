@@ -41,7 +41,7 @@ func (h JobFunctionHandler) AddRoutes(e *gin.Engine) {
 // @description Get a job function by ID.
 // @tags get
 // @produce json
-// @success 200 {object} JobFunction
+// @success 200 {object} []api.JobFunction
 // @router /controls/job-function/:id [get]
 // @param id path string true "Job Function ID"
 func (h JobFunctionHandler) Get(ctx *gin.Context) {
@@ -62,7 +62,7 @@ func (h JobFunctionHandler) Get(ctx *gin.Context) {
 // @description List all job functions.
 // @tags get
 // @produce json
-// @success 200 {object} JobFunction
+// @success 200 {object} []api.JobFunction
 // @router /controls/job-function [get]
 func (h JobFunctionHandler) List(ctx *gin.Context) {
 	var count int64
@@ -86,9 +86,9 @@ func (h JobFunctionHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} JobFunction
+// @success 200 {object} api.JobFunction
 // @router /controls/job-function [post]
-// @param job_function body JobFunction true "Job Function data"
+// @param job_function body api.JobFunction true "Job Function data"
 func (h JobFunctionHandler) Create(ctx *gin.Context) {
 	model := JobFunction{}
 	err := ctx.BindJSON(&model)
@@ -109,7 +109,7 @@ func (h JobFunctionHandler) Create(ctx *gin.Context) {
 // @summary Delete a job function.
 // @description Delete a job function.
 // @tags delete
-// @success 200 {object} JobFunction
+// @success 204
 // @router /controls/job-function/:id [delete]
 // @param id path string true "Job Function ID"
 func (h JobFunctionHandler) Delete(ctx *gin.Context) {
@@ -120,7 +120,7 @@ func (h JobFunctionHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -128,11 +128,10 @@ func (h JobFunctionHandler) Delete(ctx *gin.Context) {
 // @description Update a job function.
 // @tags update
 // @accept json
-// @produce json
-// @success 200 {object} JobFunction
+// @success 204
 // @router /controls/job-function/:id [put]
 // @param id path string true "Job Function ID"
-// @param job_function body JobFunction true "Job Function data"
+// @param job_function body api.JobFunction true "Job Function data"
 func (h JobFunctionHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 	updates := JobFunction{}
@@ -147,7 +146,7 @@ func (h JobFunctionHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 //

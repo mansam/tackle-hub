@@ -41,7 +41,7 @@ func (h TagHandler) AddRoutes(e *gin.Engine) {
 // @description Get a tag by ID.
 // @tags get
 // @produce json
-// @success 200 {object} Tag
+// @success 200 {object} api.Tag
 // @router /controls/tag/:id [get]
 // @param id path string true "Tag ID"
 func (h TagHandler) Get(ctx *gin.Context) {
@@ -62,7 +62,7 @@ func (h TagHandler) Get(ctx *gin.Context) {
 // @description List all tags.
 // @tags get
 // @produce json
-// @success 200 {object} Tag
+// @success 200 {object} []api.Tag
 // @router /controls/tag [get]
 func (h TagHandler) List(ctx *gin.Context) {
 	var count int64
@@ -86,7 +86,7 @@ func (h TagHandler) List(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} Tag
+// @success 201 {object} api.Tag
 // @router /controls/tag [post]
 // @param tag body Tag true "Tag data"
 func (h TagHandler) Create(ctx *gin.Context) {
@@ -108,7 +108,7 @@ func (h TagHandler) Create(ctx *gin.Context) {
 // @summary Delete a tag.
 // @description Delete a tag.
 // @tags delete
-// @success 200 {object} Tag
+// @success 204
 // @router /controls/tag/:id [delete]
 // @param id path string true "Tag ID"
 func (h TagHandler) Delete(ctx *gin.Context) {
@@ -119,7 +119,7 @@ func (h TagHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -127,11 +127,10 @@ func (h TagHandler) Delete(ctx *gin.Context) {
 // @description Update a tag.
 // @tags update
 // @accept json
-// @produce json
-// @success 200 {object} Tag
+// @success 204
 // @router /controls/tag/:id [put]
 // @param id path string true "Tag ID"
-// @param tag body Tag true "Tag data"
+// @param tag body api.Tag true "Tag data"
 func (h TagHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
 	updates := Tag{}
@@ -146,7 +145,7 @@ func (h TagHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 //
