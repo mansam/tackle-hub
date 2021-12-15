@@ -41,7 +41,6 @@ func Setup() (db *gorm.DB, err error) {
 	err = db.AutoMigrate(
 		&model.Application{},
 		&model.Bucket{},
-		&model.Review{},
 		&model.BusinessService{},
 		&model.Dependency{},
 		&model.JobFunction{},
@@ -92,7 +91,6 @@ func main() {
 	handlerList := []api.Handler{
 		&api.ApplicationHandler{},
 		&api.BucketHandler{},
-		&api.ReviewHandler{},
 		&api.BusinessServiceHandler{},
 		&api.DependencyHandler{},
 		&api.JobFunctionHandler{},
