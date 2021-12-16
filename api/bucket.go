@@ -228,8 +228,6 @@ func (h BucketHandler) GetContent(ctx *gin.Context) {
 	ctx.File(pathlib.Join(
 		bucket.Path,
 		rPath))
-
-	ctx.Status(http.StatusOK)
 }
 
 //
