@@ -24,6 +24,10 @@ const (
 	Running = "Running"
 )
 
+const (
+	AppLabel = "tackle-hub"
+)
+
 var Settings = &settings.Settings
 
 //
@@ -213,6 +217,7 @@ func (r *Task) job(secret *core.Secret) (job batch.Job) {
 func (r *Task) template(secret *core.Secret) (template core.PodTemplateSpec) {
 	template = core.PodTemplateSpec{
 		Spec: core.PodSpec{
+			Affinity: r.affinity(),
 			RestartPolicy: "OnFailure",
 			Containers: []core.Container{
 				r.container(),
@@ -269,6 +274,30 @@ func (r *Task) container() (container core.Container) {
 			{
 				Name:      "bucket",
 				MountPath: Settings.Hub.Bucket.Path,
+			},
+		},
+	}
+
+	return
+}
+
+//
+// Affinity.
+func (r *Task) affinity() (affinity *core.Affinity) {
+	affinity = &core.Affinity{
+		NodeAffinity: &core.NodeAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: &core.NodeSelector{
+				NodeSelectorTerms: []core.NodeSelectorTerm{
+					{
+						MatchExpressions: []core.NodeSelectorRequirement{
+							{
+								Key:      "app",
+								Operator: "In",
+								Values:   []string{AppLabel},
+							},
+						},
+					},
+				},
 			},
 		},
 	}
