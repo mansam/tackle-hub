@@ -285,16 +285,13 @@ func (r *Task) container() (container core.Container) {
 // Affinity.
 func (r *Task) affinity() (affinity *core.Affinity) {
 	affinity = &core.Affinity{
-		NodeAffinity: &core.NodeAffinity{
-			RequiredDuringSchedulingIgnoredDuringExecution: &core.NodeSelector{
-				NodeSelectorTerms: []core.NodeSelectorTerm{
-					{
-						MatchExpressions: []core.NodeSelectorRequirement{
-							{
-								Key:      "app",
-								Operator: "In",
-								Values:   []string{AppLabel},
-							},
+		PodAffinity: &core.PodAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: []core.PodAffinityTerm{
+				{
+					TopologyKey: "kubernetes.io/hostname",
+					LabelSelector: &meta.LabelSelector{
+						MatchLabels: map[string]string{
+							"app": AppLabel,
 						},
 					},
 				},

@@ -5,7 +5,7 @@ metadata:
   name: bucket
   namespace: tackle-hub
 spec:
-  storageClassName: gp2-csi
+  storageClassName: standard-csi
   accessModes:
     - ReadWriteMany
   resources:
@@ -75,7 +75,7 @@ metadata:
   labels:
     app: tackle-hub
 spec:
-  host: konveyor-tackle-hub.apps.ci-ln-tdbn1tk-76ef8.origin-ci-int-aws.dev.rhcloud.com
+  host: konveyor-tackle-hub.apps.cluster-jortel.v2v.bos.redhat.com
   to:
     kind: Service
     name: tackle-hub
