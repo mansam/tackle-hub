@@ -13,7 +13,6 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"path"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -24,8 +23,10 @@ const (
 	Running = "Running"
 )
 
-const (
-	AppLabel = "tackle-hub"
+var (
+	Labels = map[string]string {
+		"app": "tackle-hub",
+	}
 )
 
 var Settings = &settings.Settings
@@ -205,7 +206,7 @@ func (r *Task) job(secret *core.Secret) (job batch.Job) {
 		ObjectMeta: meta.ObjectMeta{
 			Namespace: Settings.Hub.Namespace,
 			GenerateName: strings.ToLower(r.Name) + "-",
-			Labels: r.labels(),
+			Labels: Labels,
 		},
 	}
 
@@ -216,6 +217,9 @@ func (r *Task) job(secret *core.Secret) (job batch.Job) {
 // template builds a Job template.
 func (r *Task) template(secret *core.Secret) (template core.PodTemplateSpec) {
 	template = core.PodTemplateSpec{
+		ObjectMeta: meta.ObjectMeta{
+			Labels: Labels,
+		},
 		Spec: core.PodSpec{
 			Affinity: r.affinity(),
 			RestartPolicy: "OnFailure",
@@ -290,9 +294,7 @@ func (r *Task) affinity() (affinity *core.Affinity) {
 				{
 					TopologyKey: "kubernetes.io/hostname",
 					LabelSelector: &meta.LabelSelector{
-						MatchLabels: map[string]string{
-							"app": AppLabel,
-						},
+						MatchLabels: Labels,
 					},
 				},
 			},
@@ -313,7 +315,7 @@ func (r *Task) secret() (secret core.Secret) {
 		ObjectMeta: meta.ObjectMeta{
 			Namespace: Settings.Hub.Namespace,
 			GenerateName: strings.ToLower(r.Name) + "-",
-			Labels: r.labels(),
+			Labels: Labels,
 		},
 		Data: map[string][]byte{
 			path.Base(Settings.Addon.Secret.Path): encoded,
@@ -321,14 +323,6 @@ func (r *Task) secret() (secret core.Secret) {
 	}
 
 	return
-}
-
-//
-// labels builds k8s labels.
-func (r *Task) labels() map[string]string {
-	return map[string]string {
-		"Task": strconv.Itoa(int(r.ID)),
-	}
 }
 
 //
