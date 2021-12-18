@@ -217,9 +217,6 @@ func (r *Task) job(secret *core.Secret) (job batch.Job) {
 // template builds a Job template.
 func (r *Task) template(secret *core.Secret) (template core.PodTemplateSpec) {
 	template = core.PodTemplateSpec{
-		ObjectMeta: meta.ObjectMeta{
-			Labels: Labels,
-		},
 		Spec: core.PodSpec{
 			Affinity: r.affinity(),
 			RestartPolicy: "OnFailure",
