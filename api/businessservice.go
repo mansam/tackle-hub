@@ -151,7 +151,7 @@ func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 	}
 
 	updates := resource.Model()
-	result := h.DB.Model(&model.BusinessService{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&model.BusinessService{}).Select("name", "description", "owner_id").Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return

@@ -158,9 +158,14 @@ func (h StakeholderHandler) Update(ctx *gin.Context) {
 		return
 	}
 	updates := resource.Model()
-	result := h.DB.Model(&model.Stakeholder{}).Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&model.Stakeholder{}).Select("displayName", "email", "job_function_id").Where("id = ?", id).Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
+		return
+	}
+	err = h.DB.Model(updates).Association("Groups").Replace("Groups", updates.Groups)
+	if err != nil {
+		h.updateFailed(ctx, err)
 		return
 	}
 
