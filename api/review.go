@@ -92,19 +92,21 @@ func (h ReviewHandler) List(ctx *gin.Context) {
 // @router /application-inventory/review [post]
 // @param review body api.Review true "Review data"
 func (h ReviewHandler) Create(ctx *gin.Context) {
-	model := Review{}
-	err := ctx.BindJSON(&model)
+	review := Review{}
+	err := ctx.BindJSON(&review)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
+	model := review.Model()
 	result := h.DB.Create(&model)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
+	review.With(model)
 
-	ctx.JSON(http.StatusCreated, model)
+	ctx.JSON(http.StatusCreated, review)
 }
 
 // Delete godoc

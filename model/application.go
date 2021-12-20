@@ -21,6 +21,17 @@ type Dependency struct {
 	From   *Application `json:"-" gorm:"foreignKey:from_id;constraint:OnDelete:CASCADE"`
 }
 
+type Repository struct {
+	Model
+	Type          string       `json:"type"`
+	URL           string       `json:"url"`
+	Branch        string       `json:"branch"`
+	Tag           string       `json:"tag"`
+	Path          string       `json:"path" gorm:"default:/"`
+	Application   *Application `json:"application"`
+	ApplicationID uint         `json:"-"`
+}
+
 type Review struct {
 	Model
 	BusinessCriticality uint         `json:"businessCriticality" gorm:"not null"`
