@@ -45,7 +45,7 @@ func (h StakeholderHandler) AddRoutes(e *gin.Engine) {
 // @router /controls/stakeholder/:id [get]
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Get(ctx *gin.Context) {
-	model := Stakeholder{}
+	model := model.Stakeholder{}
 	id := ctx.Param(ID)
 	db := h.preLoad(
 		h.DB,
@@ -58,7 +58,9 @@ func (h StakeholderHandler) Get(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, model)
+	resource := Stakeholder{}
+	resource.With(&model)
+	ctx.JSON(http.StatusOK, resource)
 }
 
 // List godoc
@@ -70,8 +72,8 @@ func (h StakeholderHandler) Get(ctx *gin.Context) {
 // @router /controls/stakeholder [get]
 func (h StakeholderHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []Stakeholder
-	h.DB.Model(Stakeholder{}).Count(&count)
+	var models []model.Stakeholder
+	h.DB.Model(model.Stakeholder{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(
@@ -84,8 +86,14 @@ func (h StakeholderHandler) List(ctx *gin.Context) {
 		h.listFailed(ctx, result.Error)
 		return
 	}
+	resources := []Stakeholder{}
+	for i := range models {
+		r := Stakeholder{}
+		r.With(&models[i])
+		resources = append(resources, r)
+	}
 
-	h.listResponse(ctx, StakeholderKind, models, int(count))
+	h.listResponse(ctx, StakeholderKind, resources, int(count))
 }
 
 // Create godoc
@@ -98,19 +106,20 @@ func (h StakeholderHandler) List(ctx *gin.Context) {
 // @router /controls/stakeholder [post]
 // @param stakeholder body api.Stakeholder true "Stakeholder data"
 func (h StakeholderHandler) Create(ctx *gin.Context) {
-	model := Stakeholder{}
-	err := ctx.BindJSON(&model)
+	resource := Stakeholder{}
+	err := ctx.BindJSON(&resource)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
-	result := h.DB.Create(&model)
+	model := resource.Model()
+	result := h.DB.Create(model)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-
-	ctx.JSON(http.StatusCreated, model)
+	resource.With(model)
+	ctx.JSON(http.StatusCreated, resource)
 }
 
 // Delete godoc
@@ -122,7 +131,7 @@ func (h StakeholderHandler) Create(ctx *gin.Context) {
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&Stakeholder{}, id)
+	result := h.DB.Delete(&model.Stakeholder{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -142,13 +151,14 @@ func (h StakeholderHandler) Delete(ctx *gin.Context) {
 // @param stakeholder body api.Stakeholder true "Stakeholder data"
 func (h StakeholderHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := Stakeholder{}
-	err := ctx.BindJSON(&updates)
+	resource := Stakeholder{}
+	err := ctx.BindJSON(&resource)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&Stakeholder{}).Where("id = ?", id).Omit("id").Updates(updates)
+	updates := resource.Model()
+	result := h.DB.Model(&model.Stakeholder{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
@@ -159,4 +169,42 @@ func (h StakeholderHandler) Update(ctx *gin.Context) {
 
 //
 // Stakeholder REST resource.
-type Stakeholder = model.Stakeholder
+type Stakeholder struct {
+	ID               uint                     `json:"id"`
+	DisplayName      string                   `json:"displayName"`
+	Email            string                   `json:"email"`
+	Groups           []model.StakeholderGroup `json:"stakeholderGroups"`
+	BusinessServices []model.BusinessService  `json:"businessServices"`
+	JobFunction      struct {
+		ID   *uint  `json:"id"`
+		Role string `json:"role"`
+	} `json:"jobFunction"`
+}
+
+//
+// With updates the resource with the model.
+func (r *Stakeholder) With(m *model.Stakeholder) {
+	r.ID = m.ID
+	r.DisplayName = m.DisplayName
+	r.Email = m.Email
+	r.Groups = m.Groups
+	r.BusinessServices = m.BusinessServices
+	r.JobFunction.ID = m.JobFunctionID
+	if m.JobFunction != nil {
+		r.JobFunction.Role = m.JobFunction.Role
+	}
+}
+
+//
+// Model builds a model.
+func (r *Stakeholder) Model() (m *model.Stakeholder) {
+	m = &model.Stakeholder{
+		DisplayName:      r.DisplayName,
+		Email:            r.Email,
+		Groups:           r.Groups,
+		BusinessServices: r.BusinessServices,
+		JobFunctionID:    r.JobFunction.ID,
+	}
+	m.ID = r.ID
+	return
+}

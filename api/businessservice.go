@@ -45,7 +45,7 @@ func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 // @router /controls/business-service/:id [get]
 // @param id path string true "Business Service ID"
 func (h BusinessServiceHandler) Get(ctx *gin.Context) {
-	model := BusinessService{}
+	model := model.BusinessService{}
 	id := ctx.Param(ID)
 	db := h.preLoad(h.DB, "Owner")
 	result := db.First(&model, id)
@@ -54,7 +54,9 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, model)
+	resource := BusinessService{}
+	resource.With(&model)
+	ctx.JSON(http.StatusOK, resource)
 }
 
 // List godoc
@@ -67,7 +69,7 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 func (h BusinessServiceHandler) List(ctx *gin.Context) {
 	var count int64
 	var models []model.BusinessService
-	h.DB.Model(BusinessService{}).Count(&count)
+	h.DB.Model(&model.BusinessService{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Owner")
@@ -76,8 +78,14 @@ func (h BusinessServiceHandler) List(ctx *gin.Context) {
 		h.listFailed(ctx, result.Error)
 		return
 	}
+	resources := []BusinessService{}
+	for i := range models {
+		r := BusinessService{}
+		r.With(&models[i])
+		resources = append(resources, r)
+	}
 
-	h.listResponse(ctx, BusinessServiceKind, models, int(count))
+	h.listResponse(ctx, BusinessServiceKind, resources, int(count))
 }
 
 // Create godoc
@@ -102,8 +110,8 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-
-	ctx.JSON(http.StatusCreated, model)
+	resource.With(model)
+	ctx.JSON(http.StatusCreated, resource)
 }
 
 // Delete godoc
@@ -115,7 +123,7 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 // @param id path string true "Business service ID"
 func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&BusinessService{}, id)
+	result := h.DB.Delete(&model.BusinessService{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -155,11 +163,25 @@ func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 //
 // BusinessService REST resource.
 type BusinessService struct {
+	ID          uint   `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Owner       struct {
-		ID *uint `json:"id"`
+		ID          *uint  `json:"id"`
+		DisplayName string `json:"displayName"`
 	} `json:"owner"`
+}
+
+//
+// With updates the resource with the model.
+func (r *BusinessService) With(m *model.BusinessService) {
+	r.ID = m.ID
+	r.Name = m.Name
+	r.Description = m.Description
+	r.Owner.ID = m.OwnerID
+	if m.Owner != nil {
+		r.Owner.DisplayName = m.Owner.DisplayName
+	}
 }
 
 //
@@ -170,5 +192,6 @@ func (r *BusinessService) Model() (m *model.BusinessService) {
 		Description: r.Description,
 		OwnerID:     r.Owner.ID,
 	}
+	m.ID = r.ID
 	return
 }

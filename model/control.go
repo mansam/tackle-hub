@@ -22,7 +22,7 @@ type Stakeholder struct {
 	Email            string             `json:"email" gorm:"not null"`
 	Groups           []StakeholderGroup `json:"stakeholderGroups" gorm:"many2many:sgStakeholder"`
 	BusinessServices []BusinessService  `json:"businessServices" gorm:"foreignKey:owner_id"`
-	JobFunctionID    uint               `json:"-" gorm:"not null"`
+	JobFunctionID    *uint              `json:"-"`
 	JobFunction      *JobFunction       `json:"jobFunction"`
 }
 

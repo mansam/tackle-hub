@@ -69,7 +69,7 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 func (h ReviewHandler) List(ctx *gin.Context) {
 	var count int64
 	var models []Review
-	h.DB.Model(Review{}).Count(&count)
+	h.DB.Model(&model.Review{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Application")
@@ -212,6 +212,7 @@ func (h ReviewHandler) CopyReview(ctx *gin.Context) {
 //
 // Review REST resource.
 type Review struct {
+	ID                  uint   `json:"id"`
 	BusinessCriticality uint   `json:"businessCriticality"`
 	EffortEstimate      string `json:"effortEstimate"`
 	ProposedAction      string `json:"proposedAction"`
@@ -224,6 +225,7 @@ type Review struct {
 
 // With updates the resource with the model.
 func (r *Review) With(m *model.Review) {
+	r.ID = m.ID
 	r.BusinessCriticality = m.BusinessCriticality
 	r.EffortEstimate = m.EffortEstimate
 	r.ProposedAction = m.ProposedAction
@@ -249,6 +251,7 @@ func (r *Review) Model() (m *model.Review) {
 	if r.Application != nil {
 		m.ApplicationID = r.Application.ID
 	}
+	m.ID = r.ID
 	return
 }
 
