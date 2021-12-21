@@ -137,8 +137,10 @@ func (h ApplicationHandler) Create(ctx *gin.Context) {
 // @router /application-inventory/application/:id [delete]
 // @param id path int true "Application id"
 func (h ApplicationHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(ID)
-	result := h.DB.Delete(&model.Application{}, id)
+	id, _ := strconv.Atoi(ctx.Param(ID))
+	model := &model.Application{}
+	model.ID = uint(id)
+	result := h.DB.Select("Tags").Delete(&model)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
