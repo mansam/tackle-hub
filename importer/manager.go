@@ -38,7 +38,8 @@ func (m *Manager) Run(ctx context.Context) {
 // unprocessed imports.
 func (m *Manager) processImports() (err error) {
 	list := []model.Import{}
-	result := m.DB.Find(&list, "processed = ?", false)
+	db := m.DB.Preload("ImportTags")
+	result := db.Find(&list, "processed = ?", false)
 	if result.Error != nil {
 		err = result.Error
 		return
