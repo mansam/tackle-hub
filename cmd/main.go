@@ -50,6 +50,7 @@ func Setup() (db *gorm.DB, err error) {
 		&model.JobFunction{},
 		&model.Repository{},
 		&model.Review{},
+		&model.Seeded{},
 		&model.Stakeholder{},
 		&model.StakeholderGroup{},
 		&model.Tag{},
@@ -59,6 +60,17 @@ func Setup() (db *gorm.DB, err error) {
 	if err != nil {
 		return
 	}
+
+	model.Seed(db,
+		model.JobFunction{},
+		model.TagType{},
+		model.Tag{},
+		model.StakeholderGroup{},
+		model.Stakeholder{},
+		model.BusinessService{},
+		model.Application{},
+		model.Review{},
+	)
 
 	return
 }
@@ -90,6 +102,9 @@ func main() {
 		return
 	}
 	db, err := Setup()
+	if err != nil {
+		panic(err)
+	}
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())

@@ -7,6 +7,7 @@ import (
 const (
 	EnvNamespace = "NAMESPACE"
 	EnvDbPath  = "DB_PATH"
+	EnvDbSeedPath = "DB_SEED_PATH"
 	EnvBucketPath = "BUCKET_PATH"
 	EnvBucketPVC = "BUCKET_PVC"
 )
@@ -17,6 +18,7 @@ type Hub struct {
 	// DB settings.
 	DB struct {
 		Path string
+		SeedPath string
 	}
 	// Bucket settings.
 	Bucket struct {
@@ -34,6 +36,10 @@ func (r *Hub) Load() (err error) {
 	r.DB.Path, found = os.LookupEnv(EnvDbPath)
 	if !found {
 		r.DB.Path = "/tmp/tackle.db"
+	}
+	r.DB.SeedPath, found = os.LookupEnv(EnvDbSeedPath)
+	if !found {
+		r.DB.SeedPath = "/seed"
 	}
 	r.Bucket.Path, found = os.LookupEnv(EnvBucketPath)
 	if !found {
