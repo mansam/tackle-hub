@@ -140,7 +140,7 @@ func (h ApplicationHandler) Delete(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param(ID))
 	model := &model.Application{}
 	model.ID = uint(id)
-	result := h.DB.Select("Tags").Delete(&model)
+	result := h.DB.Select("Tags").Delete(model)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return

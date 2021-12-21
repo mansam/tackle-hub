@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/tackle-hub/model"
 	"net/http"
+	"strconv"
 )
 
 //
@@ -113,8 +114,10 @@ func (h StakeholderGroupHandler) Create(ctx *gin.Context) {
 // @router /controls/stakeholder-group/:id [delete]
 // @param id path string true "Stakeholder Group ID"
 func (h StakeholderGroupHandler) Delete(ctx *gin.Context) {
-	id := ctx.Param(ID)
-	result := h.DB.Delete(&StakeholderGroup{}, id)
+	id, _ := strconv.Atoi(ctx.Param(ID))
+	model := &model.StakeholderGroup{}
+	model.ID = uint(id)
+	result := h.DB.Select("Stakeholders").Delete(model)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
