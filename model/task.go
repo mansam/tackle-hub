@@ -14,7 +14,7 @@ type TaskReport struct {
 	Completed int    `json:"completed"`
 	Activity  string `json:"activity"`
 	TaskID    uint   `json:"task"`
-	Task      *Task  `json:"-" gorm:"constraint:OnDelete:CASCADE;"`
+	Task      *Task  `json:"-"`
 }
 
 type Task struct {
@@ -29,7 +29,7 @@ type Task struct {
 	Status     string      `json:"status"`
 	Error      string      `json:"error"`
 	Job        string      `json:"job"`
-	Report     *TaskReport `json:"report"`
+	Report     *TaskReport `json:"report" gorm:"constraint:OnDelete:CASCADE"`
 }
 
 func (m *Task) Reset() {
