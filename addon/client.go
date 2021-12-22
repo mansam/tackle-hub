@@ -76,7 +76,7 @@ func (r *Client) Delete(path string) (err error) {
 		_ = reply.Body.Close()
 	}()
 	status := reply.StatusCode
-	if status != http.StatusOK {
+	if status != http.StatusNoContent {
 		err = errors.New(http.StatusText(status))
 		return
 	}
@@ -113,6 +113,8 @@ func (r *Client) post(method string, path string, object interface{}) (err error
 		if err != nil {
 			return
 		}
+	case http.StatusNoContent:
+		return
 	default:
 		err = errors.New(http.StatusText(status))
 		return

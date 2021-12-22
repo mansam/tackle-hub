@@ -172,7 +172,7 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 		h.updateFailed(ctx, result.Error)
 		return
 	}
-	err = h.DB.Model(m).Association("Tags").Replace("Tags", m.Tags)
+	err = h.DB.Debug().Model(&m).Association("Tags").Replace("Tags", m.Tags)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
@@ -184,8 +184,11 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 //
 // Application REST resource.
 type Application struct {
-	model.Application
 	ID              uint     `json:"id"`
+	Name            string   `json:"name"`
+	Description     string   `json:"description"`
+	Review          *Review  `json:"review"`
+	Comments        string   `json:"comments"`
 	Tags            []string `json:"tags"`
 	BusinessService string   `json:"businessService"`
 }
@@ -193,8 +196,13 @@ type Application struct {
 //
 // With updates the resource using the model.
 func (r *Application) With(m *model.Application) {
-	r.Application = *m
 	r.ID = m.ID
+	r.Name = m.Name
+	r.Description = m.Description
+	r.Comments = m.Comments
+	if m.Review != nil {
+		r.Review = &Review{ID: m.Review.ID}
+	}
 	r.BusinessService = strconv.Itoa(int(m.BusinessServiceID))
 	for _, tag := range m.Tags {
 		r.Tags = append(
@@ -206,7 +214,12 @@ func (r *Application) With(m *model.Application) {
 //
 // Model builds a model.
 func (r *Application) Model() (m *model.Application) {
-	m = &r.Application
+	m = &model.Application{
+		Name:        r.Name,
+		Description: r.Description,
+		Comments:    r.Comments,
+	}
+	m.ID = r.ID
 	if len(r.BusinessService) > 0 {
 		id, _ := strconv.Atoi(r.BusinessService)
 		m.BusinessServiceID = uint(id)

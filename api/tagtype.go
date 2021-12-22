@@ -45,7 +45,7 @@ func (h TagTypeHandler) AddRoutes(e *gin.Engine) {
 // @router /controls/tag-type/:id [get]
 // @param id path string true "Tag Type ID"
 func (h TagTypeHandler) Get(ctx *gin.Context) {
-	model := TagType{}
+	model := model.TagType{}
 	id := ctx.Param(ID)
 	db := h.preLoad(h.DB, "Tags")
 	result := db.First(&model, id)
@@ -54,7 +54,9 @@ func (h TagTypeHandler) Get(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, model)
+	resource := TagType{}
+	resource.With(&model)
+	ctx.JSON(http.StatusOK, resource)
 }
 
 // List godoc
@@ -66,8 +68,8 @@ func (h TagTypeHandler) Get(ctx *gin.Context) {
 // @router /controls/tag-type [get]
 func (h TagTypeHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []TagType
-	h.DB.Model(TagType{}).Count(&count)
+	var models []model.TagType
+	h.DB.Model(model.TagType{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Tags")
@@ -76,8 +78,14 @@ func (h TagTypeHandler) List(ctx *gin.Context) {
 		h.listFailed(ctx, result.Error)
 		return
 	}
+	resources := []TagType{}
+	for i := range models {
+		r := TagType{}
+		r.With(&models[i])
+		resources = append(resources, r)
+	}
 
-	h.listResponse(ctx, TagTypeKind, models, int(count))
+	h.listResponse(ctx, TagTypeKind, resources, int(count))
 }
 
 // Create godoc
@@ -90,12 +98,13 @@ func (h TagTypeHandler) List(ctx *gin.Context) {
 // @router /controls/tag-type [post]
 // @param tag_type body api.TagType true "Tag Type data"
 func (h TagTypeHandler) Create(ctx *gin.Context) {
-	model := TagType{}
-	err := ctx.BindJSON(&model)
+	resource := TagType{}
+	err := ctx.BindJSON(&resource)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
+	model := resource.Model()
 	result := h.DB.Create(&model)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
@@ -114,7 +123,7 @@ func (h TagTypeHandler) Create(ctx *gin.Context) {
 // @param id path string true "Tag Type ID"
 func (h TagTypeHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&TagType{}, id)
+	result := h.DB.Delete(&model.TagType{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -134,12 +143,13 @@ func (h TagTypeHandler) Delete(ctx *gin.Context) {
 // @param tag_type body api.TagType true "Tag Type data"
 func (h TagTypeHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := TagType{}
-	err := ctx.BindJSON(&updates)
+	resource := TagType{}
+	err := ctx.BindJSON(&resource)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
+	updates := resource.Model()
 	result := h.DB.Model(&TagType{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
@@ -151,4 +161,37 @@ func (h TagTypeHandler) Update(ctx *gin.Context) {
 
 //
 // TagType REST resource.
-type TagType = model.TagType
+type TagType struct {
+	ID       uint   `json:"id"`
+	Name     string `json:"name"`
+	Username string `json:"username"`
+	Rank     uint   `json:"rank"`
+	Color    string `json:"colour"`
+	Tags     []Tag  `json:"tags"`
+}
+
+//
+// With updates the resource with the model.
+func (r *TagType) With(m *model.TagType) {
+	r.ID = m.ID
+	r.Name = m.Name
+	r.Username = m.Username
+	r.Rank = m.Rank
+	r.Color = m.Color
+	for _, tag := range m.Tags {
+		r.Tags = append(r.Tags, Tag{ID: tag.ID, Name: tag.Name})
+	}
+}
+
+//
+// Model builds a model.
+func (r *TagType) Model() (m *model.TagType) {
+	m = &model.TagType{
+		Name:     r.Name,
+		Username: r.Username,
+		Rank:     r.Rank,
+		Color:    r.Color,
+	}
+	m.ID = r.ID
+	return
+}

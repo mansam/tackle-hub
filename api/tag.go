@@ -56,7 +56,7 @@ func (h TagHandler) Get(ctx *gin.Context) {
 
 	resource := Tag{}
 	resource.With(&model)
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, resource)
 }
 
 // List godoc
@@ -85,7 +85,7 @@ func (h TagHandler) List(ctx *gin.Context) {
 		resources = append(resources, r)
 	}
 
-	h.listResponse(ctx, TagKind, models, int(count))
+	h.listResponse(ctx, TagKind, resources, int(count))
 }
 
 // Create godoc
