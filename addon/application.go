@@ -36,7 +36,6 @@ func (h *Application) List() (list []api.Application, err error) {
 //
 // Update an application by ID.
 func (h *Application) Update(m *api.Application) (err error) {
-	m = &api.Application{}
 	err = h.client.Put(
 		pathlib.Join(
 			api.ApplicationsRoot,
