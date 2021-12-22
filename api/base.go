@@ -120,7 +120,7 @@ func (h *BaseHandler) createFailed(ctx *gin.Context, err error) {
 	url := ctx.Request.URL.String()
 	log.Error(
 		err,
-		"List failed.",
+		"Create failed.",
 		"url",
 		url)
 }
@@ -137,7 +137,7 @@ func (h *BaseHandler) updateFailed(ctx *gin.Context, err error) {
 	url := ctx.Request.URL.String()
 	log.Error(
 		err,
-		"List failed.",
+		"Update failed.",
 		"url",
 		url)
 }
@@ -158,7 +158,7 @@ func (h *BaseHandler) deleteFailed(ctx *gin.Context, err error) {
 	url := ctx.Request.URL.String()
 	log.Error(
 		err,
-		"Get failed.",
+		"Delete failed.",
 		"url",
 		url)
 }
