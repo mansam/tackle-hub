@@ -185,6 +185,7 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 // Application REST resource.
 type Application struct {
 	model.Application
+	ID              uint     `json:"id"`
 	Tags            []string `json:"tags"`
 	BusinessService string   `json:"businessService"`
 }
@@ -193,6 +194,7 @@ type Application struct {
 // With updates the resource using the model.
 func (r *Application) With(m *model.Application) {
 	r.Application = *m
+	r.ID = m.ID
 	r.BusinessService = strconv.Itoa(int(m.BusinessServiceID))
 	for _, tag := range m.Tags {
 		r.Tags = append(
