@@ -1,11 +1,11 @@
 package model
 
 import (
-	"bufio"
 	"encoding/json"
 	"github.com/konveyor/controller/pkg/logging"
 	"github.com/konveyor/tackle-hub/settings"
 	"gorm.io/gorm"
+	"io/ioutil"
 	"os"
 	"path"
 	"reflect"
@@ -41,35 +41,39 @@ func Seed(db *gorm.DB, models ...interface{}) {
 	}
 
 	for _, model := range models {
-		modelType := reflect.TypeOf(model)
-		segments := strings.Split(modelType.String(), ".")
+		kind := reflect.TypeOf(model).String()
+		segments := strings.Split(kind, ".")
 		fileName := strings.ToLower(segments[len(segments)-1]) + ".json"
-		seedPath := path.Join(settings.Settings.DB.SeedPath, fileName)
-		file, err := os.Open(seedPath)
+		filePath := path.Join(settings.Settings.DB.SeedPath, fileName)
+		file, err := os.Open(filePath)
 		if err != nil {
-			log.Info("No seed file found for type.", "type", modelType.String())
+			log.Info("No seed file found for type.", "type", kind)
 			continue
 		}
 		defer file.Close()
+		jsonBytes, err := ioutil.ReadAll(file)
+		if err != nil {
+			log.Info("Could not read bytes from file.", "type", kind)
+		}
+
+		var m []map[string]interface{}
+		err = json.Unmarshal(jsonBytes, &m)
+		if err != nil {
+			log.Info("Could not unmarshal records.", "type", kind)
+			continue
+		}
 		created := 0
 		failed := 0
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			m := make(map[string]interface{})
-			err = json.Unmarshal(scanner.Bytes(), &m)
-			if err != nil {
-				log.Info("Could not unmarshal record.", "type", modelType.String())
-				failed++
-				continue
-			}
-			result := db.Model(&model).Create(m)
+		for i := range m {
+			result := db.Model(&model).Create(m[i])
 			if result.Error != nil {
-				log.Info("Could not create row.", "type", modelType.String(), "error", result.Error)
+				log.Info("Could not create row.", "type", kind, "error", result.Error)
+				failed++
 				continue
 			}
 			created++
 		}
-		log.Info("Complete.", "type", modelType.String(), "created", created, "failed", failed)
+		log.Info("Complete.", "type", kind, "created", created, "failed", failed)
 	}
 
 	seeded := Seeded{}
