@@ -164,8 +164,9 @@ type Tag struct {
 	ID      uint   `json:"id"`
 	Name    string `json:"name"`
 	TagType struct {
-		ID   uint   `json:"id"`
-		Name string `json:"name"`
+		ID    uint   `json:"id"`
+		Name  string `json:"name"`
+		Color string `json:"colour"`
 	} `json:"tagType"`
 }
 
@@ -176,6 +177,7 @@ func (r *Tag) With(m *model.Tag) {
 	r.Name = m.Name
 	r.TagType.ID = m.TagTypeID
 	r.TagType.Name = m.TagType.Name
+	r.TagType.Color = m.TagType.Color
 }
 
 //
