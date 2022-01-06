@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/konveyor/controller/pkg/logging"
 	"github.com/konveyor/tackle-hub/settings"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"io/ioutil"
 	"os"
@@ -14,6 +15,10 @@ import (
 )
 
 var log = logging.WithName("model")
+
+//
+// Field (data) types.
+type JSON = datatypes.JSON
 
 //
 // Model Base model.
