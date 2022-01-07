@@ -209,10 +209,9 @@ func tag(d *Data) (err error) {
 	application, _ := addon.Application.Get(d.Application)
 	//
 	// Create tag.
-	tag := &api.Tag{
-		Name: "MyTag",
-		TagTypeID: 1,
-	}
+	tag := &api.Tag{}
+	tag.Name = "MyTag"
+	tag.TagType.ID = 1
 	err = addon.Tag.Create(tag)
 	if err != nil {
 		return

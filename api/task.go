@@ -136,17 +136,15 @@ func (h TaskHandler) AddonCreate(ctx *gin.Context) {
 			return
 		}
 	}
-	data := map[string]interface{}{}
-	err = ctx.BindJSON(&data)
-	if err != nil {
-		h.createFailed(ctx, err)
-		return
-	}
 	task := Task{}
 	task.Name = addon.Name
 	task.Addon = addon.Name
 	task.Image = addon.Spec.Image
-	task.Data = data
+	err = ctx.BindJSON(&task.Data)
+	if err != nil {
+		h.createFailed(ctx, err)
+		return
+	}
 	result := h.DB.Create(&task)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)

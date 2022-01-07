@@ -6,8 +6,11 @@ require (
 	github.com/gin-gonic/gin v1.7.4
 	github.com/google/uuid v1.1.2
 	github.com/konveyor/controller v0.8.0
+	gorm.io/datatypes v1.0.5
+	gorm.io/driver/postgres v1.2.3 // indirect
 	gorm.io/driver/sqlite v1.2.4
-	gorm.io/gorm v1.22.2
+	gorm.io/driver/sqlserver v1.2.1 // indirect
+	gorm.io/gorm v1.22.4
 	k8s.io/api v0.17.4
 	k8s.io/apimachinery v0.17.4
 	k8s.io/client-go v0.17.4

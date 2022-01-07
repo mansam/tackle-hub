@@ -1,8 +1,6 @@
 package model
 
 import (
-	"encoding/json"
-	"gorm.io/gorm"
 	"time"
 )
 
@@ -22,8 +20,7 @@ type Task struct {
 	Name       string      `json:"name"`
 	Image      string      `json:"image"`
 	Addon      string      `json:"addon"`
-	Data       interface{} `json:"data" gorm:"-"`
-	Data_      string      `json:"-"`
+	Data       JSON        `json:"data"`
 	Started    *time.Time  `json:"started"`
 	Terminated *time.Time  `json:"terminated"`
 	Status     string      `json:"status"`
@@ -37,22 +34,4 @@ func (m *Task) Reset() {
 	m.Terminated = nil
 	m.Report = nil
 	m.Status = ""
-}
-
-func (m *Task) BeforeSave(db *gorm.DB) (err error) {
-	if m.Data == nil {
-		m.Data = struct{}{}
-	}
-	b, err := json.Marshal(m.Data)
-	m.Data_ = string(b)
-	return
-}
-
-func (m *Task) AfterFind(db *gorm.DB) (err error) {
-	if len(m.Data_) == 0 {
-		m.Data_ = "{}"
-	}
-	b := []byte(m.Data_)
-	err = json.Unmarshal(b, &m.Data)
-	return
 }

@@ -13,7 +13,7 @@ vet:
 
 # Build hub
 hub: generate fmt vet
-	go build -o bin/hub github.com/konveyor/tackle-hub/cmd
+	go build --tags json1 -o bin/hub github.com/konveyor/tackle-hub/cmd
 
 # Build manager binary with compiler optimizations disabled
 debug: fmt vet
