@@ -98,7 +98,7 @@ func (h RepositoryHandler) ListByApplication(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} Repository
+// @success 201 {object} Repository
 // @router /repositories [post]
 // @param repo body Repository true "Repository data"
 func (h RepositoryHandler) Create(ctx *gin.Context) {
@@ -123,7 +123,7 @@ func (h RepositoryHandler) Create(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} Repository
+// @success 201 {object} Repository
 // @router /application-inventory/application/:id/repositories [post]
 // @param repo body Repository true "Repository data"
 func (h RepositoryHandler) CreateForApplication(ctx *gin.Context) {

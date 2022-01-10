@@ -100,7 +100,7 @@ func (h IdentityHandler) ListByRepository(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} Identity
+// @success 201 {object} Identity
 // @router /identities [post]
 // @param identity body Identity true "Identity data"
 func (h IdentityHandler) Create(ctx *gin.Context) {
@@ -125,7 +125,7 @@ func (h IdentityHandler) Create(ctx *gin.Context) {
 // @tags create
 // @accept json
 // @produce json
-// @success 200 {object} Identity
+// @success 201 {object} Identity
 // @router /identities [post]
 // @param identity body Identity true "Identity data"
 func (h IdentityHandler) CreateForRepository(ctx *gin.Context) {
