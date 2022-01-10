@@ -108,7 +108,7 @@ func (h BucketHandler) ListByApplication(ctx *gin.Context) {
 // @buckets create
 // @accept json
 // @produce json
-// @success 200 {object} Bucket
+// @success 201 {object} Bucket
 // @router /controls/bucket [post]
 // @param bucket body Bucket true "Bucket data"
 func (h BucketHandler) Create(ctx *gin.Context) {
@@ -133,7 +133,7 @@ func (h BucketHandler) Create(ctx *gin.Context) {
 // @buckets create
 // @accept json
 // @produce json
-// @success 200 {object} Bucket
+// @success 201 {object} Bucket
 // @router /controls/bucket [post]
 // @param bucket body Bucket true "Bucket data"
 func (h BucketHandler) CreateForApplication(ctx *gin.Context) {

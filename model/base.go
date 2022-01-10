@@ -14,7 +14,10 @@ import (
 	"time"
 )
 
-var log = logging.WithName("model")
+var (
+	log      = logging.WithName("model")
+	Settings = &settings.Settings
+)
 
 //
 // Field (data) types.

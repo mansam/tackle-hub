@@ -10,6 +10,7 @@ const (
 	EnvDbSeedPath = "DB_SEED_PATH"
 	EnvBucketPath = "BUCKET_PATH"
 	EnvBucketPVC = "BUCKET_PVC"
+	EnvPassphrase = "ENCRYPTION_PASSPHRASE"
 )
 
 type Hub struct {
@@ -24,6 +25,10 @@ type Hub struct {
 	Bucket struct {
 		Path string
 		PVC string
+	}
+	// Encryption settings.
+	Encryption struct {
+		Passphrase string
 	}
 }
 
@@ -48,6 +53,10 @@ func (r *Hub) Load() (err error) {
 	r.Bucket.PVC, found = os.LookupEnv(EnvBucketPVC)
 	if !found {
 		r.Bucket.PVC = "bucket"
+	}
+	r.Encryption.Passphrase, found = os.LookupEnv(EnvPassphrase)
+	if !found {
+		r.Encryption.Passphrase = "tackle"
 	}
 
 	return

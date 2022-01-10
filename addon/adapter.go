@@ -35,6 +35,8 @@ type Adapter struct {
 	Application Application
 	// Bucket API.
 	Bucket Bucket
+	// Identity API.
+	Identity Identity
 	// TagType API.
 	TagType TagType
 	// Tag API.
@@ -80,6 +82,9 @@ func newAdapter() (adapter *Adapter) {
 			client: client,
 		},
 		Bucket: Bucket{
+			client: client,
+		},
+		Identity: Identity{
 			client: client,
 		},
 		TagType: TagType{

@@ -19,6 +19,10 @@ type AES struct {
 // Encrypt plain string.
 // Returns an AES encrypted; base64 encoded string.
 func (r *AES) Encrypt(plain string) (encrypted string, err error) {
+	if plain == "" {
+		encrypted = plain
+		return
+	}
 	block, err := aes.NewCipher(r.Key)
 	if err != nil {
 		return
@@ -40,6 +44,10 @@ func (r *AES) Encrypt(plain string) (encrypted string, err error) {
 // The `encrypted` string is an AES encrypted; base64 encoded string.
 // Returns the decoded string.
 func (r *AES) Decrypt(encrypted string) (plain string, err error) {
+	if encrypted == "" {
+		plain = encrypted
+		return
+	}
 	block, err := aes.NewCipher(r.Key)
 	if err != nil {
 		return

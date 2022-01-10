@@ -281,6 +281,7 @@ func (r *Task) container() (container core.Container) {
 func (r *Task) secret() (secret core.Secret) {
 	data := Secret{}
 	data.Hub.Task = r.Task.ID
+	data.Hub.Encryption.Passphrase = Settings.Encryption.Passphrase
 	data.Addon = r.Task.Data
 	encoded, _ := json.Marshal(data)
 	secret = core.Secret{
@@ -311,6 +312,9 @@ type Secret struct {
 	Hub struct {
 		Token string
 		Task uint
+		Encryption struct {
+			Passphrase string
+		}
 	}
 	Addon interface{}
 }
