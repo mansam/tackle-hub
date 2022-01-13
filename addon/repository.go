@@ -32,14 +32,3 @@ func (h *Repository) List() (list []api.Repository, err error) {
 	err = h.client.Get(api.RepositoriesRoot, &list)
 	return
 }
-
-//
-// Update a repository by ID.
-func (h *Repository) Update(m *api.Repository) (err error) {
-	err = h.client.Put(
-		pathlib.Join(
-			api.RepositoriesRoot,
-			strconv.Itoa(int(m.ID))),
-		m)
-	return
-}

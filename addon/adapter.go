@@ -6,13 +6,17 @@ package addon
 
 import (
 	"encoding/json"
+	"github.com/konveyor/controller/pkg/logging"
 	"github.com/konveyor/tackle-hub/settings"
 	"github.com/konveyor/tackle-hub/task"
 	"net/http"
 	"os"
 )
 
-var Settings = settings.Settings
+var (
+	Settings = settings.Settings
+	Log = logging.WithName("addon")
+)
 
 //
 // Addon An addon adapter configured for a task execution.
@@ -30,6 +34,7 @@ func init() {
 //
 // The Adapter provides hub/addon integration.
 type Adapter struct {
+	// Task API.
 	Task
 	// Application API.
 	Application Application
@@ -100,6 +105,11 @@ func newAdapter() (adapter *Adapter) {
 		},
 		client: client,
 	}
+
+	Log.Info(
+		"Addon created.",
+		"data",
+		adapter.Data())
 
 	return
 }

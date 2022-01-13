@@ -41,5 +41,11 @@ func (h *Application) Update(m *api.Application) (err error) {
 			api.ApplicationsRoot,
 			strconv.Itoa(int(m.ID))),
 		m)
+	if err == nil {
+		Log.Info(
+			"Addon updated: application.",
+			"id",
+			m.ID)
+	}
 	return
 }

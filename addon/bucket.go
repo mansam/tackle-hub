@@ -17,6 +17,12 @@ type Bucket struct {
 // Create a bucket.
 func (h *Bucket) Create(m *api.Bucket) (err error) {
 	err = h.client.Post(api.BucketsRoot, m)
+	if err == nil {
+		Log.Info(
+			"Addon created: bucket.",
+			"object",
+			m)
+	}
 	return
 }
 
@@ -47,5 +53,11 @@ func (h *Bucket) Delete(m *api.Bucket) (err error) {
 		pathlib.Join(
 			api.BucketsRoot,
 			strconv.Itoa(int(m.ID))))
+	if err == nil {
+		Log.Info(
+			"Addon deleted: bucket.",
+			"object",
+			m)
+	}
 	return
 }

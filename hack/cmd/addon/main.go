@@ -9,7 +9,6 @@ package main
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	hub "github.com/konveyor/tackle-hub/addon"
 	"github.com/konveyor/tackle-hub/api"
 	"os"
@@ -23,6 +22,7 @@ import (
 var (
 	// addon adapter.
 	addon = hub.Addon
+	log   = hub.Log
 )
 
 //
@@ -37,7 +37,7 @@ func main() {
 	// Error handler.
 	defer func() {
 		if err != nil {
-			fmt.Printf("Addon failed: %s\n", err.Error())
+			log.Error(err, "Addon failed.")
 			_ = addon.Failed(err.Error())
 			d.delay()
 			os.Exit(1)
@@ -172,7 +172,7 @@ func buildIndex(bucket *api.Bucket) (err error) {
 //
 // find files.
 func find(path string, max int) (paths []string, err error) {
-	fmt.Printf("Listing: %s\n", path)
+	log.Info("Listing.", "path", path)
 	cmd := exec.Command(
 		"find",
 		path,
@@ -187,7 +187,7 @@ func find(path string, max int) (paths []string, err error) {
 	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println(stderr.String())
+		log.Info(stderr.String())
 		return
 	}
 
@@ -196,7 +196,7 @@ func find(path string, max int) (paths []string, err error) {
 		paths = paths[:max]
 	}
 
-	fmt.Printf("Listed: %v\n", paths)
+	log.Info("List found.", "paths", paths)
 
 	return
 }

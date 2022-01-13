@@ -46,14 +46,3 @@ func (h *Identity) List() (list []api.Identity, err error) {
 	}
 	return
 }
-
-//
-// Update an identity by ID.
-func (h *Identity) Update(m *api.Identity) (err error) {
-	err = h.client.Put(
-		pathlib.Join(
-			api.IdentitiesRoot,
-			strconv.Itoa(int(m.ID))),
-		m)
-	return
-}

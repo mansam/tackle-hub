@@ -17,6 +17,12 @@ type Tag struct {
 // Create a tag.
 func (h *Tag) Create(m *api.Tag) (err error) {
 	err = h.client.Post(api.TagsRoot, m)
+	if err == nil {
+		Log.Info(
+			"Addon created: tag.",
+			"object",
+			m)
+	}
 	return
 }
 
@@ -47,6 +53,12 @@ func (h *Tag) Delete(m *api.Tag) (err error) {
 		pathlib.Join(
 			api.TagsRoot,
 			strconv.Itoa(int(m.ID))))
+	if err == nil {
+		Log.Info(
+			"Addon deleted: tag.",
+			"object",
+			m)
+	}
 	return
 }
 
@@ -61,6 +73,12 @@ type TagType struct {
 // Create a tag-type.
 func (h *TagType) Create(m *api.TagType) (err error) {
 	err = h.client.Post(api.TagTypesRoot, m)
+	if err == nil {
+		Log.Info(
+			"Addon created: tag(type).",
+			"object",
+			m)
+	}
 	return
 }
 
@@ -91,5 +109,11 @@ func (h *TagType) Delete(m *api.TagType) (err error) {
 		pathlib.Join(
 			api.TagTypesRoot,
 			strconv.Itoa(int(m.ID))))
+	if err == nil {
+		Log.Info(
+			"Addon deleted: tag(type).",
+			"object",
+			m)
+	}
 	return
 }

@@ -41,6 +41,7 @@ func (h *Task) DataWith(object interface{}) (err error) {
 func (h *Task) Started() (err error) {
 	h.report.Status = task.Running
 	err = h.postReport()
+	Log.Info("Addon reported started.")
 	return
 }
 
@@ -49,6 +50,7 @@ func (h *Task) Started() (err error) {
 func (h *Task) Succeeded() (err error) {
 	h.report.Status = task.Succeeded
 	err = h.putReport()
+	Log.Info("Addon reported: succeeded.")
 	return
 }
 
@@ -59,6 +61,10 @@ func (h *Task) Failed(reason string, x ...interface{}) (err error) {
 	h.report.Status = task.Failed
 	h.report.Error = fmt.Sprintf(reason, x...)
 	err = h.putReport()
+	Log.Info(
+		"Addon reported: failed.",
+		"error",
+		h.report.Error)
 	return
 }
 
@@ -68,6 +74,10 @@ func (h *Task) Failed(reason string, x ...interface{}) (err error) {
 func (h *Task) Activity(description string, x ...interface{}) (err error) {
 	h.report.Activity = fmt.Sprintf(description, x...)
 	err = h.putReport()
+	Log.Info(
+		"Addon reported: activity.",
+		"activity",
+		h.report.Activity)
 	return
 }
 
@@ -76,6 +86,10 @@ func (h *Task) Activity(description string, x ...interface{}) (err error) {
 func (h *Task) Total(n int) (err error) {
 	h.report.Total = n
 	err = h.putReport()
+	Log.Info(
+		"Addon updated: total.",
+		"total",
+		h.report.Total)
 	return
 }
 
@@ -84,6 +98,10 @@ func (h *Task) Total(n int) (err error) {
 func (h *Task) Increment() (err error) {
 	h.report.Completed++
 	err = h.putReport()
+	Log.Info(
+		"Addon updated: total.",
+		"total",
+		h.report.Total)
 	return
 }
 
@@ -92,6 +110,7 @@ func (h *Task) Increment() (err error) {
 func (h *Task) Completed(n int) (err error) {
 	h.report.Completed = n
 	err = h.putReport()
+	Log.Info("Addon reported: completed.")
 	return
 }
 
