@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/controller/pkg/logging"
@@ -14,7 +15,12 @@ import (
 	"github.com/konveyor/tackle-hub/task"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"io/ioutil"
 	"k8s.io/client-go/kubernetes/scheme"
+	"os"
+	"path"
+	"reflect"
+	"strings"
 	"syscall"
 )
 
@@ -62,16 +68,10 @@ func Setup() (db *gorm.DB, err error) {
 		return
 	}
 
-	model.Seed(db,
-		model.JobFunction{},
-		model.TagType{},
-		model.Tag{},
-		model.StakeholderGroup{},
-		model.Stakeholder{},
-		model.BusinessService{},
-		model.Application{},
-		model.Review{},
-	)
+	err = Seed(db, model.All())
+	if err != nil {
+		return
+	}
 
 	return
 }
@@ -144,4 +144,60 @@ func main() {
 	}
 	importManager.Run(context.Background())
 	err = router.Run()
+}
+
+//
+// Seed the database with the contents of json
+// files contained in DB_SEED_PATH.
+func Seed(db *gorm.DB, models []interface{}) (err error) {
+	result := db.Find(&model.Seeded{})
+	if result.RowsAffected != 0 {
+		log.Info("Database already seeded, skipping.")
+		return
+	}
+
+	for _, m := range models {
+		err = func() (err error) {
+			kind := reflect.TypeOf(m).Name()
+			fileName := strings.ToLower(kind) + ".json"
+			filePath := path.Join(settings.Settings.DB.SeedPath, fileName)
+			file, err := os.Open(filePath)
+			if err != nil {
+				log.Info("Could not open seed file.", "model", kind, "path", filePath)
+				err = nil
+				return
+			}
+			defer file.Close()
+			jsonBytes, err := ioutil.ReadAll(file)
+			if err != nil {
+				return
+			}
+
+			var unmarshalled []map[string]interface{}
+			err = json.Unmarshal(jsonBytes, &unmarshalled)
+			if err != nil {
+				return
+			}
+			for i := range unmarshalled {
+				result := db.Model(&m).Create(unmarshalled[i])
+				if result.Error != nil {
+					err = result.Error
+					return
+				}
+			}
+			return
+		}()
+		if err != nil {
+			return
+		}
+	}
+
+	seeded := model.Seeded{}
+	result = db.Create(&seeded)
+	if result.Error != nil {
+		err = result.Error
+		return
+	}
+	log.Info("Database seeded.")
+	return
 }

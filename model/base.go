@@ -1,21 +1,12 @@
 package model
 
 import (
-	"encoding/json"
-	"github.com/konveyor/controller/pkg/logging"
 	"github.com/konveyor/tackle-hub/settings"
 	"gorm.io/datatypes"
-	"gorm.io/gorm"
-	"io/ioutil"
-	"os"
-	"path"
-	"reflect"
-	"strings"
 	"time"
 )
 
 var (
-	log      = logging.WithName("model")
 	Settings = &settings.Settings
 )
 
@@ -39,55 +30,26 @@ type Seeded struct {
 }
 
 //
-// Seed the database with the contents of json
-// files contained in DB_SEED_PATH.
-func Seed(db *gorm.DB, models ...interface{}) {
-	result := db.Find(&Seeded{})
-	if result.RowsAffected != 0 {
-		log.Info("Database already seeded, skipping.")
-		return
+// All builds all models.
+// Models are enumerated such that each are listed after
+// all the other models on which they may depend.
+func All() []interface{} {
+	return []interface{}{
+		ImportSummary{},
+		Import{},
+		ImportTag{},
+		JobFunction{},
+		TagType{},
+		Tag{},
+		StakeholderGroup{},
+		Stakeholder{},
+		BusinessService{},
+		Application{},
+		Dependency{},
+		Review{},
+		Repository{},
+		Identity{},
+		Task{},
+		TaskReport{},
 	}
-
-	for _, model := range models {
-		kind := reflect.TypeOf(model).String()
-		segments := strings.Split(kind, ".")
-		fileName := strings.ToLower(segments[len(segments)-1]) + ".json"
-		filePath := path.Join(settings.Settings.DB.SeedPath, fileName)
-		file, err := os.Open(filePath)
-		if err != nil {
-			log.Info("No seed file found for type.", "type", kind)
-			continue
-		}
-		defer file.Close()
-		jsonBytes, err := ioutil.ReadAll(file)
-		if err != nil {
-			log.Info("Could not read bytes from file.", "type", kind)
-		}
-
-		var m []map[string]interface{}
-		err = json.Unmarshal(jsonBytes, &m)
-		if err != nil {
-			log.Info("Could not unmarshal records.", "type", kind)
-			continue
-		}
-		created := 0
-		failed := 0
-		for i := range m {
-			result := db.Model(&model).Create(m[i])
-			if result.Error != nil {
-				log.Info("Could not create row.", "type", kind, "error", result.Error)
-				failed++
-				continue
-			}
-			created++
-		}
-		log.Info("Complete.", "type", kind, "created", created, "failed", failed)
-	}
-
-	seeded := Seeded{}
-	result = db.Create(&seeded)
-	if result.Error != nil {
-		log.Info("Failed to create seed record.")
-	}
-	log.Info("Database seeded.")
 }
