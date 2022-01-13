@@ -112,7 +112,7 @@ func (h IdentityHandler) Create(ctx *gin.Context) {
 	}
 	result := h.DB.Create(identity)
 	if result.Error != nil {
-		h.createFailed(ctx, err)
+		h.createFailed(ctx, result.Error)
 		return
 	}
 
@@ -145,7 +145,7 @@ func (h IdentityHandler) CreateForRepository(ctx *gin.Context) {
 	identity.RepositoryID = repository.ID
 	result = h.DB.Create(identity)
 	if result.Error != nil {
-		h.createFailed(ctx, err)
+		h.createFailed(ctx, result.Error)
 		return
 	}
 
