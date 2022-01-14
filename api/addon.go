@@ -20,7 +20,6 @@ const (
 // AddonHandler handles addon routes.
 type AddonHandler struct {
 	BaseHandler
-	Client client.Client
 }
 
 //

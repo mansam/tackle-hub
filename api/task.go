@@ -26,7 +26,6 @@ const (
 // TaskHandler handles task routes.
 type TaskHandler struct {
 	BaseHandler
-	Client client.Client
 }
 
 //

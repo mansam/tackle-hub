@@ -68,7 +68,7 @@ func Setup() (db *gorm.DB, err error) {
 		return
 	}
 
-	err = Seed(db, model.All())
+	err = seed(db, model.All())
 	if err != nil {
 		return
 	}
@@ -109,29 +109,8 @@ func main() {
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
-	handlerList := []api.Handler{
-		&api.ApplicationHandler{},
-		&api.BucketHandler{},
-		&api.BusinessServiceHandler{},
-		&api.DependencyHandler{},
-		&api.ImportHandler{},
-		&api.JobFunctionHandler{},
-		&api.RepositoryHandler{},
-		&api.IdentityHandler{},
-		&api.ReviewHandler{},
-		&api.StakeholderHandler{},
-		&api.StakeholderGroupHandler{},
-		&api.TagHandler{},
-		&api.TagTypeHandler{},
-		&api.TaskHandler{
-			Client: client,
-		},
-		&api.AddonHandler{
-			Client: client,
-		},
-	}
-	for _, h := range handlerList {
-		h.With(db)
+	for _, h := range api.All() {
+		h.With(db, client)
 		h.AddRoutes(router)
 	}
 	taskManager := task.Manager{
@@ -149,7 +128,7 @@ func main() {
 //
 // Seed the database with the contents of json
 // files contained in DB_SEED_PATH.
-func Seed(db *gorm.DB, models []interface{}) (err error) {
+func seed(db *gorm.DB, models []interface{}) (err error) {
 	result := db.Find(&model.Seeded{})
 	if result.RowsAffected != 0 {
 		log.Info("Database already seeded, skipping.")
