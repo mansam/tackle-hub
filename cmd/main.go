@@ -109,29 +109,8 @@ func main() {
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
-	handlerList := []api.Handler{
-		&api.ApplicationHandler{},
-		&api.BucketHandler{},
-		&api.BusinessServiceHandler{},
-		&api.DependencyHandler{},
-		&api.ImportHandler{},
-		&api.JobFunctionHandler{},
-		&api.RepositoryHandler{},
-		&api.IdentityHandler{},
-		&api.ReviewHandler{},
-		&api.StakeholderHandler{},
-		&api.StakeholderGroupHandler{},
-		&api.TagHandler{},
-		&api.TagTypeHandler{},
-		&api.TaskHandler{
-			Client: client,
-		},
-		&api.AddonHandler{
-			Client: client,
-		},
-	}
-	for _, h := range handlerList {
-		h.With(db)
+	for _, h := range api.All() {
+		h.With(db, client)
 		h.AddRoutes(router)
 	}
 	taskManager := task.Manager{
