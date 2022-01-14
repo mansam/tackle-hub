@@ -44,6 +44,8 @@ type Adapter struct {
 	Bucket Bucket
 	// Identity API.
 	Identity Identity
+	// Proxy API.
+	Proxy Proxy
 	// TagType API.
 	TagType TagType
 	// Tag API.
@@ -95,6 +97,9 @@ func newAdapter() (adapter *Adapter) {
 			client: client,
 		},
 		Identity: Identity{
+			client: client,
+		},
+		Proxy: Proxy{
 			client: client,
 		},
 		TagType: TagType{

@@ -32,6 +32,7 @@ const (
 // All builds all handlers.
 func All() []Handler {
 	return []Handler{
+		&AddonHandler{},
 		&ApplicationHandler{},
 		&BucketHandler{},
 		&BusinessServiceHandler{},
@@ -40,13 +41,13 @@ func All() []Handler {
 		&JobFunctionHandler{},
 		&RepositoryHandler{},
 		&IdentityHandler{},
+		&ProxyHandler{},
 		&ReviewHandler{},
 		&StakeholderHandler{},
 		&StakeholderGroupHandler{},
 		&TagHandler{},
 		&TagTypeHandler{},
 		&TaskHandler{},
-		&AddonHandler{},
 	}
 }
 

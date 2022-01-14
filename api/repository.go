@@ -110,7 +110,7 @@ func (h RepositoryHandler) Create(ctx *gin.Context) {
 	}
 	result := h.DB.Create(repo)
 	if result.Error != nil {
-		h.createFailed(ctx, err)
+		h.createFailed(ctx, result.Error)
 		return
 	}
 

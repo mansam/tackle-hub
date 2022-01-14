@@ -170,4 +170,3 @@ func (r *Hal) With(kind string, resources interface{}, total int) {
 	r.Embedded[kind] = resources
 	r.TotalCount = total
 }
-
