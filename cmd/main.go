@@ -68,7 +68,7 @@ func Setup() (db *gorm.DB, err error) {
 		return
 	}
 
-	err = Seed(db, model.All())
+	err = seed(db, model.All())
 	if err != nil {
 		return
 	}
@@ -128,7 +128,7 @@ func main() {
 //
 // Seed the database with the contents of json
 // files contained in DB_SEED_PATH.
-func Seed(db *gorm.DB, models []interface{}) (err error) {
+func seed(db *gorm.DB, models []interface{}) (err error) {
 	result := db.Find(&model.Seeded{})
 	if result.RowsAffected != 0 {
 		log.Info("Database already seeded, skipping.")
