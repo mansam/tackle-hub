@@ -155,3 +155,19 @@ func (h *BaseHandler) listResponse(ctx *gin.Context, kind string, resources inte
 	}
 	ctx.JSON(http.StatusOK, resources)
 }
+
+//
+// Hal REST resource.
+type Hal struct {
+	Embedded   map[string]interface{} `json:"_embedded"`
+	TotalCount int                    `json:"total_count"`
+}
+
+//
+// With sets the embedded resource and count.
+func (r *Hal) With(kind string, resources interface{}, total int) {
+	r.Embedded = make(map[string]interface{})
+	r.Embedded[kind] = resources
+	r.TotalCount = total
+}
+
