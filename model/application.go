@@ -9,15 +9,15 @@ type Application struct {
 	Review            *Review          `json:"review"`
 	Comments          string           `json:"comments"`
 	Tags              []Tag            `json:"tags" gorm:"many2many:applicationTags"`
-	BusinessServiceID uint             `json:"-"`
+	BusinessServiceID uint             `json:"-" gorm:"index"`
 	BusinessService   *BusinessService `json:"businessService"`
 }
 
 type Dependency struct {
 	Model
-	ToID   uint         `json:"to"`
+	ToID   uint         `json:"to" gorm:"index"`
 	To     *Application `json:"-" gorm:"foreignKey:to_id;constraint:OnDelete:CASCADE"`
-	FromID uint         `json:"from"`
+	FromID uint         `json:"from" gorm:"index"`
 	From   *Application `json:"-" gorm:"foreignKey:from_id;constraint:OnDelete:CASCADE"`
 }
 
@@ -29,7 +29,7 @@ type Repository struct {
 	Branch        string `json:"branch"`
 	Tag           string `json:"tag"`
 	Path          string `json:"path" gorm:"default:/"`
-	ApplicationID uint   `json:"application"`
+	ApplicationID uint   `json:"application" gorm:"index"`
 }
 
 type Review struct {
@@ -40,7 +40,7 @@ type Review struct {
 	WorkPriority        uint         `json:"workPriority" gorm:"not null"`
 	Comments            string       `json:"comments"`
 	Application         *Application `json:"application"`
-	ApplicationID       uint         `json:"-"`
+	ApplicationID       uint         `json:"-" gorm:"index"`
 }
 
 type Import struct {
@@ -56,7 +56,7 @@ type Import struct {
 	IsValid             bool          `json:"isValid"`
 	RecordType1         string        `json:"recordType1"`
 	ImportSummary       ImportSummary `json:"-"`
-	ImportSummaryID     uint          `json:"-"`
+	ImportSummaryID     uint          `json:"-" gorm:"index"`
 	Processed           bool          `json:"-"`
 	ImportTags          []ImportTag   `json:"-" gorm:"constraint:OnDelete:CASCADE"`
 }
@@ -96,6 +96,6 @@ type ImportTag struct {
 	Model
 	Name     string
 	TagType  string
-	ImportID uint
+	ImportID uint `gorm:"index"`
 	Import   *Import
 }
