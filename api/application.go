@@ -172,7 +172,7 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 		h.updateFailed(ctx, result.Error)
 		return
 	}
-	err = h.DB.Debug().Model(&m).Association("Tags").Replace("Tags", m.Tags)
+	err = h.DB.Model(&m).Association("Tags").Replace("Tags", m.Tags)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
