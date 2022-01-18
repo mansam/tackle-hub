@@ -114,7 +114,7 @@ func (h ApplicationHandler) Create(ctx *gin.Context) {
 		return
 	}
 	m := r.Model()
-	result := h.DB.Create(&m)
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
@@ -185,7 +185,7 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 // Application REST resource.
 type Application struct {
 	ID              uint     `json:"id"`
-	Name            string   `json:"name"`
+	Name            string   `json:"name" binding:"required"`
 	Description     string   `json:"description"`
 	Review          *Review  `json:"review"`
 	Comments        string   `json:"comments"`

@@ -162,12 +162,12 @@ func (h TagHandler) Update(ctx *gin.Context) {
 // Tag REST resource.
 type Tag struct {
 	ID      uint   `json:"id"`
-	Name    string `json:"name"`
+	Name    string `json:"name" binding:"required"`
 	TagType struct {
-		ID    uint   `json:"id"`
+		ID    uint   `json:"id" binding:"required"`
 		Name  string `json:"name"`
 		Color string `json:"colour"`
-	} `json:"tagType"`
+	} `json:"tagType" binding:"required"`
 }
 
 //

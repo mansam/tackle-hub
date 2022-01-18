@@ -164,7 +164,7 @@ func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 // BusinessService REST resource.
 type BusinessService struct {
 	ID          uint   `json:"id"`
-	Name        string `json:"name"`
+	Name        string `json:"name" binding:"required"`
 	Description string `json:"description"`
 	Owner       struct {
 		ID          *uint  `json:"id"`

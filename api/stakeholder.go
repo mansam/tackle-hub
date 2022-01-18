@@ -180,8 +180,8 @@ func (h StakeholderHandler) Update(ctx *gin.Context) {
 // Stakeholder REST resource.
 type Stakeholder struct {
 	ID               uint                     `json:"id"`
-	DisplayName      string                   `json:"displayName"`
-	Email            string                   `json:"email"`
+	DisplayName      string                   `json:"displayName" binding:"required"`
+	Email            string                   `json:"email" binding:"required"`
 	Groups           []model.StakeholderGroup `json:"stakeholderGroups"`
 	BusinessServices []model.BusinessService  `json:"businessServices"`
 	JobFunction      struct {

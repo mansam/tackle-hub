@@ -163,7 +163,7 @@ func (h TagTypeHandler) Update(ctx *gin.Context) {
 // TagType REST resource.
 type TagType struct {
 	ID       uint   `json:"id"`
-	Name     string `json:"name"`
+	Name     string `json:"name" binding:"required"`
 	Username string `json:"username"`
 	Rank     uint   `json:"rank"`
 	Color    string `json:"colour"`

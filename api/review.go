@@ -219,8 +219,8 @@ type Review struct {
 	WorkPriority        uint   `json:"workPriority"`
 	Comments            string `json:"comments"`
 	Application         *struct {
-		ID uint `json:"id"`
-	} `json:"application"`
+		ID uint `json:"id" binding:"required"`
+	} `json:"application" binding:"required"`
 }
 
 // With updates the resource with the model.
@@ -232,7 +232,7 @@ func (r *Review) With(m *model.Review) {
 	r.WorkPriority = m.WorkPriority
 	r.Comments = m.Comments
 	r.Application = &struct {
-		ID uint `json:"id"`
+		ID uint `json:"id" binding:"required"`
 	}{
 		ID: m.ApplicationID,
 	}
@@ -258,6 +258,6 @@ func (r *Review) Model() (m *model.Review) {
 //
 // CopyRequest REST resource.
 type CopyRequest struct {
-	SourceReview       uint   `json:"sourceReview"`
-	TargetApplications []uint `json:"targetApplications"`
+	SourceReview       uint   `json:"sourceReview" binding:"required"`
+	TargetApplications []uint `json:"targetApplications" binding:"required"`
 }

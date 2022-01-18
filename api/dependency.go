@@ -149,11 +149,11 @@ func (h DependencyHandler) Delete(ctx *gin.Context) {
 type Dependency struct {
 	ID uint `json:"id"`
 	To struct {
-		ID   uint   `json:"id"`
+		ID   uint   `json:"id" binding:"required"`
 		Name string `json:"name"`
 	} `json:"to"`
 	From struct {
-		ID   uint   `json:"id"`
+		ID   uint   `json:"id" binding:"required"`
 		Name string `json:"name"`
 	} `json:"from"`
 }
