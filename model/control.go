@@ -23,7 +23,7 @@ type Stakeholder struct {
 	Groups           []StakeholderGroup `json:"stakeholderGroups" gorm:"many2many:sgStakeholder"`
 	BusinessServices []BusinessService  `json:"businessServices" gorm:"foreignKey:owner_id"`
 	JobFunctionID    *uint              `json:"-" gorm:"index"`
-	JobFunction      *JobFunction       `json:"jobFunc	tion"`
+	JobFunction      *JobFunction       `json:"jobFunction"`
 }
 
 type JobFunction struct {
