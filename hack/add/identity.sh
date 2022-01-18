@@ -18,8 +18,8 @@ curl -X POST ${host}/identities -d \
 curl -X POST ${host}/repositories/1/identities -d \
 '{
     "createUser": "tackle",
-    "kind": "git",
-    "name":"jeff",
+    "kind": "mvn",
+    "name":"jeff-mvn",
     "description": "Forklift",
     "user": "userA",
     "password": "passwordA",

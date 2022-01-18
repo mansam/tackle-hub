@@ -8,7 +8,7 @@ import (
 
 type Identity struct {
 	Model
-	Kind         string `json:"kind" gorm:"not null"`
+	Kind         string `json:"kind" gorm:"not null;uniqueIndex:Identity_A"`
 	Name         string `json:"name" gorm:"not null"`
 	Description  string `json:"description"`
 	User         string `json:"user"`
@@ -16,7 +16,7 @@ type Identity struct {
 	Key          string `json:"key"`
 	Settings     string `json:"settings"`
 	Encrypted    string `json:"encrypted"`
-	RepositoryID uint   `json:"repository"`
+	RepositoryID uint   `json:"repository" gorm:"index;uniqueIndex:Identity_A"`
 }
 
 //

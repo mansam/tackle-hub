@@ -25,6 +25,7 @@ func (h RepositoryHandler) AddRoutes(e *gin.Engine) {
 	e.GET(RepositoriesRoot+"/", h.List)
 	e.POST(RepositoriesRoot, h.Create)
 	e.POST(AppRepositoriesRoot, h.CreateForApplication)
+	e.GET(AppRepositoriesRoot, h.ListByApplication)
 	e.GET(RepositoryRoot, h.Get)
 	e.PUT(RepositoryRoot, h.Update)
 	e.DELETE(RepositoryRoot, h.Delete)
@@ -39,15 +40,15 @@ func (h RepositoryHandler) AddRoutes(e *gin.Engine) {
 // @router /repositories/:id [get]
 // @param id path string true "Repository ID"
 func (h RepositoryHandler) Get(ctx *gin.Context) {
-	repo := Repository{}
+	repository := Repository{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&repo, id)
+	result := h.DB.First(&repository, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, repo)
+	ctx.JSON(http.StatusOK, repository)
 }
 
 // List godoc
@@ -102,19 +103,19 @@ func (h RepositoryHandler) ListByApplication(ctx *gin.Context) {
 // @router /repositories [post]
 // @param repo body Repository true "Repository data"
 func (h RepositoryHandler) Create(ctx *gin.Context) {
-	repo := &Repository{}
-	err := ctx.BindJSON(repo)
+	repository := &Repository{}
+	err := ctx.BindJSON(repository)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
-	result := h.DB.Create(repo)
+	result := h.DB.Create(repository)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, repo)
+	ctx.JSON(http.StatusCreated, repository)
 }
 
 // CreateForApplication godoc
@@ -127,8 +128,8 @@ func (h RepositoryHandler) Create(ctx *gin.Context) {
 // @router /application-inventory/application/:id/repositories [post]
 // @param repo body Repository true "Repository data"
 func (h RepositoryHandler) CreateForApplication(ctx *gin.Context) {
-	repo := &Repository{}
-	err := ctx.BindJSON(repo)
+	repository := &Repository{}
+	err := ctx.BindJSON(repository)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
@@ -140,14 +141,14 @@ func (h RepositoryHandler) CreateForApplication(ctx *gin.Context) {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-	repo.ApplicationID = application.ID
-	result = h.DB.Create(repo)
+	repository.ApplicationID = application.ID
+	result = h.DB.Create(repository)
 	if result.Error != nil {
 		h.createFailed(ctx, err)
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, repo)
+	ctx.JSON(http.StatusCreated, repository)
 }
 
 // Delete godoc
@@ -159,13 +160,13 @@ func (h RepositoryHandler) CreateForApplication(ctx *gin.Context) {
 // @param id path string true "Repository ID"
 func (h RepositoryHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	repo := &Repository{}
-	result := h.DB.First(repo, id)
+	repository := &Repository{}
+	result := h.DB.First(repository, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
 	}
-	result = h.DB.Delete(repo, id)
+	result = h.DB.Delete(repository, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return

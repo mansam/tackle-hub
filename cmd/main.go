@@ -15,6 +15,7 @@ import (
 	"github.com/konveyor/tackle-hub/task"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 	"io/ioutil"
 	"k8s.io/client-go/kubernetes/scheme"
 	"os"
@@ -41,7 +42,13 @@ func init() {
 //
 // Setup the DB and models.
 func Setup() (db *gorm.DB, err error) {
-	db, err = gorm.Open(sqlite.Open(fmt.Sprintf(ConnectionString, Settings.DB.Path)), &gorm.Config{})
+	db, err = gorm.Open(
+		sqlite.Open(fmt.Sprintf(ConnectionString, Settings.DB.Path)),
+		&gorm.Config{
+			NamingStrategy: &schema.NamingStrategy{
+				SingularTable: true,
+			},
+		})
 	if err != nil {
 		return
 	}

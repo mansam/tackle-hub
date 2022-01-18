@@ -24,12 +24,12 @@ type Dependency struct {
 type Repository struct {
 	Model
 	Kind          string `json:"kind"`
-	Binary        bool   `json:"binary"`
+	Binary        bool   `json:"binary" gorm:"uniqueIndex:Repository_A"`
 	URL           string `json:"url"`
 	Branch        string `json:"branch"`
 	Tag           string `json:"tag"`
 	Path          string `json:"path" gorm:"default:/"`
-	ApplicationID uint   `json:"application" gorm:"index"`
+	ApplicationID uint   `json:"application" gorm:"index;uniqueIndex:Repository_A"`
 }
 
 type Review struct {
