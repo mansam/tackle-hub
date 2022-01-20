@@ -37,15 +37,17 @@ func (h ProxyHandler) AddRoutes(e *gin.Engine) {
 // @router /proxies/:id [get]
 // @param id path string true "Proxy ID"
 func (h ProxyHandler) Get(ctx *gin.Context) {
-	proxy := Proxy{}
+	proxy := &model.Proxy{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&proxy, id)
+	result := h.DB.First(proxy, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
+	r := Proxy{}
+	r.With(proxy)
 
-	ctx.JSON(http.StatusOK, proxy)
+	ctx.JSON(http.StatusOK, r)
 }
 
 // List godoc
@@ -56,7 +58,7 @@ func (h ProxyHandler) Get(ctx *gin.Context) {
 // @success 200 {object} []Proxy
 // @router /proxies [get]
 func (h ProxyHandler) List(ctx *gin.Context) {
-	var list []Proxy
+	var list []model.Proxy
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	kind := ctx.Query("kind")
@@ -67,6 +69,12 @@ func (h ProxyHandler) List(ctx *gin.Context) {
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
+	}
+	resources := []Proxy{}
+	for i := range list {
+		r := Proxy{}
+		r.With(&list[i])
+		resources = append(resources, r)
 	}
 
 	ctx.JSON(http.StatusOK, list)
@@ -88,11 +96,13 @@ func (h ProxyHandler) Create(ctx *gin.Context) {
 		h.createFailed(ctx, err)
 		return
 	}
-	result := h.DB.Create(proxy)
+	m := proxy.Model()
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
+	proxy.With(m)
 
 	ctx.JSON(http.StatusCreated, proxy)
 }
@@ -106,7 +116,7 @@ func (h ProxyHandler) Create(ctx *gin.Context) {
 // @param id path string true "Proxy ID"
 func (h ProxyHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	proxy := &Proxy{}
+	proxy := &model.Proxy{}
 	result := h.DB.First(proxy, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
@@ -132,16 +142,17 @@ func (h ProxyHandler) Delete(ctx *gin.Context) {
 // @param proxy body Proxy true "Proxy data"
 func (h ProxyHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := Proxy{}
-	err := ctx.BindJSON(&updates)
+	r := &Proxy{}
+	err := ctx.BindJSON(r)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
 	}
-	db := h.DB.Model(&Proxy{})
+	m := r.Model()
+	db := h.DB.Model(&model.Proxy{})
 	db = db.Where("id", id)
 	db = db.Omit("id")
-	result := db.Updates(updates)
+	result := db.Updates(m)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
@@ -152,4 +163,34 @@ func (h ProxyHandler) Update(ctx *gin.Context) {
 
 //
 // Proxy REST resource.
-type Proxy = model.Proxy
+type Proxy struct {
+	ID         uint   `json:"id"`
+	Kind       string `json:"kind"`
+	Host       string `json:"host"`
+	Port       int    `json:"port"`
+	IdentityID uint   `json:"identity"`
+}
+
+//
+// With updates the resource with the model.
+func (r *Proxy) With(m *model.Proxy) {
+	r.ID = m.ID
+	r.Kind = m.Kind
+	r.Host = m.Host
+	r.Port = m.Port
+	r.IdentityID = m.IdentityID
+}
+
+//
+// Model builds a model.
+func (r *Proxy) Model() (m *model.Proxy) {
+	m = &model.Proxy{
+		Kind:       r.Kind,
+		Host:       r.Host,
+		Port:       r.Port,
+		IdentityID: r.IdentityID,
+	}
+	m.ID = r.ID
+
+	return
+}

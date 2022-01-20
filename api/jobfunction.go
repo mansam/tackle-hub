@@ -48,7 +48,7 @@ func (h JobFunctionHandler) Get(ctx *gin.Context) {
 	m := &model.JobFunction{}
 	id := ctx.Param(ID)
 	db := h.preLoad(h.DB, "Stakeholders")
-	result := db.First(&m, id)
+	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
