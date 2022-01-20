@@ -8,6 +8,7 @@ import (
 
 //
 // Identity represents and identity with a set of credentials.
+// Kinds = (git|svn|mvn|proxy)
 type Identity struct {
 	Model
 	Kind          string `json:"kind" gorm:"not null"`
