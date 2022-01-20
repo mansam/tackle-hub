@@ -6,17 +6,20 @@ import (
 	"gorm.io/gorm"
 )
 
+//
+// Identity represents and identity with a set of credentials.
+// Kinds = (git|svn|mvn|proxy)
 type Identity struct {
 	Model
-	Kind         string `json:"kind" gorm:"not null;uniqueIndex:Identity_A"`
-	Name         string `json:"name" gorm:"not null"`
-	Description  string `json:"description"`
-	User         string `json:"user"`
-	Password     string `json:"password"`
-	Key          string `json:"key"`
-	Settings     string `json:"settings"`
-	Encrypted    string `json:"encrypted"`
-	RepositoryID uint   `json:"repository" gorm:"index;uniqueIndex:Identity_A"`
+	Kind          string `json:"kind" gorm:"not null"`
+	Name          string `json:"name" gorm:"not null"`
+	Description   string `json:"description"`
+	User          string `json:"user"`
+	Password      string `json:"password"`
+	Key           string `json:"key"`
+	Settings      string `json:"settings"`
+	Encrypted     string `json:"encrypted"`
+	ApplicationID uint   `json:"application" gorm:"many2many:appIdentity"`
 }
 
 //
@@ -73,7 +76,7 @@ func (r *Identity) BeforeSave(tx *gorm.DB) (err error) {
 }
 
 //
-// encrypted returns the encrypted identity.
+// encrypted returns the encrypted credentials.
 func (r *Identity) encrypted(passphrase string) (encrypted *Identity, err error) {
 	aes := encryption.New(passphrase)
 	encrypted = &Identity{}

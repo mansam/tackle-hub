@@ -9,9 +9,9 @@ import (
 //
 // Routes
 const (
-	IdentitiesRoot           = "/identities"
-	IdentityRoot             = IdentitiesRoot + "/:" + ID
-	RepositoryIdentitiesRoot = RepositoryRoot + IdentitiesRoot
+	IdentitiesRoot    = "/identities"
+	IdentityRoot      = IdentitiesRoot + "/:" + ID
+	AppIdentitiesRoot = ApplicationRoot + IdentitiesRoot
 )
 
 //
@@ -23,13 +23,13 @@ type IdentityHandler struct {
 func (h IdentityHandler) AddRoutes(e *gin.Engine) {
 	e.GET(IdentitiesRoot, h.List)
 	e.GET(IdentitiesRoot+"/", h.List)
-	e.GET(RepositoryIdentitiesRoot, h.ListByRepository)
-	e.GET(RepositoryIdentitiesRoot+"/", h.ListByRepository)
 	e.POST(IdentitiesRoot, h.Create)
-	e.POST(RepositoryIdentitiesRoot, h.CreateForRepository)
 	e.GET(IdentityRoot, h.Get)
 	e.PUT(IdentityRoot, h.Update)
 	e.DELETE(IdentityRoot, h.Delete)
+	e.POST(AppIdentitiesRoot, h.CreateForApplication)
+	e.GET(AppIdentitiesRoot, h.ListByApplication)
+	e.GET(AppIdentitiesRoot+"/", h.ListByApplication)
 }
 
 // Get godoc
@@ -72,19 +72,19 @@ func (h IdentityHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, list)
 }
 
-// ListByRepository  godoc
-// @summary List identities for a repository.
-// @description List identities for a repository.
+// ListByApplication  godoc
+// @summary List identities for an application.
+// @description List identities for an application.
 // @tags get
 // @produce json
 // @success 200 {object} []Identity
 // @router /identities [get]
-func (h IdentityHandler) ListByRepository(ctx *gin.Context) {
+func (h IdentityHandler) ListByApplication(ctx *gin.Context) {
 	var list []Identity
-	repositoryID := ctx.Param(ID)
+	appId := ctx.Param(ID)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
-	db = db.Where("repository_id", repositoryID)
+	db = db.Where("application_id", appId)
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
@@ -119,30 +119,30 @@ func (h IdentityHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, identity)
 }
 
-// CreateForRepository godoc
-// @summary Create an identity for a repository.
-// @description Create an identity for a repository.
+// CreateForApplication godoc
+// @summary Create an identity for an application.
+// @description Create an identity for an application.
 // @tags create
 // @accept json
 // @produce json
 // @success 201 {object} Identity
 // @router /identities [post]
 // @param identity body Identity true "Identity data"
-func (h IdentityHandler) CreateForRepository(ctx *gin.Context) {
+func (h IdentityHandler) CreateForApplication(ctx *gin.Context) {
 	identity := &Identity{}
 	err := ctx.BindJSON(identity)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
-	repositoryID := ctx.Param(ID)
-	repository := &model.Repository{}
-	result := h.DB.First(repository, repositoryID)
+	appId := ctx.Param(ID)
+	application := &model.Application{}
+	result := h.DB.First(application, appId)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-	identity.RepositoryID = repository.ID
+	identity.ApplicationID = application.ID
 	result = h.DB.Create(identity)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)

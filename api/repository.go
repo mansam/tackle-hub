@@ -24,11 +24,11 @@ func (h RepositoryHandler) AddRoutes(e *gin.Engine) {
 	e.GET(RepositoriesRoot, h.List)
 	e.GET(RepositoriesRoot+"/", h.List)
 	e.POST(RepositoriesRoot, h.Create)
-	e.POST(AppRepositoriesRoot, h.CreateForApplication)
-	e.GET(AppRepositoriesRoot, h.ListByApplication)
 	e.GET(RepositoryRoot, h.Get)
 	e.PUT(RepositoryRoot, h.Update)
 	e.DELETE(RepositoryRoot, h.Delete)
+	e.POST(AppRepositoriesRoot, h.CreateForApplication)
+	e.GET(AppRepositoriesRoot, h.ListByApplication)
 }
 
 // Get godoc

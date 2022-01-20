@@ -12,10 +12,10 @@ curl -X POST ${host}/identities -d \
     "password": "passwordA",
     "key": "keyA",
     "settings": "settingsA",
-    "repository": 1
+    "application": 1
 }' | jq -M .
 
-curl -X POST ${host}/repositories/1/identities -d \
+curl -X POST ${host}/application-inventory/application/1/identities -d \
 '{
     "createUser": "tackle",
     "kind": "mvn",
