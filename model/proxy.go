@@ -11,12 +11,13 @@ import (
 // kind = (http|https)
 type Proxy struct {
 	Model
-	Kind      string `json:"kind" gorm:"uniqueIndex"`
-	Host      string `json:"host" gorm:"not null"`
-	Port      int    `json:"port"`
-	User      string `json:"user"`
-	Password  string `json:"password"`
-	Encrypted string `json:"encrypted"`
+	Kind       string `json:"kind" gorm:"uniqueIndex"`
+	Host       string `json:"host" gorm:"not null"`
+	Port       int    `json:"port"`
+	User       string `json:"user"`
+	Password   string `json:"password"`
+	IdentityID uint   `json:"identity"`
+	Encrypted  string `json:"encrypted"`
 }
 
 //
