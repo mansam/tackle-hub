@@ -95,7 +95,7 @@ func (h ImportHandler) GetImport(ctx *gin.Context) {
 // @router /application-inventory/application-import [get]
 func (h ImportHandler) ListImports(ctx *gin.Context) {
 	var count int64
-	var models []model.Import
+	var list []model.Import
 	db := h.DB
 	summaryId := ctx.Query("importSummary.id")
 	if summaryId != "" {
@@ -111,14 +111,14 @@ func (h ImportHandler) ListImports(ctx *gin.Context) {
 	pagination := NewPagination(ctx)
 	db = pagination.apply(db)
 	db = h.preLoad(db, "ImportTags")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []map[string]interface{}{}
-	for i := range models {
-		resources = append(resources, models[i].AsMap())
+	for i := range list {
+		resources = append(resources, list[i].AsMap())
 	}
 
 	h.listResponse(ctx, ImportKind, resources, int(count))
@@ -174,20 +174,20 @@ func (h ImportHandler) GetSummary(ctx *gin.Context) {
 // @router /application-inventory/import-summary [get]
 func (h ImportHandler) ListSummaries(ctx *gin.Context) {
 	var count int64
-	var models []model.ImportSummary
+	var list []model.ImportSummary
 	h.DB.Model(model.ImportSummary{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Imports")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []ImportSummary{}
-	for i := range models {
+	for i := range list {
 		r := ImportSummary{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 

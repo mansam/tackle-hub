@@ -69,18 +69,18 @@ func (h BucketHandler) Get(ctx *gin.Context) {
 // @success 200 {object} []Bucket
 // @router /controls/bucket [get]
 func (h BucketHandler) List(ctx *gin.Context) {
-	var models []model.Bucket
+	var list []model.Bucket
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []Bucket{}
-	for i := range models {
+	for i := range list {
 		r := Bucket{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 
@@ -95,20 +95,20 @@ func (h BucketHandler) List(ctx *gin.Context) {
 // @success 200 {object} []Bucket
 // @router /controls/bucket [get]
 func (h BucketHandler) ListByApplication(ctx *gin.Context) {
-	var models []model.Bucket
+	var list []model.Bucket
 	appId := ctx.Param(ID)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = db.Where("application_id", appId)
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []Bucket{}
-	for i := range models {
+	for i := range list {
 		r := Bucket{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 

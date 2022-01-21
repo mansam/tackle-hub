@@ -68,20 +68,20 @@ func (h JobFunctionHandler) Get(ctx *gin.Context) {
 // @router /controls/job-function [get]
 func (h JobFunctionHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.JobFunction
+	var list []model.JobFunction
 	h.DB.Model(model.JobFunction{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Stakeholders")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []JobFunction{}
-	for i := range models {
+	for i := range list {
 		r := JobFunction{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 

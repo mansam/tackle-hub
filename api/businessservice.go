@@ -68,20 +68,20 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 // @router /controls/business-service [get]
 func (h BusinessServiceHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.BusinessService
+	var list []model.BusinessService
 	h.DB.Model(&model.BusinessService{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Owner")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []BusinessService{}
-	for i := range models {
+	for i := range list {
 		r := BusinessService{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 
@@ -104,13 +104,13 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 		h.createFailed(ctx, err)
 		return
 	}
-	model := resource.Model()
-	result := h.DB.Create(model)
+	m := resource.Model()
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-	resource.With(model)
+	resource.With(m)
 	ctx.JSON(http.StatusCreated, resource)
 }
 

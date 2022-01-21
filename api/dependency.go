@@ -68,7 +68,7 @@ func (h DependencyHandler) Get(ctx *gin.Context) {
 // @router /application-inventory/applications-dependency [get]
 func (h DependencyHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.Dependency
+	var list []model.Dependency
 
 	db := h.DB
 	to := ctx.Query("to.id")
@@ -83,16 +83,16 @@ func (h DependencyHandler) List(ctx *gin.Context) {
 	pagination := NewPagination(ctx)
 	db = pagination.apply(db)
 	db = h.preLoad(db, "To", "From")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
 	resources := []Dependency{}
-	for i := range models {
+	for i := range list {
 		r := Dependency{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 

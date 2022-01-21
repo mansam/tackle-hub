@@ -68,20 +68,20 @@ func (h TagHandler) Get(ctx *gin.Context) {
 // @router /controls/tag [get]
 func (h TagHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.Tag
+	var list []model.Tag
 	h.DB.Model(model.Tag{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "TagType")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []Tag{}
-	for i := range models {
+	for i := range list {
 		r := Tag{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 

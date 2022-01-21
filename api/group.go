@@ -69,20 +69,20 @@ func (h StakeholderGroupHandler) Get(ctx *gin.Context) {
 // @router /controls/stakeholder-group [get]
 func (h StakeholderGroupHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.StakeholderGroup
+	var list []model.StakeholderGroup
 	h.DB.Model(model.StakeholderGroup{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(h.DB, "Stakeholders")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []StakeholderGroup{}
-	for i := range models {
+	for i := range list {
 		r := StakeholderGroup{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 
@@ -125,9 +125,9 @@ func (h StakeholderGroupHandler) Create(ctx *gin.Context) {
 // @param id path string true "Stakeholder Group ID"
 func (h StakeholderGroupHandler) Delete(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param(ID))
-	model := &model.StakeholderGroup{}
-	model.ID = uint(id)
-	result := h.DB.Select("Stakeholders").Delete(model)
+	m := &model.StakeholderGroup{}
+	m.ID = uint(id)
+	result := h.DB.Select("Stakeholders").Delete(m)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return

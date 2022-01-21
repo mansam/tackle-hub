@@ -68,20 +68,20 @@ func (h TagTypeHandler) Get(ctx *gin.Context) {
 // @router /controls/tag-type [get]
 func (h TagTypeHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.TagType
+	var list []model.TagType
 	h.DB.Model(model.TagType{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Tags")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []TagType{}
-	for i := range models {
+	for i := range list {
 		r := TagType{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 

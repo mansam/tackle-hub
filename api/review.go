@@ -68,18 +68,18 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 // @router /application-inventory/review [get]
 func (h ReviewHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []Review
+	var list []Review
 	h.DB.Model(&model.Review{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Application")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
-	h.listResponse(ctx, ReviewKind, models, int(count))
+	h.listResponse(ctx, ReviewKind, list, int(count))
 }
 
 // Create godoc
