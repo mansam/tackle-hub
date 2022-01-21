@@ -21,9 +21,19 @@ import (
 )
 
 //
+// Mount specification.
+type Mount struct {
+	Name string `json:"name"`
+	Claim string `json:"claim"`
+}
+
+//
 // AddonSpec defines the desired state of Addon
 type AddonSpec struct {
+	// Addon fqin.
 	Image string `json:"image"`
+	// Mounts optional.
+	Mounts []Mount `json:"mounts,omitempty"`
 }
 
 //

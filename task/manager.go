@@ -104,6 +104,8 @@ type Task struct {
 	*model.Task
 	// k8s client.
 	client client.Client
+	// addon
+	addon *crd.Addon
 }
 
 //
@@ -115,11 +117,11 @@ func (r *Task) Run() (err error) {
 			r.Status = Failed
 		}
 	}()
-	addon, err := r.findAddon(r.Addon)
+	r.addon, err = r.findAddon(r.Addon)
 	if err != nil {
 		return
 	}
-	r.Image = addon.Spec.Image
+	r.Image = r.addon.Spec.Image
 	secret := r.secret()
 	err = r.client.Create(context.TODO(), &secret)
 	if err != nil {
@@ -236,6 +238,19 @@ func (r *Task) template(secret *core.Secret) (template core.PodTemplateSpec) {
 				},
 			},
 		},
+	}
+	mounts := r.addon.Spec.Mounts
+	for _, mnt := range mounts {
+		template.Spec.Volumes = append(
+			template.Spec.Volumes,
+			core.Volume{
+				Name: mnt.Name,
+				VolumeSource: core.VolumeSource{
+					PersistentVolumeClaim: &core.PersistentVolumeClaimVolumeSource{
+						ClaimName: mnt.Claim,
+					},
+				},
+			})
 	}
 
 	return
