@@ -99,7 +99,7 @@ func (h BucketHandler) ListByApplication(ctx *gin.Context) {
 	appId := ctx.Param(ID)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
-	db = db.Where("application_id", appId)
+	db = db.Where("applicationid", appId)
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)

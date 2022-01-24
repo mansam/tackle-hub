@@ -99,13 +99,13 @@ func (h ImportHandler) ListImports(ctx *gin.Context) {
 	db := h.DB
 	summaryId := ctx.Query("importSummary.id")
 	if summaryId != "" {
-		db = db.Where("import_summary_id = ?", summaryId)
+		db = db.Where("importsummaryid = ?", summaryId)
 	}
 	isValid := ctx.Query("isValid")
 	if isValid == "true" {
-		db = db.Where("is_valid")
+		db = db.Where("isvalid")
 	} else if isValid == "false" {
-		db = db.Not("is_valid")
+		db = db.Not("isvalid")
 	}
 	db.Model(model.Import{}).Count(&count)
 	pagination := NewPagination(ctx)

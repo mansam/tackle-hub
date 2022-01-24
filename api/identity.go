@@ -77,7 +77,7 @@ func (h IdentityHandler) List(ctx *gin.Context) {
 		resources = append(resources, r)
 	}
 
-	ctx.JSON(http.StatusOK, list)
+	ctx.JSON(http.StatusOK, resources)
 }
 
 // ListByApplication  godoc
@@ -92,7 +92,7 @@ func (h IdentityHandler) ListByApplication(ctx *gin.Context) {
 	appId := ctx.Param(ID)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
-	db = db.Where("application_id", appId)
+	db = db.Where("applicationid", appId)
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)

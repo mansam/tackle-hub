@@ -74,9 +74,9 @@ func (h DependencyHandler) List(ctx *gin.Context) {
 	to := ctx.Query("to.id")
 	from := ctx.Query("from.id")
 	if to != "" {
-		db = db.Where("to_id = ?", to)
+		db = db.Where("toid = ?", to)
 	} else if from != "" {
-		db = db.Where("from_id = ?", from)
+		db = db.Where("fromid = ?", from)
 	}
 
 	db.Model(model.Dependency{}).Count(&count)

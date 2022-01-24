@@ -47,16 +47,18 @@ func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 // @router /application-inventory/review/:id [get]
 // @param id path string true "Review ID"
 func (h ReviewHandler) Get(ctx *gin.Context) {
-	model := Review{}
+	m := &model.Review{}
 	id := ctx.Param(ID)
 	db := h.preLoad(h.DB, "Application")
-	result := db.First(&model, id)
+	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
+	r := Review{}
+	r.With(m)
 
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, r)
 }
 
 // List godoc
@@ -68,7 +70,7 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 // @router /application-inventory/review [get]
 func (h ReviewHandler) List(ctx *gin.Context) {
 	var count int64
-	var list []Review
+	var list []model.Review
 	h.DB.Model(&model.Review{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
@@ -78,8 +80,14 @@ func (h ReviewHandler) List(ctx *gin.Context) {
 		h.listFailed(ctx, result.Error)
 		return
 	}
+	resources := []Review{}
+	for i := range list {
+		r := Review{}
+		r.With(&list[i])
+		resources = append(resources, r)
+	}
 
-	h.listResponse(ctx, ReviewKind, list, int(count))
+	h.listResponse(ctx, ReviewKind, resources, int(count))
 }
 
 // Create godoc
@@ -190,7 +198,7 @@ func (h ReviewHandler) CopyReview(ctx *gin.Context) {
 			ApplicationID:       id,
 		}
 		existing := []model.Review{}
-		result = h.DB.Find(&existing, "application_id = ?", id)
+		result = h.DB.Find(&existing, "applicationid = ?", id)
 		if result.Error != nil {
 			h.createFailed(ctx, result.Error)
 			return
