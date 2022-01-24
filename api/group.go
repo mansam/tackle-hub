@@ -73,7 +73,7 @@ func (h StakeholderGroupHandler) List(ctx *gin.Context) {
 	h.DB.Model(model.StakeholderGroup{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
-	db = h.preLoad(h.DB, "Stakeholders")
+	db = h.preLoad(db, "Stakeholders")
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)

@@ -332,15 +332,15 @@ func (r *Task) With(m *model.Task) {
 // Model builds a model.
 func (r *Task) Model() (m *model.Task) {
 	m = &model.Task{
-		Name: r.Name,
-		Image: r.Image,
-		Addon: r.Addon,
-		Data: r.Data,
-		Started: r.Started,
+		Name:       r.Name,
+		Image:      r.Image,
+		Addon:      r.Addon,
+		Data:       r.Data,
+		Started:    r.Started,
 		Terminated: r.Terminated,
-		Status: r.Status,
-		Error: r.Error,
-		Job: r.Job,
+		Status:     r.Status,
+		Error:      r.Error,
+		Job:        r.Job,
 	}
 	m.ID = r.ID
 	if r.Report != nil {

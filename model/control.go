@@ -18,10 +18,10 @@ type StakeholderGroup struct {
 
 type Stakeholder struct {
 	Model
-	DisplayName      string             `json:"displayName" gorm:"column:displayName;not null;"`
+	DisplayName      string             `json:"displayName" gorm:"not null;"`
 	Email            string             `json:"email" gorm:"index;unique;not null"`
 	Groups           []StakeholderGroup `json:"stakeholderGroups" gorm:"many2many:sgStakeholder"`
-	BusinessServices []BusinessService  `json:"businessServices" gorm:"foreignKey:owner_id"`
+	BusinessServices []BusinessService  `json:"businessServices" gorm:"foreignKey:OwnerID"`
 	JobFunctionID    *uint              `json:"-" gorm:"index"`
 	JobFunction      *JobFunction       `json:"jobFunction"`
 }
@@ -35,9 +35,9 @@ type JobFunction struct {
 
 type Tag struct {
 	Model
-	Name      string  `json:"name" gorm:"uniqueIndex:idx_tag_tagtype;not null"`
+	Name      string  `json:"name" gorm:"uniqueIndex:tag_a;not null"`
 	Username  string  `json:"username"`
-	TagTypeID uint    `json:"-" gorm:"uniqueIndex:idx_tag_tagtype;index;not null"`
+	TagTypeID uint    `json:"-" gorm:"uniqueIndex:tag_a;index;not null"`
 	TagType   TagType `json:"tagType"`
 }
 

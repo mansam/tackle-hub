@@ -45,17 +45,17 @@ func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 // @router /controls/business-service/:id [get]
 // @param id path string true "Business Service ID"
 func (h BusinessServiceHandler) Get(ctx *gin.Context) {
-	model := model.BusinessService{}
+	m := &model.BusinessService{}
 	id := ctx.Param(ID)
 	db := h.preLoad(h.DB, "Owner")
-	result := db.First(&model, id)
+	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
 
 	resource := BusinessService{}
-	resource.With(&model)
+	resource.With(m)
 	ctx.JSON(http.StatusOK, resource)
 }
 
@@ -151,7 +151,7 @@ func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 	}
 
 	updates := resource.Model()
-	result := h.DB.Model(&model.BusinessService{}).Select("name", "description", "owner_id").Where("id = ?", id).Omit("id").Updates(updates)
+	result := h.DB.Model(&model.BusinessService{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return

@@ -47,7 +47,7 @@ func Setup() (db *gorm.DB, err error) {
 		&gorm.Config{
 			NamingStrategy: &schema.NamingStrategy{
 				SingularTable: true,
-				NoLowerCase: true,
+				NoLowerCase:   true,
 			},
 		})
 	if err != nil {

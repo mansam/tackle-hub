@@ -17,9 +17,9 @@ type Application struct {
 type Dependency struct {
 	Model
 	ToID   uint         `json:"to" gorm:"index"`
-	To     *Application `json:"-" gorm:"foreignKey:to_id;constraint:OnDelete:CASCADE"`
+	To     *Application `json:"-" gorm:"foreignKey:ToID;constraint:OnDelete:CASCADE"`
 	FromID uint         `json:"from" gorm:"index"`
-	From   *Application `json:"-" gorm:"foreignKey:from_id;constraint:OnDelete:CASCADE"`
+	From   *Application `json:"-" gorm:"foreignKey:FromID;constraint:OnDelete:CASCADE"`
 }
 
 type Repository struct {
@@ -88,7 +88,7 @@ type ImportSummary struct {
 	Model
 	Content      []byte   `json:"-"`
 	Filename     string   `json:"filename"`
-	ImportStatus string   `json:"importStatus" gorm:"column:importStatus"`
+	ImportStatus string   `json:"importStatus"`
 	Imports      []Import `json:"-" gorm:"constraint:OnDelete:CASCADE"`
 }
 
