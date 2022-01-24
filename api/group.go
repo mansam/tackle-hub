@@ -106,7 +106,12 @@ func (h StakeholderGroupHandler) Create(ctx *gin.Context) {
 		return
 	}
 	m := r.Model()
-	result := h.DB.Create(&m)
+	result := h.DB.Find(&model.StakeholderGroup{}, "name", m.Name)
+	if result.RowsAffected > 0 {
+		h.conflict(ctx, "name")
+		return
+	}
+	result = h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return

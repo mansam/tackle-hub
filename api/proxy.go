@@ -97,7 +97,12 @@ func (h ProxyHandler) Create(ctx *gin.Context) {
 		return
 	}
 	m := proxy.Model()
-	result := h.DB.Create(m)
+	result := h.DB.Find(&model.Proxy{}, "kind", m.Kind)
+	if result.RowsAffected > 0 {
+		h.conflict(ctx, "kind")
+		return
+	}
+	result = h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return

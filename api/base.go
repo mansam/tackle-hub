@@ -131,6 +131,16 @@ func (h *BaseHandler) deleteFailed(ctx *gin.Context, err error) {
 }
 
 //
+//
+func (h *BaseHandler) conflict(ctx *gin.Context, field string) {
+	ctx.JSON(
+		http.StatusConflict,
+		gin.H{
+			"error": field + " must be unique",
+		})
+}
+
+//
 // preLoad update DB to pre-load fields.
 func (h *BaseHandler) preLoad(db *gorm.DB, fields ...string) (tx *gorm.DB) {
 	tx = db

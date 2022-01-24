@@ -10,7 +10,7 @@ type BusinessService struct {
 
 type StakeholderGroup struct {
 	Model
-	Name         string        `json:"name" gorm:"index;unique"`
+	Name         string        `json:"name" gorm:"index;unique;not null"`
 	Username     string        `json:"username"`
 	Description  string        `json:"description"`
 	Stakeholders []Stakeholder `json:"stakeholders" gorm:"many2many:sgStakeholder"`
@@ -43,7 +43,7 @@ type Tag struct {
 
 type TagType struct {
 	Model
-	Name     string `json:"name" gorm:"not null"`
+	Name     string `json:"name" gorm:"index;unique;not null"`
 	Username string `json:"username"`
 	Rank     uint   `json:"rank"`
 	Color    string `json:"colour"`

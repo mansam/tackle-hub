@@ -105,7 +105,12 @@ func (h JobFunctionHandler) Create(ctx *gin.Context) {
 		return
 	}
 	m := r.Model()
-	result := h.DB.Create(m)
+	result := h.DB.Find(&model.JobFunction{}, "role", m.Role)
+	if result.RowsAffected > 0 {
+		h.conflict(ctx, "role")
+		return
+	}
+	result = h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return

@@ -98,20 +98,26 @@ func (h TagTypeHandler) List(ctx *gin.Context) {
 // @router /controls/tag-type [post]
 // @param tag_type body api.TagType true "Tag Type data"
 func (h TagTypeHandler) Create(ctx *gin.Context) {
-	resource := TagType{}
-	err := ctx.BindJSON(&resource)
+	r := TagType{}
+	err := ctx.BindJSON(&r)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
-	model := resource.Model()
-	result := h.DB.Create(&model)
+	m := r.Model()
+	result := h.DB.Find(&model.TagType{}, "name", m.Name)
+	if result.RowsAffected > 0 {
+		h.conflict(ctx, "name")
+		return
+	}
+	result = h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
+	r.With(m)
 
-	ctx.JSON(http.StatusCreated, model)
+	ctx.JSON(http.StatusCreated, m)
 }
 
 // Delete godoc

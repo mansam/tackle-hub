@@ -4,7 +4,7 @@ import "fmt"
 
 type Application struct {
 	Model
-	Name              string           `json:"name" gorm:"not null"`
+	Name              string           `json:"name" gorm:"index;unique;not null"`
 	Description       string           `json:"description"`
 	Review            *Review          `json:"review"`
 	Comments          string           `json:"comments"`
@@ -40,7 +40,7 @@ type Review struct {
 	WorkPriority        uint         `json:"workPriority" gorm:"not null"`
 	Comments            string       `json:"comments"`
 	Application         *Application `json:"application"`
-	ApplicationID       uint         `json:"-" gorm:"index"`
+	ApplicationID       uint         `json:"-" gorm:"uniqueIndex"`
 }
 
 type Import struct {

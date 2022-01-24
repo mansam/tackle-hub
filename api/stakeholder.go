@@ -107,20 +107,26 @@ func (h StakeholderHandler) List(ctx *gin.Context) {
 // @router /controls/stakeholder [post]
 // @param stakeholder body api.Stakeholder true "Stakeholder data"
 func (h StakeholderHandler) Create(ctx *gin.Context) {
-	resource := Stakeholder{}
-	err := ctx.BindJSON(&resource)
+	r := &Stakeholder{}
+	err := ctx.BindJSON(r)
 	if err != nil {
 		h.createFailed(ctx, err)
 		return
 	}
-	m := resource.Model()
-	result := h.DB.Create(m)
+	m := r.Model()
+	result := h.DB.Find(&model.Stakeholder{}, "email", m.Email)
+	if result.RowsAffected > 0 {
+		h.conflict(ctx, "email")
+		return
+	}
+	result = h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-	resource.With(m)
-	ctx.JSON(http.StatusCreated, resource)
+	r.With(m)
+
+	ctx.JSON(http.StatusCreated, r)
 }
 
 // Delete godoc

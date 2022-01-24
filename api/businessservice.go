@@ -105,7 +105,12 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 		return
 	}
 	m := resource.Model()
-	result := h.DB.Create(m)
+	result := h.DB.Find(&model.BusinessService{}, "name", m.Name)
+	if result.RowsAffected > 0 {
+		h.conflict(ctx, "name")
+		return
+	}
+	result = h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return

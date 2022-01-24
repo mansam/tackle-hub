@@ -98,13 +98,18 @@ func (h ReviewHandler) Create(ctx *gin.Context) {
 		h.createFailed(ctx, err)
 		return
 	}
-	model := review.Model()
-	result := h.DB.Create(&model)
+	m := review.Model()
+	result := h.DB.Find(&model.Review{}, "applicationid", m.ApplicationID)
+	if result.RowsAffected > 0 {
+		h.conflict(ctx, "applicationid")
+		return
+	}
+	result = h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-	review.With(model)
+	review.With(m)
 
 	ctx.JSON(http.StatusCreated, review)
 }
