@@ -128,7 +128,6 @@ func (h BucketHandler) Create(ctx *gin.Context) {
 	bucket := &Bucket{}
 	err := ctx.BindJSON(bucket)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	err = h.create(bucket)
@@ -153,7 +152,6 @@ func (h BucketHandler) CreateForApplication(ctx *gin.Context) {
 	bucket := &Bucket{}
 	err := ctx.BindJSON(bucket)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	appID := ctx.Param(ID)
@@ -212,7 +210,6 @@ func (h BucketHandler) Update(ctx *gin.Context) {
 	r := &Bucket{}
 	err := ctx.BindJSON(r)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	m := r.Model()

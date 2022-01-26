@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/mattn/go-sqlite3"
 	"gorm.io/gorm"
 	"net/http"
 	"os"
@@ -78,8 +79,18 @@ func (h *BaseHandler) listFailed(ctx *gin.Context, err error) {
 //
 // createFailed handles Create() errors.
 func (h *BaseHandler) createFailed(ctx *gin.Context, err error) {
+	status := http.StatusInternalServerError
+	sqliteErr := &sqlite3.Error{}
+
+	if errors.As(err, sqliteErr) {
+		switch sqliteErr.ExtendedCode {
+		case sqlite3.ErrConstraintUnique:
+			status = http.StatusConflict
+		}
+	}
+
 	ctx.JSON(
-		http.StatusInternalServerError,
+		status,
 		gin.H{
 			"error": err.Error(),
 		})
@@ -95,8 +106,18 @@ func (h *BaseHandler) createFailed(ctx *gin.Context, err error) {
 //
 // updateFailed handles Update() errors.
 func (h *BaseHandler) updateFailed(ctx *gin.Context, err error) {
+	status := http.StatusInternalServerError
+	sqliteErr := &sqlite3.Error{}
+
+	if errors.As(err, sqliteErr) {
+		switch sqliteErr.ExtendedCode {
+		case sqlite3.ErrConstraintUnique:
+			status = http.StatusConflict
+		}
+	}
+
 	ctx.JSON(
-		http.StatusInternalServerError,
+		status,
 		gin.H{
 			"error": err.Error(),
 		})
@@ -128,16 +149,6 @@ func (h *BaseHandler) deleteFailed(ctx *gin.Context, err error) {
 		"Delete failed.",
 		"url",
 		url)
-}
-
-//
-//
-func (h *BaseHandler) conflict(ctx *gin.Context, field string) {
-	ctx.JSON(
-		http.StatusConflict,
-		gin.H{
-			"error": field + " must be unique",
-		})
 }
 
 //

@@ -101,16 +101,10 @@ func (h JobFunctionHandler) Create(ctx *gin.Context) {
 	r := &JobFunction{}
 	err := ctx.BindJSON(r)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	m := r.Model()
-	result := h.DB.Find(&model.JobFunction{}, "role", m.Role)
-	if result.RowsAffected > 0 {
-		h.conflict(ctx, "role")
-		return
-	}
-	result = h.DB.Create(m)
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
@@ -152,7 +146,6 @@ func (h JobFunctionHandler) Update(ctx *gin.Context) {
 	r := &JobFunction{}
 	err := ctx.BindJSON(r)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	m := r.Model()

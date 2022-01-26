@@ -103,16 +103,10 @@ func (h ReviewHandler) Create(ctx *gin.Context) {
 	review := Review{}
 	err := ctx.BindJSON(&review)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	m := review.Model()
-	result := h.DB.Find(&model.Review{}, "applicationid", m.ApplicationID)
-	if result.RowsAffected > 0 {
-		h.conflict(ctx, "applicationid")
-		return
-	}
-	result = h.DB.Create(m)
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
@@ -154,7 +148,6 @@ func (h ReviewHandler) Update(ctx *gin.Context) {
 	updates := Review{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	result := h.DB.Model(&Review{}).Where("id = ?", id).Omit("id").Updates(updates)
@@ -178,7 +171,6 @@ func (h ReviewHandler) CopyReview(ctx *gin.Context) {
 	c := CopyRequest{}
 	err := ctx.BindJSON(&c)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 

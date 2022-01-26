@@ -110,16 +110,10 @@ func (h ApplicationHandler) Create(ctx *gin.Context) {
 	r := &Application{}
 	err := ctx.BindJSON(r)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	m := r.Model()
-	result := h.DB.Find(&model.Application{}, "name", m.Name)
-	if result.RowsAffected > 0 {
-		h.conflict(ctx, "name")
-		return
-	}
-	result = h.DB.Create(m)
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
@@ -168,7 +162,6 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 	r := &Application{}
 	err := ctx.BindJSON(r)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	m := r.Model()

@@ -101,16 +101,10 @@ func (h TagHandler) Create(ctx *gin.Context) {
 	r := &Tag{}
 	err := ctx.BindJSON(r)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	m := r.Model()
-	result := h.DB.Find(&model.Tag{}, "name", m.Name, "tagtypeid", m.TagTypeID)
-	if result.RowsAffected > 0 {
-		h.conflict(ctx, "name")
-		return
-	}
-	result = h.DB.Create(m)
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
@@ -152,7 +146,6 @@ func (h TagHandler) Update(ctx *gin.Context) {
 	resource := Tag{}
 	err := ctx.BindJSON(&resource)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	updates := resource.Model()

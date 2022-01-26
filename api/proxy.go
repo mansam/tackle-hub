@@ -93,16 +93,10 @@ func (h ProxyHandler) Create(ctx *gin.Context) {
 	proxy := &Proxy{}
 	err := ctx.BindJSON(proxy)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	m := proxy.Model()
-	result := h.DB.Find(&model.Proxy{}, "kind", m.Kind)
-	if result.RowsAffected > 0 {
-		h.conflict(ctx, "kind")
-		return
-	}
-	result = h.DB.Create(m)
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
@@ -150,7 +144,6 @@ func (h ProxyHandler) Update(ctx *gin.Context) {
 	r := &Proxy{}
 	err := ctx.BindJSON(r)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	m := r.Model()

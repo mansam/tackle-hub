@@ -98,25 +98,20 @@ func (h BusinessServiceHandler) List(ctx *gin.Context) {
 // @router /controls/business-service [post]
 // @param business_service body api.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Create(ctx *gin.Context) {
-	resource := BusinessService{}
-	err := ctx.BindJSON(&resource)
+	r := &BusinessService{}
+	err := ctx.BindJSON(r)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
-	m := resource.Model()
-	result := h.DB.Find(&model.BusinessService{}, "name", m.Name)
-	if result.RowsAffected > 0 {
-		h.conflict(ctx, "name")
-		return
-	}
-	result = h.DB.Create(m)
+	m := r.Model()
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-	resource.With(m)
-	ctx.JSON(http.StatusCreated, resource)
+	r.With(m)
+
+	ctx.JSON(http.StatusCreated, r)
 }
 
 // Delete godoc
@@ -148,14 +143,12 @@ func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 // @param business_service body api.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	resource := BusinessService{}
-	err := ctx.BindJSON(&resource)
+	r := &BusinessService{}
+	err := ctx.BindJSON(r)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
-
-	updates := resource.Model()
+	updates := r.Model()
 	result := h.DB.Model(&model.BusinessService{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)

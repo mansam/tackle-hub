@@ -153,7 +153,6 @@ func (h TaskHandler) AddonCreate(ctx *gin.Context) {
 	task.Image = addon.Spec.Image
 	err = ctx.BindJSON(&task.Data)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	m := task.Model()
@@ -216,7 +215,6 @@ func (h TaskHandler) Update(ctx *gin.Context) {
 	updates := &Task{}
 	err := ctx.BindJSON(updates)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	m := updates.Model()
@@ -244,7 +242,6 @@ func (h TaskHandler) CreateReport(ctx *gin.Context) {
 	report := &TaskReport{}
 	err := ctx.BindJSON(report)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	task, _ := strconv.Atoi(id)
@@ -274,7 +271,6 @@ func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 	report := &TaskReport{}
 	err := ctx.BindJSON(report)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	task, _ := strconv.Atoi(id)

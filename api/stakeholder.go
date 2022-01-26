@@ -110,16 +110,10 @@ func (h StakeholderHandler) Create(ctx *gin.Context) {
 	r := &Stakeholder{}
 	err := ctx.BindJSON(r)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	m := r.Model()
-	result := h.DB.Find(&model.Stakeholder{}, "email", m.Email)
-	if result.RowsAffected > 0 {
-		h.conflict(ctx, "email")
-		return
-	}
-	result = h.DB.Create(m)
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
@@ -163,7 +157,6 @@ func (h StakeholderHandler) Update(ctx *gin.Context) {
 	resource := Stakeholder{}
 	err := ctx.BindJSON(&resource)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	updates := resource.Model()

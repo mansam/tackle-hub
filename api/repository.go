@@ -120,7 +120,6 @@ func (h RepositoryHandler) Create(ctx *gin.Context) {
 	repository := &Repository{}
 	err := ctx.BindJSON(repository)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	m := repository.Model()
@@ -147,7 +146,6 @@ func (h RepositoryHandler) CreateForApplication(ctx *gin.Context) {
 	repository := &Repository{}
 	err := ctx.BindJSON(repository)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	appID := ctx.Param(ID)
@@ -207,7 +205,6 @@ func (h RepositoryHandler) Update(ctx *gin.Context) {
 	r := &Repository{}
 	err := ctx.BindJSON(r)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	updates := r.Model()
