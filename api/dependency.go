@@ -68,31 +68,31 @@ func (h DependencyHandler) Get(ctx *gin.Context) {
 // @router /application-inventory/applications-dependency [get]
 func (h DependencyHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.Dependency
+	var list []model.Dependency
 
 	db := h.DB
 	to := ctx.Query("to.id")
 	from := ctx.Query("from.id")
 	if to != "" {
-		db = db.Where("to_id = ?", to)
+		db = db.Where("toid = ?", to)
 	} else if from != "" {
-		db = db.Where("from_id = ?", from)
+		db = db.Where("fromid = ?", from)
 	}
 
 	db.Model(model.Dependency{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db = pagination.apply(db)
 	db = h.preLoad(db, "To", "From")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 
 	resources := []Dependency{}
-	for i := range models {
+	for i := range list {
 		r := Dependency{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 
@@ -149,11 +149,11 @@ func (h DependencyHandler) Delete(ctx *gin.Context) {
 type Dependency struct {
 	ID uint `json:"id"`
 	To struct {
-		ID   uint   `json:"id"`
+		ID   uint   `json:"id" binding:"required"`
 		Name string `json:"name"`
 	} `json:"to"`
 	From struct {
-		ID   uint   `json:"id"`
+		ID   uint   `json:"id" binding:"required"`
 		Name string `json:"name"`
 	} `json:"from"`
 }

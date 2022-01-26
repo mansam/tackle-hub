@@ -45,16 +45,18 @@ func (h JobFunctionHandler) AddRoutes(e *gin.Engine) {
 // @router /controls/job-function/:id [get]
 // @param id path string true "Job Function ID"
 func (h JobFunctionHandler) Get(ctx *gin.Context) {
-	model := JobFunction{}
+	m := &model.JobFunction{}
 	id := ctx.Param(ID)
 	db := h.preLoad(h.DB, "Stakeholders")
-	result := db.First(&model, id)
+	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
+	r := JobFunction{}
+	r.With(m)
 
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, r)
 }
 
 // List godoc
@@ -66,18 +68,24 @@ func (h JobFunctionHandler) Get(ctx *gin.Context) {
 // @router /controls/job-function [get]
 func (h JobFunctionHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []JobFunction
-	h.DB.Model(JobFunction{}).Count(&count)
+	var list []model.JobFunction
+	h.DB.Model(model.JobFunction{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Stakeholders")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
+	resources := []JobFunction{}
+	for i := range list {
+		r := JobFunction{}
+		r.With(&list[i])
+		resources = append(resources, r)
+	}
 
-	h.listResponse(ctx, JobFunctionKind, models, int(count))
+	h.listResponse(ctx, JobFunctionKind, resources, int(count))
 }
 
 // Create godoc
@@ -90,19 +98,20 @@ func (h JobFunctionHandler) List(ctx *gin.Context) {
 // @router /controls/job-function [post]
 // @param job_function body api.JobFunction true "Job Function data"
 func (h JobFunctionHandler) Create(ctx *gin.Context) {
-	model := JobFunction{}
-	err := ctx.BindJSON(&model)
+	r := &JobFunction{}
+	err := ctx.BindJSON(r)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
-	result := h.DB.Create(&model)
+	m := r.Model()
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
+	r.With(m)
 
-	ctx.JSON(http.StatusCreated, model)
+	ctx.JSON(http.StatusCreated, r)
 }
 
 // Delete godoc
@@ -114,7 +123,7 @@ func (h JobFunctionHandler) Create(ctx *gin.Context) {
 // @param id path string true "Job Function ID"
 func (h JobFunctionHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	result := h.DB.Delete(&JobFunction{}, id)
+	result := h.DB.Delete(&model.JobFunction{}, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -134,13 +143,13 @@ func (h JobFunctionHandler) Delete(ctx *gin.Context) {
 // @param job_function body api.JobFunction true "Job Function data"
 func (h JobFunctionHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := JobFunction{}
-	err := ctx.BindJSON(&updates)
+	r := &JobFunction{}
+	err := ctx.BindJSON(r)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&JobFunction{}).Where("id = ?", id).Omit("id").Updates(updates)
+	m := r.Model()
+	result := h.DB.Model(&JobFunction{}).Where("id = ?", id).Omit("id").Updates(m)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
@@ -151,4 +160,32 @@ func (h JobFunctionHandler) Update(ctx *gin.Context) {
 
 //
 // JobFunction REST resrouce.
-type JobFunction = model.JobFunction
+type JobFunction struct {
+	ID           uint          `json:"id"`
+	Role         string        `json:"role" binding:"required"`
+	Stakeholders []Stakeholder `json:"stakeholders"`
+}
+
+//
+// With updates the resource with the model.
+func (r *JobFunction) With(m *model.JobFunction) {
+	r.ID = m.ID
+	r.Role = m.Role
+	for _, s := range m.Stakeholders {
+		r.Stakeholders = append(r.Stakeholders, Stakeholder{
+			ID:          s.ID,
+			DisplayName: s.DisplayName,
+		})
+	}
+}
+
+//
+// Model builds a model.
+func (r *JobFunction) Model() (m *model.JobFunction) {
+	m = &model.JobFunction{
+		Role: r.Role,
+	}
+	m.ID = r.ID
+
+	return
+}

@@ -4,7 +4,7 @@ import "fmt"
 
 type Application struct {
 	Model
-	Name              string           `json:"name" gorm:"not null"`
+	Name              string           `json:"name" gorm:"index;unique;not null"`
 	Description       string           `json:"description"`
 	Review            *Review          `json:"review"`
 	Comments          string           `json:"comments"`
@@ -17,9 +17,9 @@ type Application struct {
 type Dependency struct {
 	Model
 	ToID   uint         `json:"to" gorm:"index"`
-	To     *Application `json:"-" gorm:"foreignKey:to_id;constraint:OnDelete:CASCADE"`
+	To     *Application `json:"-" gorm:"foreignKey:ToID;constraint:OnDelete:CASCADE"`
 	FromID uint         `json:"from" gorm:"index"`
-	From   *Application `json:"-" gorm:"foreignKey:from_id;constraint:OnDelete:CASCADE"`
+	From   *Application `json:"-" gorm:"foreignKey:FromID;constraint:OnDelete:CASCADE"`
 }
 
 type Repository struct {
@@ -40,7 +40,7 @@ type Review struct {
 	WorkPriority        uint         `json:"workPriority" gorm:"not null"`
 	Comments            string       `json:"comments"`
 	Application         *Application `json:"application"`
-	ApplicationID       uint         `json:"-" gorm:"index"`
+	ApplicationID       uint         `json:"-" gorm:"uniqueIndex"`
 }
 
 type Import struct {
@@ -88,7 +88,7 @@ type ImportSummary struct {
 	Model
 	Content      []byte   `json:"-"`
 	Filename     string   `json:"filename"`
-	ImportStatus string   `json:"importStatus" gorm:"column:importStatus"`
+	ImportStatus string   `json:"importStatus"`
 	Imports      []Import `json:"-" gorm:"constraint:OnDelete:CASCADE"`
 }
 

@@ -46,16 +46,18 @@ func (h StakeholderGroupHandler) AddRoutes(e *gin.Engine) {
 // @router /controls/stakeholder-group/:id [get]
 // @param id path string true "Stakeholder Group ID"
 func (h StakeholderGroupHandler) Get(ctx *gin.Context) {
-	model := StakeholderGroup{}
+	m := &model.StakeholderGroup{}
 	id := ctx.Param(ID)
 	db := h.preLoad(h.DB, "Stakeholders")
-	result := db.First(&model, id)
+	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
+	r := StakeholderGroup{}
+	r.With(m)
 
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, m)
 }
 
 // List godoc
@@ -67,18 +69,24 @@ func (h StakeholderGroupHandler) Get(ctx *gin.Context) {
 // @router /controls/stakeholder-group [get]
 func (h StakeholderGroupHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []StakeholderGroup
-	h.DB.Model(StakeholderGroup{}).Count(&count)
+	var list []model.StakeholderGroup
+	h.DB.Model(model.StakeholderGroup{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
-	db = h.preLoad(h.DB, "Stakeholders")
-	result := db.Find(&models)
+	db = h.preLoad(db, "Stakeholders")
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
+	resources := []StakeholderGroup{}
+	for i := range list {
+		r := StakeholderGroup{}
+		r.With(&list[i])
+		resources = append(resources, r)
+	}
 
-	h.listResponse(ctx, StakeholderGroupKind, models, int(count))
+	h.listResponse(ctx, StakeholderGroupKind, resources, int(count))
 }
 
 // Create godoc
@@ -91,19 +99,20 @@ func (h StakeholderGroupHandler) List(ctx *gin.Context) {
 // @router /controls/stakeholder-group [post]
 // @param stakeholder_group body api.StakeholderGroup true "Stakeholder Group data"
 func (h StakeholderGroupHandler) Create(ctx *gin.Context) {
-	model := StakeholderGroup{}
-	err := ctx.BindJSON(&model)
+	r := &StakeholderGroup{}
+	err := ctx.BindJSON(r)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
-	result := h.DB.Create(&model)
+	m := r.Model()
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
+	r.With(m)
 
-	ctx.JSON(http.StatusCreated, model)
+	ctx.JSON(http.StatusCreated, r)
 }
 
 // Delete godoc
@@ -115,9 +124,9 @@ func (h StakeholderGroupHandler) Create(ctx *gin.Context) {
 // @param id path string true "Stakeholder Group ID"
 func (h StakeholderGroupHandler) Delete(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param(ID))
-	model := &model.StakeholderGroup{}
-	model.ID = uint(id)
-	result := h.DB.Select("Stakeholders").Delete(model)
+	m := &model.StakeholderGroup{}
+	m.ID = uint(id)
+	result := h.DB.Select("Stakeholders").Delete(m)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -137,18 +146,18 @@ func (h StakeholderGroupHandler) Delete(ctx *gin.Context) {
 // @param stakeholder_group body api.StakeholderGroup true "Stakeholder Group data"
 func (h StakeholderGroupHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := StakeholderGroup{}
-	err := ctx.BindJSON(&updates)
+	r := &StakeholderGroup{}
+	err := ctx.BindJSON(r)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&StakeholderGroup{}).Where("id = ?", id).Omit("id").Updates(updates)
+	m := r.Model()
+	result := h.DB.Model(&model.StakeholderGroup{}).Where("id = ?", id).Omit("id").Updates(m)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
 	}
-	err = h.DB.Model(&updates).Association("Stakeholders").Replace("Stakeholders", updates.Stakeholders)
+	err = h.DB.Model(m).Association("Stakeholders").Replace("Stakeholders", m.Stakeholders)
 	if err != nil {
 		h.updateFailed(ctx, err)
 		return
@@ -159,4 +168,37 @@ func (h StakeholderGroupHandler) Update(ctx *gin.Context) {
 
 //
 // StakeholderGroup REST resource.
-type StakeholderGroup = model.StakeholderGroup
+type StakeholderGroup struct {
+	ID           uint          `json:"id"`
+	Name         string        `json:"name" binding:"required"`
+	Description  string        `json:"description"`
+	Stakeholders []Stakeholder `json:"stakeholders"`
+}
+
+//
+// With updates the resource with the model.
+func (r *StakeholderGroup) With(m *model.StakeholderGroup) {
+	r.ID = m.ID
+	r.Name = m.Name
+	r.Description = m.Description
+	for _, s := range m.Stakeholders {
+		r.Stakeholders = append(r.Stakeholders, Stakeholder{
+			ID:          s.ID,
+			DisplayName: s.DisplayName,
+		})
+	}
+}
+
+//
+// Model builds a model.
+func (r *StakeholderGroup) Model() (m *model.StakeholderGroup) {
+	m = &model.StakeholderGroup{
+		Name:        r.Name,
+		Description: r.Description,
+	}
+	m.ID = r.ID
+	for _, s := range r.Stakeholders {
+		m.Stakeholders = append(m.Stakeholders, *s.Model())
+	}
+	return
+}

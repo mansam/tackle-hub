@@ -47,16 +47,18 @@ func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 // @router /application-inventory/review/:id [get]
 // @param id path string true "Review ID"
 func (h ReviewHandler) Get(ctx *gin.Context) {
-	model := Review{}
+	m := &model.Review{}
 	id := ctx.Param(ID)
 	db := h.preLoad(h.DB, "Application")
-	result := db.First(&model, id)
+	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
+	r := Review{}
+	r.With(m)
 
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, r)
 }
 
 // List godoc
@@ -68,18 +70,24 @@ func (h ReviewHandler) Get(ctx *gin.Context) {
 // @router /application-inventory/review [get]
 func (h ReviewHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []Review
+	var list []model.Review
 	h.DB.Model(&model.Review{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Application")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
+	resources := []Review{}
+	for i := range list {
+		r := Review{}
+		r.With(&list[i])
+		resources = append(resources, r)
+	}
 
-	h.listResponse(ctx, ReviewKind, models, int(count))
+	h.listResponse(ctx, ReviewKind, resources, int(count))
 }
 
 // Create godoc
@@ -95,16 +103,15 @@ func (h ReviewHandler) Create(ctx *gin.Context) {
 	review := Review{}
 	err := ctx.BindJSON(&review)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
-	model := review.Model()
-	result := h.DB.Create(&model)
+	m := review.Model()
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-	review.With(model)
+	review.With(m)
 
 	ctx.JSON(http.StatusCreated, review)
 }
@@ -141,7 +148,6 @@ func (h ReviewHandler) Update(ctx *gin.Context) {
 	updates := Review{}
 	err := ctx.BindJSON(&updates)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	result := h.DB.Model(&Review{}).Where("id = ?", id).Omit("id").Updates(updates)
@@ -165,7 +171,6 @@ func (h ReviewHandler) CopyReview(ctx *gin.Context) {
 	c := CopyRequest{}
 	err := ctx.BindJSON(&c)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 
@@ -185,7 +190,7 @@ func (h ReviewHandler) CopyReview(ctx *gin.Context) {
 			ApplicationID:       id,
 		}
 		existing := []model.Review{}
-		result = h.DB.Find(&existing, "application_id = ?", id)
+		result = h.DB.Find(&existing, "applicationid = ?", id)
 		if result.Error != nil {
 			h.createFailed(ctx, result.Error)
 			return
@@ -219,8 +224,8 @@ type Review struct {
 	WorkPriority        uint   `json:"workPriority"`
 	Comments            string `json:"comments"`
 	Application         *struct {
-		ID uint `json:"id"`
-	} `json:"application"`
+		ID uint `json:"id" binding:"required"`
+	} `json:"application" binding:"required"`
 }
 
 // With updates the resource with the model.
@@ -232,7 +237,7 @@ func (r *Review) With(m *model.Review) {
 	r.WorkPriority = m.WorkPriority
 	r.Comments = m.Comments
 	r.Application = &struct {
-		ID uint `json:"id"`
+		ID uint `json:"id" binding:"required"`
 	}{
 		ID: m.ApplicationID,
 	}
@@ -258,6 +263,6 @@ func (r *Review) Model() (m *model.Review) {
 //
 // CopyRequest REST resource.
 type CopyRequest struct {
-	SourceReview       uint   `json:"sourceReview"`
-	TargetApplications []uint `json:"targetApplications"`
+	SourceReview       uint   `json:"sourceReview" binding:"required"`
+	TargetApplications []uint `json:"targetApplications" binding:"required"`
 }

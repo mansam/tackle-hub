@@ -11,6 +11,7 @@ import (
 	"path"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strconv"
+	"time"
 )
 
 //
@@ -51,7 +52,7 @@ func (h TaskHandler) AddRoutes(e *gin.Engine) {
 // @router /tasks/:id [get]
 // @param id path string true "Task ID"
 func (h TaskHandler) Get(ctx *gin.Context) {
-	task := &Task{}
+	task := &model.Task{}
 	id := ctx.Param(ID)
 	db := h.DB.Preload("Report")
 	result := db.First(task, id)
@@ -59,8 +60,10 @@ func (h TaskHandler) Get(ctx *gin.Context) {
 		h.getFailed(ctx, result.Error)
 		return
 	}
+	r := Task{}
+	r.With(task)
 
-	ctx.JSON(http.StatusOK, task)
+	ctx.JSON(http.StatusOK, r)
 }
 
 // List godoc
@@ -71,7 +74,7 @@ func (h TaskHandler) Get(ctx *gin.Context) {
 // @success 200 {object} []api.Task
 // @router /tasks [get]
 func (h TaskHandler) List(ctx *gin.Context) {
-	var list []Task
+	var list []model.Task
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = db.Preload("Report")
@@ -80,8 +83,14 @@ func (h TaskHandler) List(ctx *gin.Context) {
 		h.listFailed(ctx, result.Error)
 		return
 	}
+	resources := []Task{}
+	for i := range list {
+		r := Task{}
+		r.With(&list[i])
+		resources = append(resources, r)
+	}
 
-	ctx.JSON(http.StatusOK, list)
+	ctx.JSON(http.StatusOK, resources)
 }
 
 // Create godoc
@@ -100,12 +109,15 @@ func (h TaskHandler) Create(ctx *gin.Context) {
 		h.createFailed(ctx, err)
 		return
 	}
-	task.Reset()
-	result := h.DB.Create(&task)
+
+	m := task.Model()
+	m.Reset()
+	result := h.DB.Create(&m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
+	task.With(m)
 
 	ctx.JSON(http.StatusCreated, task)
 }
@@ -141,14 +153,15 @@ func (h TaskHandler) AddonCreate(ctx *gin.Context) {
 	task.Image = addon.Spec.Image
 	err = ctx.BindJSON(&task.Data)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
-	result := h.DB.Create(&task)
+	m := task.Model()
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
+	task.With(m)
 
 	ctx.JSON(http.StatusCreated, task)
 }
@@ -162,7 +175,7 @@ func (h TaskHandler) AddonCreate(ctx *gin.Context) {
 // @param id path string true "Task ID"
 func (h TaskHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	task := &Task{}
+	task := &model.Task{}
 	result := h.DB.First(task, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
@@ -199,13 +212,13 @@ func (h TaskHandler) Delete(ctx *gin.Context) {
 // @param task body Task true "Task data"
 func (h TaskHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := Task{}
-	err := ctx.BindJSON(&updates)
+	updates := &Task{}
+	err := ctx.BindJSON(updates)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
-	result := h.DB.Model(&Task{}).Where("id", id).Omit("id").Updates(updates)
+	m := updates.Model()
+	result := h.DB.Model(&Task{}).Where("id", id).Omit("id").Updates(m)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
@@ -229,15 +242,16 @@ func (h TaskHandler) CreateReport(ctx *gin.Context) {
 	report := &TaskReport{}
 	err := ctx.BindJSON(report)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	task, _ := strconv.Atoi(id)
 	report.TaskID = uint(task)
-	result := h.DB.Create(report)
+	m := report.Model()
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 	}
+	report.With(m)
 
 	ctx.JSON(http.StatusCreated, report)
 }
@@ -257,26 +271,114 @@ func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 	report := &TaskReport{}
 	err := ctx.BindJSON(report)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	task, _ := strconv.Atoi(id)
 	report.TaskID = uint(task)
-	db := h.DB.Model(&TaskReport{})
-	db = db.Where("task_id", task)
+	m := report.Model()
+	db := h.DB.Model(&model.TaskReport{})
+	db = db.Where("taskid", task)
 	db = db.Omit("id")
-	result := db.Updates(report)
+	result := db.Updates(m)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 	}
+	report.With(m)
 
 	ctx.JSON(http.StatusOK, report)
 }
 
 //
 // Task REST resource.
-type Task = model.Task
+type Task struct {
+	ID         uint        `json:"id"`
+	Name       string      `json:"name"`
+	Image      string      `json:"image"`
+	Addon      string      `json:"addon"`
+	Data       model.JSON  `json:"data"`
+	Started    *time.Time  `json:"started"`
+	Terminated *time.Time  `json:"terminated"`
+	Status     string      `json:"status"`
+	Error      string      `json:"error"`
+	Job        string      `json:"job"`
+	Report     *TaskReport `json:"report"`
+}
+
+//
+// With updates the resource with the model.
+func (r *Task) With(m *model.Task) {
+	r.ID = m.ID
+	r.Name = m.Name
+	r.Image = m.Image
+	r.Addon = m.Addon
+	r.Data = m.Data
+	r.Started = m.Started
+	r.Terminated = m.Terminated
+	r.Status = m.Status
+	r.Error = m.Error
+	r.Job = m.Job
+	if m.Report != nil {
+		report := &TaskReport{}
+		report.With(m.Report)
+		r.Report = report
+	}
+}
+
+//
+// Model builds a model.
+func (r *Task) Model() (m *model.Task) {
+	m = &model.Task{
+		Name:       r.Name,
+		Image:      r.Image,
+		Addon:      r.Addon,
+		Data:       r.Data,
+		Started:    r.Started,
+		Terminated: r.Terminated,
+		Status:     r.Status,
+		Error:      r.Error,
+		Job:        r.Job,
+	}
+	m.ID = r.ID
+	if r.Report != nil {
+		m.Report = r.Report.Model()
+	}
+
+	return
+}
 
 //
 // TaskReport REST resource.
-type TaskReport = model.TaskReport
+type TaskReport struct {
+	ID        uint   `json:"id"`
+	Error     string `json:"error"`
+	Total     int    `json:"total"`
+	Completed int    `json:"completed"`
+	Activity  string `json:"activity"`
+	TaskID    uint   `json:"task"`
+}
+
+//
+// With updates the resource with the model.
+func (r *TaskReport) With(m *model.TaskReport) {
+	r.ID = m.ID
+	r.Error = m.Error
+	r.Total = m.Total
+	r.Completed = m.Completed
+	r.Activity = m.Activity
+	r.TaskID = m.TaskID
+}
+
+//
+// Model builds a model.
+func (r *TaskReport) Model() (m *model.TaskReport) {
+	m = &model.TaskReport{
+		Error:     r.Error,
+		Total:     r.Total,
+		Completed: r.Completed,
+		Activity:  r.Activity,
+		TaskID:    r.TaskID,
+	}
+	m.ID = r.ID
+
+	return
+}

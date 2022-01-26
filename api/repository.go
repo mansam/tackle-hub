@@ -40,15 +40,17 @@ func (h RepositoryHandler) AddRoutes(e *gin.Engine) {
 // @router /repositories/:id [get]
 // @param id path string true "Repository ID"
 func (h RepositoryHandler) Get(ctx *gin.Context) {
-	repository := Repository{}
+	repository := &model.Repository{}
 	id := ctx.Param(ID)
-	result := h.DB.First(&repository, id)
+	result := h.DB.First(repository, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
+	r := Repository{}
+	r.With(repository)
 
-	ctx.JSON(http.StatusOK, repository)
+	ctx.JSON(http.StatusOK, r)
 }
 
 // List godoc
@@ -59,7 +61,7 @@ func (h RepositoryHandler) Get(ctx *gin.Context) {
 // @success 200 {object} []Repository
 // @router /repositories [get]
 func (h RepositoryHandler) List(ctx *gin.Context) {
-	var list []Repository
+	var list []model.Repository
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	result := db.Find(&list)
@@ -67,8 +69,14 @@ func (h RepositoryHandler) List(ctx *gin.Context) {
 		h.listFailed(ctx, result.Error)
 		return
 	}
+	resources := []Repository{}
+	for i := range list {
+		r := Repository{}
+		r.With(&list[i])
+		resources = append(resources, r)
+	}
 
-	ctx.JSON(http.StatusOK, list)
+	ctx.JSON(http.StatusOK, resources)
 }
 
 // ListByApplication godoc
@@ -79,18 +87,24 @@ func (h RepositoryHandler) List(ctx *gin.Context) {
 // @success 200 {object} []Repository
 // @router /application-inventory/application/:id/repositories [get]
 func (h RepositoryHandler) ListByApplication(ctx *gin.Context) {
-	var list []Repository
+	var list []model.Repository
 	appId := ctx.Param(ID)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
-	db = db.Where("application_id", appId)
+	db = db.Where("applicationid", appId)
 	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
+	resources := []Repository{}
+	for i := range list {
+		r := Repository{}
+		r.With(&list[i])
+		resources = append(resources, r)
+	}
 
-	ctx.JSON(http.StatusOK, list)
+	ctx.JSON(http.StatusOK, resources)
 }
 
 // Create godoc
@@ -106,14 +120,15 @@ func (h RepositoryHandler) Create(ctx *gin.Context) {
 	repository := &Repository{}
 	err := ctx.BindJSON(repository)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
-	result := h.DB.Create(repository)
+	m := repository.Model()
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
+	repository.With(m)
 
 	ctx.JSON(http.StatusCreated, repository)
 }
@@ -131,7 +146,6 @@ func (h RepositoryHandler) CreateForApplication(ctx *gin.Context) {
 	repository := &Repository{}
 	err := ctx.BindJSON(repository)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	appID := ctx.Param(ID)
@@ -142,11 +156,13 @@ func (h RepositoryHandler) CreateForApplication(ctx *gin.Context) {
 		return
 	}
 	repository.ApplicationID = application.ID
-	result = h.DB.Create(repository)
+	m := repository.Model()
+	result = h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, err)
 		return
 	}
+	repository.With(m)
 
 	ctx.JSON(http.StatusCreated, repository)
 }
@@ -160,7 +176,7 @@ func (h RepositoryHandler) CreateForApplication(ctx *gin.Context) {
 // @param id path string true "Repository ID"
 func (h RepositoryHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	repository := &Repository{}
+	repository := &model.Repository{}
 	result := h.DB.First(repository, id)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
@@ -172,7 +188,7 @@ func (h RepositoryHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 // Update godoc
@@ -186,13 +202,13 @@ func (h RepositoryHandler) Delete(ctx *gin.Context) {
 // @param repo body Repository true "Repository data"
 func (h RepositoryHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	updates := Repository{}
-	err := ctx.BindJSON(&updates)
+	r := &Repository{}
+	err := ctx.BindJSON(r)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
-	db := h.DB.Model(&Repository{})
+	updates := r.Model()
+	db := h.DB.Model(&model.Repository{})
 	db = db.Where("id", id)
 	db = db.Omit("id", "location")
 	result := db.Updates(updates)
@@ -201,9 +217,45 @@ func (h RepositoryHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 //
 // Repository REST resource.
-type Repository = model.Repository
+type Repository struct {
+	ID            uint   `json:"id"`
+	Kind          string `json:"kind"`
+	URL           string `json:"url"`
+	Branch        string `json:"branch"`
+	Tag           string `json:"tag"`
+	Path          string `json:"path"`
+	ApplicationID uint   `json:"application"`
+}
+
+//
+// With updates the resource with the model.
+func (r *Repository) With(m *model.Repository) {
+	r.ID = m.ID
+	r.Kind = m.Kind
+	r.URL = m.URL
+	r.Branch = m.Branch
+	r.Tag = m.Tag
+	r.Path = m.Path
+	r.ApplicationID = m.ApplicationID
+}
+
+//
+// Model builds a model.
+func (r *Repository) Model() (m *model.Repository) {
+	m = &model.Repository{
+		Kind:          r.Kind,
+		URL:           r.URL,
+		Branch:        r.Branch,
+		Tag:           r.Tag,
+		Path:          r.Path,
+		ApplicationID: r.ApplicationID,
+	}
+	m.ID = r.ID
+
+	return
+}

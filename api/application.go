@@ -73,7 +73,7 @@ func (h ApplicationHandler) Get(ctx *gin.Context) {
 // @router /application-inventory/application [get]
 func (h ApplicationHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.Application
+	var list []model.Application
 	h.DB.Model(model.Application{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
@@ -82,15 +82,15 @@ func (h ApplicationHandler) List(ctx *gin.Context) {
 		"Tags",
 		"Review",
 		"BusinessService")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []Application{}
-	for i := range models {
+	for i := range list {
 		r := Application{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 
@@ -110,11 +110,10 @@ func (h ApplicationHandler) Create(ctx *gin.Context) {
 	r := &Application{}
 	err := ctx.BindJSON(r)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
 	m := r.Model()
-	result := h.DB.Create(&m)
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
@@ -138,9 +137,9 @@ func (h ApplicationHandler) Create(ctx *gin.Context) {
 // @param id path int true "Application id"
 func (h ApplicationHandler) Delete(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param(ID))
-	model := &model.Application{}
-	model.ID = uint(id)
-	result := h.DB.Select("Tags").Delete(model)
+	m := &model.Application{}
+	m.ID = uint(id)
+	result := h.DB.Select("Tags").Delete(m)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -163,7 +162,6 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 	r := &Application{}
 	err := ctx.BindJSON(r)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	m := r.Model()
@@ -185,7 +183,7 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 // Application REST resource.
 type Application struct {
 	ID              uint     `json:"id"`
-	Name            string   `json:"name"`
+	Name            string   `json:"name" binding:"required"`
 	Description     string   `json:"description"`
 	Review          *Review  `json:"review"`
 	Comments        string   `json:"comments"`

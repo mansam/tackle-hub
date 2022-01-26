@@ -45,17 +45,17 @@ func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 // @router /controls/business-service/:id [get]
 // @param id path string true "Business Service ID"
 func (h BusinessServiceHandler) Get(ctx *gin.Context) {
-	model := model.BusinessService{}
+	m := &model.BusinessService{}
 	id := ctx.Param(ID)
 	db := h.preLoad(h.DB, "Owner")
-	result := db.First(&model, id)
+	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
 
 	resource := BusinessService{}
-	resource.With(&model)
+	resource.With(m)
 	ctx.JSON(http.StatusOK, resource)
 }
 
@@ -68,20 +68,20 @@ func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 // @router /controls/business-service [get]
 func (h BusinessServiceHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.BusinessService
+	var list []model.BusinessService
 	h.DB.Model(&model.BusinessService{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "Owner")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []BusinessService{}
-	for i := range models {
+	for i := range list {
 		r := BusinessService{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 
@@ -98,20 +98,20 @@ func (h BusinessServiceHandler) List(ctx *gin.Context) {
 // @router /controls/business-service [post]
 // @param business_service body api.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Create(ctx *gin.Context) {
-	resource := BusinessService{}
-	err := ctx.BindJSON(&resource)
+	r := &BusinessService{}
+	err := ctx.BindJSON(r)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
-	model := resource.Model()
-	result := h.DB.Create(model)
+	m := r.Model()
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-	resource.With(model)
-	ctx.JSON(http.StatusCreated, resource)
+	r.With(m)
+
+	ctx.JSON(http.StatusCreated, r)
 }
 
 // Delete godoc
@@ -143,15 +143,13 @@ func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 // @param business_service body api.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	resource := BusinessService{}
-	err := ctx.BindJSON(&resource)
+	r := &BusinessService{}
+	err := ctx.BindJSON(r)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
-
-	updates := resource.Model()
-	result := h.DB.Model(&model.BusinessService{}).Select("name", "description", "owner_id").Where("id = ?", id).Omit("id").Updates(updates)
+	updates := r.Model()
+	result := h.DB.Model(&model.BusinessService{}).Where("id = ?", id).Omit("id").Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
@@ -164,7 +162,7 @@ func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 // BusinessService REST resource.
 type BusinessService struct {
 	ID          uint   `json:"id"`
-	Name        string `json:"name"`
+	Name        string `json:"name" binding:"required"`
 	Description string `json:"description"`
 	Owner       struct {
 		ID          *uint  `json:"id"`

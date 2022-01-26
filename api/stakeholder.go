@@ -46,21 +46,21 @@ func (h StakeholderHandler) AddRoutes(e *gin.Engine) {
 // @router /controls/stakeholder/:id [get]
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Get(ctx *gin.Context) {
-	model := model.Stakeholder{}
+	m := &model.Stakeholder{}
 	id := ctx.Param(ID)
 	db := h.preLoad(
 		h.DB,
 		"JobFunction",
 		"BusinessServices",
 		"StakeholderGroups")
-	result := db.First(&model, id)
+	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
 
 	resource := Stakeholder{}
-	resource.With(&model)
+	resource.With(m)
 	ctx.JSON(http.StatusOK, resource)
 }
 
@@ -73,7 +73,7 @@ func (h StakeholderHandler) Get(ctx *gin.Context) {
 // @router /controls/stakeholder [get]
 func (h StakeholderHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.Stakeholder
+	var list []model.Stakeholder
 	h.DB.Model(model.Stakeholder{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
@@ -82,15 +82,15 @@ func (h StakeholderHandler) List(ctx *gin.Context) {
 		"JobFunction",
 		"BusinessServices",
 		"Groups")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []Stakeholder{}
-	for i := range models {
+	for i := range list {
 		r := Stakeholder{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 
@@ -107,20 +107,20 @@ func (h StakeholderHandler) List(ctx *gin.Context) {
 // @router /controls/stakeholder [post]
 // @param stakeholder body api.Stakeholder true "Stakeholder data"
 func (h StakeholderHandler) Create(ctx *gin.Context) {
-	resource := Stakeholder{}
-	err := ctx.BindJSON(&resource)
+	r := &Stakeholder{}
+	err := ctx.BindJSON(r)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
-	model := resource.Model()
-	result := h.DB.Create(model)
+	m := r.Model()
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-	resource.With(model)
-	ctx.JSON(http.StatusCreated, resource)
+	r.With(m)
+
+	ctx.JSON(http.StatusCreated, r)
 }
 
 // Delete godoc
@@ -132,9 +132,9 @@ func (h StakeholderHandler) Create(ctx *gin.Context) {
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Delete(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param(ID))
-	model := &model.Stakeholder{}
-	model.ID = uint(id)
-	result := h.DB.Select("Groups").Delete(model)
+	m := &model.Stakeholder{}
+	m.ID = uint(id)
+	result := h.DB.Select("Groups").Delete(m)
 	if result.Error != nil {
 		h.deleteFailed(ctx, result.Error)
 		return
@@ -157,12 +157,10 @@ func (h StakeholderHandler) Update(ctx *gin.Context) {
 	resource := Stakeholder{}
 	err := ctx.BindJSON(&resource)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	updates := resource.Model()
-	result := h.DB.Model(&model.Stakeholder{}).Select(
-		"displayName", "email", "job_function_id").Where("id = ?", id).Updates(updates)
+	result := h.DB.Model(&model.Stakeholder{}).Where("id = ?", id).Updates(updates)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return
@@ -180,8 +178,8 @@ func (h StakeholderHandler) Update(ctx *gin.Context) {
 // Stakeholder REST resource.
 type Stakeholder struct {
 	ID               uint                     `json:"id"`
-	DisplayName      string                   `json:"displayName"`
-	Email            string                   `json:"email"`
+	DisplayName      string                   `json:"displayName" binding:"required"`
+	Email            string                   `json:"email" binding:"required"`
 	Groups           []model.StakeholderGroup `json:"stakeholderGroups"`
 	BusinessServices []model.BusinessService  `json:"businessServices"`
 	JobFunction      struct {

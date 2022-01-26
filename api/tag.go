@@ -68,20 +68,20 @@ func (h TagHandler) Get(ctx *gin.Context) {
 // @router /controls/tag [get]
 func (h TagHandler) List(ctx *gin.Context) {
 	var count int64
-	var models []model.Tag
+	var list []model.Tag
 	h.DB.Model(model.Tag{}).Count(&count)
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
 	db = h.preLoad(db, "TagType")
-	result := db.Find(&models)
+	result := db.Find(&list)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
 	resources := []Tag{}
-	for i := range models {
+	for i := range list {
 		r := Tag{}
-		r.With(&models[i])
+		r.With(&list[i])
 		resources = append(resources, r)
 	}
 
@@ -98,19 +98,20 @@ func (h TagHandler) List(ctx *gin.Context) {
 // @router /controls/tag [post]
 // @param tag body Tag true "Tag data"
 func (h TagHandler) Create(ctx *gin.Context) {
-	resource := Tag{}
-	err := ctx.BindJSON(&resource)
+	r := &Tag{}
+	err := ctx.BindJSON(r)
 	if err != nil {
-		h.createFailed(ctx, err)
 		return
 	}
-	model := resource.Model()
-	result := h.DB.Create(&model)
+	m := r.Model()
+	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
 	}
-	ctx.JSON(http.StatusCreated, model)
+	r.With(m)
+
+	ctx.JSON(http.StatusCreated, r)
 }
 
 // Delete godoc
@@ -145,7 +146,6 @@ func (h TagHandler) Update(ctx *gin.Context) {
 	resource := Tag{}
 	err := ctx.BindJSON(&resource)
 	if err != nil {
-		h.updateFailed(ctx, err)
 		return
 	}
 	updates := resource.Model()
@@ -162,12 +162,12 @@ func (h TagHandler) Update(ctx *gin.Context) {
 // Tag REST resource.
 type Tag struct {
 	ID      uint   `json:"id"`
-	Name    string `json:"name"`
+	Name    string `json:"name" binding:"required"`
 	TagType struct {
-		ID    uint   `json:"id"`
+		ID    uint   `json:"id" binding:"required"`
 		Name  string `json:"name"`
 		Color string `json:"colour"`
-	} `json:"tagType"`
+	} `json:"tagType" binding:"required"`
 }
 
 //

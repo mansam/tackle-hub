@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"strconv"
+	"strings"
 )
 
 //
@@ -11,7 +12,7 @@ import (
 const (
 	Limit  = 20
 	Offset = 0
-	Sort   = "id asc"
+	Sort   = ""
 )
 
 //
@@ -26,7 +27,9 @@ type Pagination struct {
 // apply pagination.
 func (p *Pagination) apply(db *gorm.DB) (tx *gorm.DB) {
 	tx = db.Offset(p.Offset).Limit(p.Limit)
-	tx = tx.Order(p.Sort)
+	if p.Sort != "" {
+		tx = tx.Order(p.Sort)
+	}
 	return
 }
 
@@ -42,8 +45,11 @@ func NewPagination(ctx *gin.Context) Pagination {
 		offset = Offset
 	}
 	sort := ctx.Query("sort")
-	if sort == "" {
+	if strings.Contains(sort, ".") {
 		sort = Sort
+	}
+	if strings.HasPrefix(sort, "-") {
+		sort = strings.Replace(sort, "-", "", 1) + " desc"
 	}
 	return Pagination{
 		Limit:  limit,
