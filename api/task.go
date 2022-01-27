@@ -292,10 +292,11 @@ func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 // Task REST resource.
 type Task struct {
 	ID         uint        `json:"id"`
-	Name       string      `json:"name"`
-	Image      string      `json:"image"`
-	Addon      string      `json:"addon"`
+	Name       string      `json:"name" binding:"required"`
+	Addon      string      `json:"addon" binding:"required"`
+	Isolated   bool        `json:"isolated,omitempty"`
 	Data       model.JSON  `json:"data"`
+	Image      string      `json:"image"`
 	Started    *time.Time  `json:"started"`
 	Terminated *time.Time  `json:"terminated"`
 	Status     string      `json:"status"`
@@ -311,6 +312,7 @@ func (r *Task) With(m *model.Task) {
 	r.Name = m.Name
 	r.Image = m.Image
 	r.Addon = m.Addon
+	r.Isolated = m.Isolated
 	r.Data = m.Data
 	r.Started = m.Started
 	r.Terminated = m.Terminated
@@ -328,15 +330,10 @@ func (r *Task) With(m *model.Task) {
 // Model builds a model.
 func (r *Task) Model() (m *model.Task) {
 	m = &model.Task{
-		Name:       r.Name,
-		Image:      r.Image,
-		Addon:      r.Addon,
-		Data:       r.Data,
-		Started:    r.Started,
-		Terminated: r.Terminated,
-		Status:     r.Status,
-		Error:      r.Error,
-		Job:        r.Job,
+		Name:     r.Name,
+		Addon:    r.Addon,
+		Isolated: r.Isolated,
+		Data:     r.Data,
 	}
 	m.ID = r.ID
 	if r.Report != nil {
@@ -350,6 +347,7 @@ func (r *Task) Model() (m *model.Task) {
 // TaskReport REST resource.
 type TaskReport struct {
 	ID        uint   `json:"id"`
+	Status    string `json:"status"`
 	Error     string `json:"error"`
 	Total     int    `json:"total"`
 	Completed int    `json:"completed"`
