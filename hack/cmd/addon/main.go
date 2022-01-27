@@ -3,7 +3,7 @@ TEST addon adapter.
 This is an example of an addon adapter that lists files
 and creates an application bucket for each. Error handling is
 deliberately minimized to reduce code clutter.
- */
+*/
 package main
 
 import (
@@ -109,9 +109,9 @@ func createBucket(d *Data, paths []string) (err error) {
 		//
 		// Write file.
 		err = os.WriteFile(
-				target,
-				b,
-				0644)
+			target,
+			b,
+			0644)
 		if err != nil {
 			return
 		}

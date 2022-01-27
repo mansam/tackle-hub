@@ -23,7 +23,7 @@ func (m *Manager) Run(ctx context.Context) {
 	go func() {
 		for {
 			select {
-			case <- ctx.Done():
+			case <-ctx.Done():
 				return
 			default:
 				time.Sleep(time.Second)

@@ -116,7 +116,7 @@ func (h ImportHandler) ListImports(ctx *gin.Context) {
 		h.listFailed(ctx, result.Error)
 		return
 	}
-	resources := []map[string]interface{}{}
+	resources := []Import{}
 	for i := range list {
 		resources = append(resources, list[i].AsMap())
 	}
@@ -388,12 +388,15 @@ func (h ImportHandler) applicationFromRow(fileName string, row []string) (app mo
 
 //
 // Import REST resource.
-type Import = model.Import
+type Import map[string]interface{}
 
 //
 // ImportSummary REST resource.
 type ImportSummary struct {
 	model.ImportSummary
+	ID           uint      `json:"id"`
+	Filename     string    `json:"filename"`
+	ImportStatus string    `json:"importStatus"`
 	ImportTime   time.Time `json:"importTime"`
 	ValidCount   int       `json:"validCount"`
 	InvalidCount int       `json:"invalidCount"`

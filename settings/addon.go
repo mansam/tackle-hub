@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	EnvAddonSecretPath  = "ADDON_SECRET_PATH"
-	EnvHubBaseURL = "HUB_BASE_URL"
+	EnvAddonSecretPath = "ADDON_SECRET_PATH"
+	EnvHubBaseURL      = "HUB_BASE_URL"
 )
 
 //

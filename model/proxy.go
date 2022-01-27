@@ -5,8 +5,8 @@ package model
 // kind = (http|https)
 type Proxy struct {
 	Model
-	Kind       string `json:"kind" gorm:"uniqueIndex"`
-	Host       string `json:"host" gorm:"not null"`
-	Port       int    `json:"port"`
-	IdentityID uint   `json:"identity" gorm:"index"`
+	Kind       string `gorm:"uniqueIndex"`
+	Host       string `gorm:"not null"`
+	Port       int
+	IdentityID uint `gorm:"index"`
 }

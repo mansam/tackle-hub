@@ -11,15 +11,15 @@ import (
 // Kinds = (git|svn|mvn|proxy)
 type Identity struct {
 	Model
-	Kind          string `json:"kind" gorm:"not null"`
-	Name          string `json:"name" gorm:"not null"`
-	Description   string `json:"description"`
-	User          string `json:"user"`
-	Password      string `json:"password"`
-	Key           string `json:"key"`
-	Settings      string `json:"settings"`
-	Encrypted     string `json:"encrypted"`
-	ApplicationID uint   `json:"application" gorm:"many2many:appIdentity"`
+	Kind          string `gorm:"not null"`
+	Name          string `gorm:"not null"`
+	Description   string
+	User          string
+	Password      string
+	Key           string
+	Settings      string
+	Encrypted     string
+	ApplicationID uint `gorm:"many2many:appIdentity"`
 }
 
 //

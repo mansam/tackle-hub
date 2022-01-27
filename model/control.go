@@ -2,50 +2,50 @@ package model
 
 type BusinessService struct {
 	Model
-	Name        string       `json:"name" gorm:"index;unique;not null"`
-	Description string       `json:"description"`
-	OwnerID     *uint        `json:"-" gorm:"index"`
-	Owner       *Stakeholder `json:"owner"`
+	Name        string `gorm:"index;unique;not null"`
+	Description string
+	OwnerID     *uint `gorm:"index"`
+	Owner       *Stakeholder
 }
 
 type StakeholderGroup struct {
 	Model
-	Name         string        `json:"name" gorm:"index;unique;not null"`
-	Username     string        `json:"username"`
-	Description  string        `json:"description"`
-	Stakeholders []Stakeholder `json:"stakeholders" gorm:"many2many:sgStakeholder"`
+	Name         string `gorm:"index;unique;not null"`
+	Username     string
+	Description  string
+	Stakeholders []Stakeholder `gorm:"many2many:sgStakeholder"`
 }
 
 type Stakeholder struct {
 	Model
-	DisplayName      string             `json:"displayName" gorm:"not null;"`
-	Email            string             `json:"email" gorm:"index;unique;not null"`
-	Groups           []StakeholderGroup `json:"stakeholderGroups" gorm:"many2many:sgStakeholder"`
-	BusinessServices []BusinessService  `json:"businessServices" gorm:"foreignKey:OwnerID"`
-	JobFunctionID    *uint              `json:"-" gorm:"index"`
-	JobFunction      *JobFunction       `json:"jobFunction"`
+	DisplayName      string             `gorm:"not null;"`
+	Email            string             `gorm:"index;unique;not null"`
+	Groups           []StakeholderGroup `gorm:"many2many:sgStakeholder"`
+	BusinessServices []BusinessService  `gorm:"foreignKey:OwnerID"`
+	JobFunctionID    *uint              `gorm:"index"`
+	JobFunction      *JobFunction
 }
 
 type JobFunction struct {
 	Model
-	Username     string        `json:"username"`
-	Role         string        `json:"role" gorm:"index;unique;not null"`
-	Stakeholders []Stakeholder `json:"stakeholders"`
+	Username     string
+	Role         string `gorm:"index;unique;not null"`
+	Stakeholders []Stakeholder
 }
 
 type Tag struct {
 	Model
-	Name      string  `json:"name" gorm:"uniqueIndex:tag_a;not null"`
-	Username  string  `json:"username"`
-	TagTypeID uint    `json:"-" gorm:"uniqueIndex:tag_a;index;not null"`
-	TagType   TagType `json:"tagType"`
+	Name      string `gorm:"uniqueIndex:tag_a;not null"`
+	Username  string
+	TagTypeID uint `gorm:"uniqueIndex:tag_a;index;not null"`
+	TagType   TagType
 }
 
 type TagType struct {
 	Model
-	Name     string `json:"name" gorm:"index;unique;not null"`
-	Username string `json:"username"`
-	Rank     uint   `json:"rank"`
-	Color    string `json:"colour"`
-	Tags     []Tag  `json:"tags"`
+	Name     string `gorm:"index;unique;not null"`
+	Username string
+	Rank     uint
+	Color    string
+	Tags     []Tag
 }

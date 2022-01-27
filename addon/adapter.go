@@ -1,6 +1,6 @@
 /*
 Tackle hub/addon integration.
- */
+*/
 
 package addon
 
@@ -15,7 +15,7 @@ import (
 
 var (
 	Settings = settings.Settings
-	Log = logging.WithName("addon")
+	Log      = logging.WithName("addon")
 )
 
 //
@@ -78,7 +78,7 @@ func newAdapter() (adapter *Adapter) {
 	// Build REST client.
 	client := &Client{
 		baseURL: Settings.Addon.Hub.URL,
-		http: &http.Client{},
+		http:    &http.Client{},
 	}
 	//
 	// Build Adapter.

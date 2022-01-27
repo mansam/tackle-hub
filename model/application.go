@@ -4,61 +4,61 @@ import "fmt"
 
 type Application struct {
 	Model
-	Name              string           `json:"name" gorm:"index;unique;not null"`
-	Description       string           `json:"description"`
-	Review            *Review          `json:"review"`
-	Comments          string           `json:"comments"`
-	Tags              []Tag            `json:"tags" gorm:"many2many:applicationTags"`
-	Identities        []Identity       `json:"identities" gorm:"many2many:appIdentity"`
-	BusinessServiceID uint             `json:"-" gorm:"index"`
-	BusinessService   *BusinessService `json:"businessService"`
+	Name              string `gorm:"index;unique;not null"`
+	Description       string
+	Review            *Review
+	Comments          string
+	Tags              []Tag      `gorm:"many2many:applicationTags"`
+	Identities        []Identity `gorm:"many2many:appIdentity"`
+	BusinessServiceID uint       `gorm:"index"`
+	BusinessService   *BusinessService
 }
 
 type Dependency struct {
 	Model
-	ToID   uint         `json:"to" gorm:"index"`
-	To     *Application `json:"-" gorm:"foreignKey:ToID;constraint:OnDelete:CASCADE"`
-	FromID uint         `json:"from" gorm:"index"`
-	From   *Application `json:"-" gorm:"foreignKey:FromID;constraint:OnDelete:CASCADE"`
+	ToID   uint         `gorm:"index"`
+	To     *Application `gorm:"foreignKey:ToID;constraint:OnDelete:CASCADE"`
+	FromID uint         `gorm:"index"`
+	From   *Application `gorm:"foreignKey:FromID;constraint:OnDelete:CASCADE"`
 }
 
 type Repository struct {
 	Model
-	Kind          string `json:"kind"`
-	URL           string `json:"url"`
-	Branch        string `json:"branch"`
-	Tag           string `json:"tag"`
-	Path          string `json:"path" gorm:"default:/"`
-	ApplicationID uint   `json:"application" gorm:"index;unique"`
+	Kind          string
+	URL           string
+	Branch        string
+	Tag           string
+	Path          string `gorm:"default:/"`
+	ApplicationID uint   `gorm:"index;unique"`
 }
 
 type Review struct {
 	Model
-	BusinessCriticality uint         `json:"businessCriticality" gorm:"not null"`
-	EffortEstimate      string       `json:"effortEstimate" gorm:"not null"`
-	ProposedAction      string       `json:"proposedAction" gorm:"not null"`
-	WorkPriority        uint         `json:"workPriority" gorm:"not null"`
-	Comments            string       `json:"comments"`
-	Application         *Application `json:"application"`
-	ApplicationID       uint         `json:"-" gorm:"uniqueIndex"`
+	BusinessCriticality uint   `gorm:"not null"`
+	EffortEstimate      string `gorm:"not null"`
+	ProposedAction      string `gorm:"not null"`
+	WorkPriority        uint   `gorm:"not null"`
+	Comments            string
+	Application         *Application
+	ApplicationID       uint `gorm:"uniqueIndex"`
 }
 
 type Import struct {
 	Model
-	Filename            string        `json:"filename"`
-	ApplicationName     string        `json:"applicationName"`
-	BusinessService     string        `json:"businessService"`
-	Comments            string        `json:"comments"`
-	Dependency          string        `json:"dependency"`
-	DependencyDirection string        `json:"dependencyDirection"`
-	Description         string        `json:"description"`
-	ErrorMessage        string        `json:"errorMessage"`
-	IsValid             bool          `json:"isValid"`
-	RecordType1         string        `json:"recordType1"`
-	ImportSummary       ImportSummary `json:"-"`
-	ImportSummaryID     uint          `json:"-" gorm:"index"`
-	Processed           bool          `json:"-"`
-	ImportTags          []ImportTag   `json:"-" gorm:"constraint:OnDelete:CASCADE"`
+	Filename            string
+	ApplicationName     string
+	BusinessService     string
+	Comments            string
+	Dependency          string
+	DependencyDirection string
+	Description         string
+	ErrorMessage        string
+	IsValid             bool
+	RecordType1         string
+	ImportSummary       ImportSummary
+	ImportSummaryID     uint `gorm:"index"`
+	Processed           bool
+	ImportTags          []ImportTag `gorm:"constraint:OnDelete:CASCADE"`
 }
 
 func (r *Import) AsMap() (m map[string]interface{}) {
@@ -86,10 +86,10 @@ func (r *Import) AsMap() (m map[string]interface{}) {
 
 type ImportSummary struct {
 	Model
-	Content      []byte   `json:"-"`
-	Filename     string   `json:"filename"`
-	ImportStatus string   `json:"importStatus"`
-	Imports      []Import `json:"-" gorm:"constraint:OnDelete:CASCADE"`
+	Content      []byte
+	Filename     string
+	ImportStatus string
+	Imports      []Import `gorm:"constraint:OnDelete:CASCADE"`
 }
 
 type ImportTag struct {

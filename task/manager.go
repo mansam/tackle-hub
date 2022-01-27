@@ -190,7 +190,7 @@ func (r *Task) Reflect() (err error) {
 		context.TODO(),
 		client.ObjectKey{
 			Namespace: path.Dir(r.Job),
-			Name: path.Base(r.Job),
+			Name:      path.Base(r.Job),
 		},
 		job)
 	if err != nil {
@@ -225,7 +225,7 @@ func (r *Task) findAddon(name string) (addon *crd.Addon, err error) {
 		context.TODO(),
 		client.ObjectKey{
 			Namespace: Settings.Hub.Namespace,
-			Name: name,
+			Name:      name,
 		},
 		addon)
 	if err != nil {
@@ -242,9 +242,9 @@ func (r *Task) job(secret *core.Secret) (job batch.Job) {
 	job = batch.Job{
 		Spec: batch.JobSpec{Template: template},
 		ObjectMeta: meta.ObjectMeta{
-			Namespace: Settings.Hub.Namespace,
+			Namespace:    Settings.Hub.Namespace,
 			GenerateName: strings.ToLower(r.Name) + "-",
-			Labels: r.labels(),
+			Labels:       r.labels(),
 		},
 	}
 
@@ -303,17 +303,17 @@ func (r *Task) container() (container core.Container) {
 	container = core.Container{
 		Name:  "main",
 		Image: r.Image,
-		Env: []core.EnvVar {
+		Env: []core.EnvVar{
 			{
-				Name: settings.EnvHubBaseURL,
+				Name:  settings.EnvHubBaseURL,
 				Value: Settings.Addon.Hub.URL,
 			},
 			{
-				Name: settings.EnvAddonSecretPath,
+				Name:  settings.EnvAddonSecretPath,
 				Value: Settings.Addon.Secret.Path,
 			},
 			{
-				Name: settings.EnvBucketPath,
+				Name:  settings.EnvBucketPath,
 				Value: Settings.Hub.Bucket.Path,
 			},
 		},
@@ -342,9 +342,9 @@ func (r *Task) secret() (secret core.Secret) {
 	encoded, _ := json.Marshal(data)
 	secret = core.Secret{
 		ObjectMeta: meta.ObjectMeta{
-			Namespace: Settings.Hub.Namespace,
+			Namespace:    Settings.Hub.Namespace,
 			GenerateName: strings.ToLower(r.Name) + "-",
-			Labels: r.labels(),
+			Labels:       r.labels(),
 		},
 		Data: map[string][]byte{
 			path.Base(Settings.Addon.Secret.Path): encoded,
@@ -357,7 +357,7 @@ func (r *Task) secret() (secret core.Secret) {
 //
 // labels builds k8s labels.
 func (r *Task) labels() map[string]string {
-	return map[string]string {
+	return map[string]string{
 		"Task": strconv.Itoa(int(r.ID)),
 	}
 }
@@ -366,8 +366,8 @@ func (r *Task) labels() map[string]string {
 // Secret payload.
 type Secret struct {
 	Hub struct {
-		Token string
-		Task uint
+		Token      string
+		Task       uint
 		Encryption struct {
 			Passphrase string
 		}
