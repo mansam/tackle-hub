@@ -225,7 +225,7 @@ func (h IdentityHandler) Update(ctx *gin.Context) {
 // Identity REST resource.
 type Identity struct {
 	Resource
-	Kind          string `json:"kind" binding:"required"`
+	Kind          string `json:"kind" binding:"oneof=git svn mvn"`
 	Name          string `json:"name" binding:"required"`
 	Description   string `json:"description"`
 	User          string `json:"user"`

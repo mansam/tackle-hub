@@ -53,26 +53,7 @@ func Setup() (db *gorm.DB, err error) {
 	if err != nil {
 		return
 	}
-	err = db.AutoMigrate(
-		&model.Application{},
-		&model.Bucket{},
-		&model.BusinessService{},
-		&model.Dependency{},
-		&model.Identity{},
-		&model.Import{},
-		&model.ImportSummary{},
-		&model.ImportTag{},
-		&model.JobFunction{},
-		&model.Proxy{},
-		&model.Repository{},
-		&model.Review{},
-		&model.Seeded{},
-		&model.Stakeholder{},
-		&model.StakeholderGroup{},
-		&model.Tag{},
-		&model.TagType{},
-		&model.TaskReport{},
-		&model.Task{})
+	err = db.AutoMigrate(append(model.All(), &model.Seeded{})...)
 	if err != nil {
 		return
 	}
