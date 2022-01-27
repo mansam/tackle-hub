@@ -101,6 +101,7 @@ func (h JobFunctionHandler) Create(ctx *gin.Context) {
 	r := &JobFunction{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()
@@ -146,6 +147,7 @@ func (h JobFunctionHandler) Update(ctx *gin.Context) {
 	r := &JobFunction{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()

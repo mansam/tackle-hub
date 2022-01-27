@@ -110,6 +110,7 @@ func (h ApplicationHandler) Create(ctx *gin.Context) {
 	r := &Application{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()
@@ -162,6 +163,7 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 	r := &Application{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()

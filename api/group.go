@@ -102,6 +102,7 @@ func (h StakeholderGroupHandler) Create(ctx *gin.Context) {
 	r := &StakeholderGroup{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()
@@ -149,6 +150,7 @@ func (h StakeholderGroupHandler) Update(ctx *gin.Context) {
 	r := &StakeholderGroup{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()

@@ -154,6 +154,16 @@ func (h *BaseHandler) deleteFailed(ctx *gin.Context, err error) {
 }
 
 //
+// bindFailed handles errors from BindJSON().
+func (h *BaseHandler) bindFailed(ctx *gin.Context, err error) {
+	ctx.JSON(
+		http.StatusBadRequest,
+		gin.H{
+			"error": err.Error(),
+		})
+}
+
+//
 // preLoad update DB to pre-load fields.
 func (h *BaseHandler) preLoad(db *gorm.DB, fields ...string) (tx *gorm.DB) {
 	tx = db

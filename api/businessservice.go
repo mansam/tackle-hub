@@ -101,6 +101,7 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 	r := &BusinessService{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()
@@ -146,6 +147,7 @@ func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 	r := &BusinessService{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	updates := r.Model()

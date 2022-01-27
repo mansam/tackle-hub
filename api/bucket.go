@@ -210,6 +210,7 @@ func (h BucketHandler) Update(ctx *gin.Context) {
 	r := &Bucket{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()

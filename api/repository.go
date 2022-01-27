@@ -205,6 +205,7 @@ func (h RepositoryHandler) Update(ctx *gin.Context) {
 	r := &Repository{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	updates := r.Model()

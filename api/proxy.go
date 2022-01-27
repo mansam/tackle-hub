@@ -144,6 +144,7 @@ func (h ProxyHandler) Update(ctx *gin.Context) {
 	r := &Proxy{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()

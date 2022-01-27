@@ -121,6 +121,7 @@ func (h IdentityHandler) Create(ctx *gin.Context) {
 	r := &Identity{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()
@@ -147,6 +148,7 @@ func (h IdentityHandler) CreateForApplication(ctx *gin.Context) {
 	r := &Identity{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	appId := ctx.Param(ID)
@@ -206,6 +208,7 @@ func (h IdentityHandler) Update(ctx *gin.Context) {
 	r := &Identity{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()

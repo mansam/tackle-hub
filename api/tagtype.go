@@ -45,17 +45,17 @@ func (h TagTypeHandler) AddRoutes(e *gin.Engine) {
 // @router /controls/tag-type/:id [get]
 // @param id path string true "Tag Type ID"
 func (h TagTypeHandler) Get(ctx *gin.Context) {
-	model := model.TagType{}
+	m := &model.TagType{}
 	id := ctx.Param(ID)
 	db := h.preLoad(h.DB, "Tags")
-	result := db.First(&model, id)
+	result := db.First(m, id)
 	if result.Error != nil {
 		h.getFailed(ctx, result.Error)
 		return
 	}
 
 	resource := TagType{}
-	resource.With(&model)
+	resource.With(m)
 	ctx.JSON(http.StatusOK, resource)
 }
 
@@ -101,6 +101,7 @@ func (h TagTypeHandler) Create(ctx *gin.Context) {
 	r := TagType{}
 	err := ctx.BindJSON(&r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()
@@ -143,13 +144,14 @@ func (h TagTypeHandler) Delete(ctx *gin.Context) {
 // @param tag_type body api.TagType true "Tag Type data"
 func (h TagTypeHandler) Update(ctx *gin.Context) {
 	id := ctx.Param(ID)
-	resource := TagType{}
-	err := ctx.BindJSON(&resource)
+	r := &TagType{}
+	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
-	updates := resource.Model()
-	result := h.DB.Model(&TagType{}).Where("id = ?", id).Omit("id").Updates(updates)
+	m := r.Model()
+	result := h.DB.Model(&TagType{}).Where("id = ?", id).Omit("id").Updates(m)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
 		return

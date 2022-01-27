@@ -110,6 +110,7 @@ func (h StakeholderHandler) Create(ctx *gin.Context) {
 	r := &Stakeholder{}
 	err := ctx.BindJSON(r)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	m := r.Model()
@@ -157,6 +158,7 @@ func (h StakeholderHandler) Update(ctx *gin.Context) {
 	resource := Stakeholder{}
 	err := ctx.BindJSON(&resource)
 	if err != nil {
+		h.bindFailed(ctx, err)
 		return
 	}
 	updates := resource.Model()
