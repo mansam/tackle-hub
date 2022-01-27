@@ -291,7 +291,7 @@ func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 //
 // Task REST resource.
 type Task struct {
-	ID         uint        `json:"id"`
+	Resource
 	Name       string      `json:"name" binding:"required"`
 	Addon      string      `json:"addon" binding:"required"`
 	Isolated   bool        `json:"isolated,omitempty"`
@@ -308,7 +308,7 @@ type Task struct {
 //
 // With updates the resource with the model.
 func (r *Task) With(m *model.Task) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.Name = m.Name
 	r.Image = m.Image
 	r.Addon = m.Addon
@@ -346,7 +346,7 @@ func (r *Task) Model() (m *model.Task) {
 //
 // TaskReport REST resource.
 type TaskReport struct {
-	ID        uint   `json:"id"`
+	Resource
 	Status    string `json:"status"`
 	Error     string `json:"error"`
 	Total     int    `json:"total"`
@@ -358,7 +358,7 @@ type TaskReport struct {
 //
 // With updates the resource with the model.
 func (r *TaskReport) With(m *model.TaskReport) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.Error = m.Error
 	r.Total = m.Total
 	r.Completed = m.Completed

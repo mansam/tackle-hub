@@ -217,7 +217,7 @@ func (h ReviewHandler) CopyReview(ctx *gin.Context) {
 //
 // Review REST resource.
 type Review struct {
-	ID                  uint   `json:"id"`
+	Resource
 	BusinessCriticality uint   `json:"businessCriticality"`
 	EffortEstimate      string `json:"effortEstimate"`
 	ProposedAction      string `json:"proposedAction"`
@@ -230,7 +230,7 @@ type Review struct {
 
 // With updates the resource with the model.
 func (r *Review) With(m *model.Review) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.BusinessCriticality = m.BusinessCriticality
 	r.EffortEstimate = m.EffortEstimate
 	r.ProposedAction = m.ProposedAction

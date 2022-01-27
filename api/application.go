@@ -182,7 +182,7 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 //
 // Application REST resource.
 type Application struct {
-	ID              uint     `json:"id"`
+	Resource
 	Name            string   `json:"name" binding:"required"`
 	Description     string   `json:"description"`
 	Review          *Review  `json:"review"`
@@ -194,12 +194,12 @@ type Application struct {
 //
 // With updates the resource using the model.
 func (r *Application) With(m *model.Application) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.Name = m.Name
 	r.Description = m.Description
 	r.Comments = m.Comments
 	if m.Review != nil {
-		r.Review = &Review{ID: m.Review.ID}
+		r.Review = &Review{Resource: Resource{ID: m.Review.ID}}
 	}
 	r.BusinessService = strconv.Itoa(int(m.BusinessServiceID))
 	for _, tag := range m.Tags {

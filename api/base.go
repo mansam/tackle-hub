@@ -3,12 +3,14 @@ package api
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/konveyor/tackle-hub/model"
 	"github.com/mattn/go-sqlite3"
 	"gorm.io/gorm"
 	"net/http"
 	"os"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strings"
+	"time"
 )
 
 //
@@ -190,4 +192,22 @@ func (r *Hal) With(kind string, resources interface{}, total int) {
 	r.Embedded = make(map[string]interface{})
 	r.Embedded[kind] = resources
 	r.TotalCount = total
+}
+
+//
+// REST resource.
+type Resource struct {
+	ID         uint      `json:"id"`
+	CreateUser string    `json:"createUser"`
+	UpdateUser string    `json:"updateUser"`
+	CreateTime time.Time `json:"createTime"`
+}
+
+//
+// Update the resource with the model.
+func (r *Resource) With(m *model.Model) {
+	r.ID = m.ID
+	r.CreateUser = m.CreateUser
+	r.UpdateUser = m.UpdateUser
+	r.CreateTime = m.CreateTime
 }

@@ -169,7 +169,7 @@ func (h StakeholderGroupHandler) Update(ctx *gin.Context) {
 //
 // StakeholderGroup REST resource.
 type StakeholderGroup struct {
-	ID           uint          `json:"id"`
+	Resource
 	Name         string        `json:"name" binding:"required"`
 	Description  string        `json:"description"`
 	Stakeholders []Stakeholder `json:"stakeholders"`
@@ -178,12 +178,14 @@ type StakeholderGroup struct {
 //
 // With updates the resource with the model.
 func (r *StakeholderGroup) With(m *model.StakeholderGroup) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.Name = m.Name
 	r.Description = m.Description
 	for _, s := range m.Stakeholders {
 		r.Stakeholders = append(r.Stakeholders, Stakeholder{
-			ID:          s.ID,
+			Resource: Resource{
+				ID: s.ID,
+			},
 			DisplayName: s.DisplayName,
 		})
 	}

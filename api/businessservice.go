@@ -161,7 +161,7 @@ func (h BusinessServiceHandler) Update(ctx *gin.Context) {
 //
 // BusinessService REST resource.
 type BusinessService struct {
-	ID          uint   `json:"id"`
+	Resource
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description"`
 	Owner       struct {
@@ -173,7 +173,7 @@ type BusinessService struct {
 //
 // With updates the resource with the model.
 func (r *BusinessService) With(m *model.BusinessService) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.Name = m.Name
 	r.Description = m.Description
 	r.Owner.ID = m.OwnerID

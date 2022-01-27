@@ -161,7 +161,7 @@ func (h JobFunctionHandler) Update(ctx *gin.Context) {
 //
 // JobFunction REST resrouce.
 type JobFunction struct {
-	ID           uint          `json:"id"`
+	Resource
 	Role         string        `json:"role" binding:"required"`
 	Stakeholders []Stakeholder `json:"stakeholders"`
 }
@@ -169,11 +169,13 @@ type JobFunction struct {
 //
 // With updates the resource with the model.
 func (r *JobFunction) With(m *model.JobFunction) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.Role = m.Role
 	for _, s := range m.Stakeholders {
 		r.Stakeholders = append(r.Stakeholders, Stakeholder{
-			ID:          s.ID,
+			Resource: Resource{
+				ID: s.ID,
+			},
 			DisplayName: s.DisplayName,
 		})
 	}

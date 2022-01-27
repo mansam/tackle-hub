@@ -393,8 +393,7 @@ type Import map[string]interface{}
 //
 // ImportSummary REST resource.
 type ImportSummary struct {
-	model.ImportSummary
-	ID           uint      `json:"id"`
+	Resource
 	Filename     string    `json:"filename"`
 	ImportStatus string    `json:"importStatus"`
 	ImportTime   time.Time `json:"importTime"`
@@ -405,9 +404,10 @@ type ImportSummary struct {
 //
 // With updates the resource with the model.
 func (r *ImportSummary) With(m *model.ImportSummary) {
-	r.ImportSummary = *m
+	r.Resource.With(&m.Model)
+	r.Filename = m.Filename
 	r.ImportTime = m.CreateTime
-	for _, imp := range r.Imports {
+	for _, imp := range m.Imports {
 		if imp.Processed {
 			if imp.IsValid {
 				r.ValidCount++
@@ -416,7 +416,7 @@ func (r *ImportSummary) With(m *model.ImportSummary) {
 			}
 		}
 	}
-	if len(r.Imports) == r.ValidCount+r.InvalidCount {
+	if len(m.Imports) == r.ValidCount+r.InvalidCount {
 		r.ImportStatus = Completed
 	} else {
 		r.ImportStatus = InProgress

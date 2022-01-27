@@ -224,7 +224,7 @@ func (h IdentityHandler) Update(ctx *gin.Context) {
 //
 // Identity REST resource.
 type Identity struct {
-	ID            uint   `json:"id"`
+	Resource
 	Kind          string `json:"kind" binding:"required"`
 	Name          string `json:"name" binding:"required"`
 	Description   string `json:"description"`
@@ -239,7 +239,7 @@ type Identity struct {
 //
 // With updates the resource with the model.
 func (r *Identity) With(m *model.Identity) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.Kind = m.Kind
 	r.Name = m.Name
 	r.Description = m.Description
