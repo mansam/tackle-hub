@@ -19,10 +19,10 @@ import (
 )
 
 const (
-	Pending = ""
+	Pending   = ""
 	Succeeded = "Succeeded"
-	Failed = "Failed"
-	Running = "Running"
+	Failed    = "Failed"
+	Running   = "Running"
 	Postponed = "Postponed"
 )
 
@@ -74,7 +74,7 @@ func (m *Manager) startPending() (err error) {
 		pending := &list[i]
 		task := Task{
 			client: m.Client,
-			Task: pending,
+			Task:   pending,
 		}
 		switch pending.Status {
 		case Pending,
@@ -104,7 +104,7 @@ func (m *Manager) updateRunning() (err error) {
 	for _, running := range list {
 		task := Task{
 			client: m.Client,
-			Task: &running,
+			Task:   &running,
 		}
 		err := task.Reflect()
 		if err != nil {

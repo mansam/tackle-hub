@@ -5,11 +5,11 @@ cmd: hub addon
 
 # Run go fmt against code
 fmt:
-	go fmt ./cmd/... ./api/... ./model/...
+	go fmt ./addon/... ./api/... ./cmd/... ./encryption/... ./importer/... ./k8s/... ./model/... ./settings/... ./task/...
 
 # Run go vet against code
 vet:
-	go vet ./cmd/... ./api/... ./model/...
+	go vet ./addon/... ./api/... ./cmd/... ./encryption/... ./importer/... ./k8s/... ./model/... ./settings/... ./task/...
 
 # Build hub
 hub: generate fmt vet
