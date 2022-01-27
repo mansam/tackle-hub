@@ -164,9 +164,9 @@ func (h ProxyHandler) Update(ctx *gin.Context) {
 // Proxy REST resource.
 type Proxy struct {
 	Resource
-	Kind       string `json:"kind"`
-	Host       string `json:"host"`
-	Port       int    `json:"port"`
+	Kind       string `json:"kind" binding:"oneof=http https"`
+	Host       string `json:"host" binding:"required"`
+	Port       int    `json:"port" binding:"gt=0"`
 	IdentityID uint   `json:"identity"`
 }
 

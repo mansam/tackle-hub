@@ -1,15 +1,25 @@
 GOBIN ?= ${GOPATH}/bin
 
+PKG = ./addon/... \
+      ./api/... \
+      ./cmd/... \
+      ./encryption/... \
+      ./importer/... \
+      ./k8s/... \
+      ./model/... \
+      ./settings/... \
+      ./task/...
+
 # Build ALL commands.
 cmd: hub addon
 
 # Run go fmt against code
 fmt:
-	go fmt ./addon/... ./api/... ./cmd/... ./encryption/... ./importer/... ./k8s/... ./model/... ./settings/... ./task/...
+	go fmt ${PKG}
 
 # Run go vet against code
 vet:
-	go vet ./addon/... ./api/... ./cmd/... ./encryption/... ./importer/... ./k8s/... ./model/... ./settings/... ./task/...
+	go vet ${PKG}
 
 # Build hub
 hub: generate fmt vet

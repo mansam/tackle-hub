@@ -6,6 +6,7 @@ curl -X POST ${host}/controls/stakeholder -d \
 '{
     "createUser": "tackle",
     "username": "tackle",
+    "displayName":"Elmer",
     "email": "tackle@konveyor.org",
     "role": "Administrator",
     "stakeholderGroups": [{"id": 1}],
