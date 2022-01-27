@@ -73,7 +73,6 @@ func createBucket(d *Data, paths []string) (err error) {
 		return
 	}
 	bucket := &api.Bucket{}
-	bucket.CreateUser = "addon"
 	bucket.Name = "Listing"
 	bucket.ApplicationID = d.Application
 	err = addon.Bucket.Create(bucket)

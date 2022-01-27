@@ -116,7 +116,6 @@ func (h *Task) Completed(n int) (err error) {
 
 func (h *Task) postReport() (err error) {
 	taskID := strconv.Itoa(int(h.secret.Hub.Task))
-	h.report.CreateUser = "addon"
 	err = h.client.Post(
 		pathlib.Join(
 			api.TasksRoot,
@@ -128,7 +127,6 @@ func (h *Task) postReport() (err error) {
 
 func (h *Task) putReport() (err error) {
 	taskID := strconv.Itoa(int(h.secret.Hub.Task))
-	h.report.UpdateUser = "addon"
 	err = h.client.Put(
 		pathlib.Join(
 			api.TasksRoot,

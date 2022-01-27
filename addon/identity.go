@@ -15,17 +15,19 @@ type Identity struct {
 
 //
 // Get an identity by ID.
-func (h *Identity) Get(id uint) (m *api.Identity, err error) {
-	m = &api.Identity{}
+func (h *Identity) Get(id uint) (r *api.Identity, err error) {
+	r = &api.Identity{}
 	err = h.client.Get(
 		pathlib.Join(
 			api.IdentitiesRoot,
 			strconv.Itoa(int(id))),
-		m)
+		r)
 	if err != nil {
 		return
 	}
+	m := r.Model()
 	err = m.Decrypt(Addon.secret.Hub.Encryption.Passphrase)
+	r.With(m)
 	return
 }
 
@@ -38,8 +40,10 @@ func (h *Identity) List() (list []api.Identity, err error) {
 		return
 	}
 	for i := range list {
-		m := &list[i]
+		r := &list[i]
+		m := r.Model()
 		err = m.Decrypt(Addon.secret.Hub.Encryption.Passphrase)
+		r.With(m)
 		if err != nil {
 			return
 		}

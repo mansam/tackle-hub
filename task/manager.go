@@ -19,9 +19,11 @@ import (
 )
 
 const (
+	Pending = ""
 	Succeeded = "Succeeded"
 	Failed = "Failed"
 	Running = "Running"
+	Postponed = "Postponed"
 )
 
 var Settings = &settings.Settings
@@ -45,37 +47,54 @@ func (m *Manager) Run(ctx context.Context) {
 				return
 			default:
 				time.Sleep(time.Second)
-				_ = m.runPending()
-				_ = m.reflectRunning()
+				_ = m.updateRunning()
+				_ = m.startPending()
 			}
 		}
 	}()
 }
 
 //
-// runPending starts (run) pending tasks.
-func (m *Manager) runPending() (err error) {
+// startPending starts pending tasks.
+func (m *Manager) startPending() (err error) {
 	list := []model.Task{}
-	result := m.DB.Find(&list, "status", "")
+	result := m.DB.Find(
+		&list,
+		"status IN ?",
+		[]string{
+			Pending,
+			Running,
+			Postponed,
+		})
 	if result.Error != nil {
 		err = result.Error
 		return
 	}
-	for _, pending := range list {
+	for i := range list {
+		pending := &list[i]
 		task := Task{
-			Task: &pending,
 			client: m.Client,
+			Task: pending,
 		}
-		_ = task.Run()
-		_ = m.DB.Save(&pending)
+		switch pending.Status {
+		case Pending,
+			Postponed:
+			if m.postpone(pending, list) {
+				pending.Status = Postponed
+				_ = m.DB.Save(pending)
+				continue
+			}
+			_ = task.Run()
+			_ = m.DB.Save(pending)
+		}
 	}
 
 	return
 }
 
 //
-// reflectRunning updates running tasks to reflect job status.
-func (m *Manager) reflectRunning() (err error) {
+// updateRunning tasks to reflect job status.
+func (m *Manager) updateRunning() (err error) {
 	list := []model.Task{}
 	result := m.DB.Find(&list, "status", Running)
 	if result.Error != nil {
@@ -84,14 +103,36 @@ func (m *Manager) reflectRunning() (err error) {
 	}
 	for _, running := range list {
 		task := Task{
-			Task: &running,
 			client: m.Client,
+			Task: &running,
 		}
 		err := task.Reflect()
 		if err != nil {
 			continue
 		}
 		_ = m.DB.Save(&running)
+	}
+
+	return
+}
+
+//
+// postpone task based on requested isolation.
+// An isolated task must run by itself and will cause all
+// other tasks to be postponed.
+func (m *Manager) postpone(pending *model.Task, list []model.Task) (found bool) {
+	for i := range list {
+		task := &list[i]
+		if pending.ID == task.ID {
+			continue
+		}
+		if pending.Status != Running {
+			continue
+		}
+		if pending.Isolated || task.Isolated {
+			found = true
+			return
+		}
 	}
 
 	return

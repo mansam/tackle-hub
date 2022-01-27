@@ -20,6 +20,7 @@ type Task struct {
 	Name       string      `json:"name"`
 	Image      string      `json:"image"`
 	Addon      string      `json:"addon"`
+	Isolated   bool        `json:"isolated"`
 	Data       JSON        `json:"data"`
 	Started    *time.Time  `json:"started"`
 	Terminated *time.Time  `json:"terminated"`

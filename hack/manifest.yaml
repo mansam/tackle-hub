@@ -5,7 +5,7 @@ metadata:
   name: bucket
   namespace: tackle-hub
 spec:
-  storageClassName: standard-csi
+  storageClassName: csi-manila-ceph
   accessModes:
     - ReadWriteMany
   resources:
