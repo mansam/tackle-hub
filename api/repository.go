@@ -225,7 +225,7 @@ func (h RepositoryHandler) Update(ctx *gin.Context) {
 // Repository REST resource.
 type Repository struct {
 	Resource
-	Kind          string `json:"kind" binding:"oneof=git svn"`
+	Kind          string `json:"kind" binding:"required"`
 	URL           string `json:"url" binding:"url"`
 	Branch        string `json:"branch"`
 	Tag           string `json:"tag"`
