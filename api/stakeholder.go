@@ -177,7 +177,7 @@ func (h StakeholderHandler) Update(ctx *gin.Context) {
 //
 // Stakeholder REST resource.
 type Stakeholder struct {
-	ID               uint                     `json:"id"`
+	Resource
 	DisplayName      string                   `json:"displayName" binding:"required"`
 	Email            string                   `json:"email" binding:"required"`
 	Groups           []model.StakeholderGroup `json:"stakeholderGroups"`
@@ -191,7 +191,7 @@ type Stakeholder struct {
 //
 // With updates the resource with the model.
 func (r *Stakeholder) With(m *model.Stakeholder) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.DisplayName = m.DisplayName
 	r.Email = m.Email
 	r.Groups = m.Groups

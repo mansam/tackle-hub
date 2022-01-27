@@ -5,11 +5,11 @@ import (
 )
 
 const (
-	EnvNamespace = "NAMESPACE"
-	EnvDbPath  = "DB_PATH"
+	EnvNamespace  = "NAMESPACE"
+	EnvDbPath     = "DB_PATH"
 	EnvDbSeedPath = "DB_SEED_PATH"
 	EnvBucketPath = "BUCKET_PATH"
-	EnvBucketPVC = "BUCKET_PVC"
+	EnvBucketPVC  = "BUCKET_PVC"
 	EnvPassphrase = "ENCRYPTION_PASSPHRASE"
 )
 
@@ -18,13 +18,13 @@ type Hub struct {
 	Namespace string
 	// DB settings.
 	DB struct {
-		Path string
+		Path     string
 		SeedPath string
 	}
 	// Bucket settings.
 	Bucket struct {
 		Path string
-		PVC string
+		PVC  string
 	}
 	// Encryption settings.
 	Encryption struct {

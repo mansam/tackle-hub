@@ -267,7 +267,7 @@ func (h BucketHandler) create(bucket *Bucket) (err error) {
 //
 // Bucket REST Resource.
 type Bucket struct {
-	ID            uint   `json:"id"`
+	Resource
 	Name          string `json:"name"`
 	Path          string `json:"path"`
 	ApplicationID uint   `json:"application"`
@@ -276,7 +276,7 @@ type Bucket struct {
 //
 // With updates the resource with the model.
 func (r *Bucket) With(m *model.Bucket) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.Name = m.Name
 	r.Path = m.Path
 	r.ApplicationID = m.ApplicationID

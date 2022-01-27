@@ -23,8 +23,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-"k8s.io/apimachinery/pkg/runtime/schema"
-"sigs.k8s.io/controller-runtime/pkg/runtime/scheme"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/controller-runtime/pkg/runtime/scheme"
 )
 
 var SchemeGroupVersion = schema.GroupVersion{
@@ -33,4 +33,3 @@ var SchemeGroupVersion = schema.GroupVersion{
 }
 
 var SchemeBuilder = &scheme.Builder{GroupVersion: SchemeGroupVersion}
-

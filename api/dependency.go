@@ -147,7 +147,7 @@ func (h DependencyHandler) Delete(ctx *gin.Context) {
 //
 // Dependency REST resource.
 type Dependency struct {
-	ID uint `json:"id"`
+	Resource
 	To struct {
 		ID   uint   `json:"id" binding:"required"`
 		Name string `json:"name"`
@@ -161,7 +161,7 @@ type Dependency struct {
 //
 // With updates the resource using the model.
 func (r *Dependency) With(m *model.Dependency) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.To.ID = m.ToID
 	r.To.Name = m.To.Name
 	r.From.ID = m.FromID

@@ -161,7 +161,7 @@ func (h TagTypeHandler) Update(ctx *gin.Context) {
 //
 // TagType REST resource.
 type TagType struct {
-	ID       uint   `json:"id"`
+	Resource
 	Name     string `json:"name" binding:"required"`
 	Username string `json:"username"`
 	Rank     uint   `json:"rank"`
@@ -172,13 +172,14 @@ type TagType struct {
 //
 // With updates the resource with the model.
 func (r *TagType) With(m *model.TagType) {
+	r.Resource.With(&m.Model)
 	r.ID = m.ID
 	r.Name = m.Name
 	r.Username = m.Username
 	r.Rank = m.Rank
 	r.Color = m.Color
 	for _, tag := range m.Tags {
-		r.Tags = append(r.Tags, Tag{ID: tag.ID, Name: tag.Name})
+		r.Tags = append(r.Tags, Tag{Resource: Resource{ID: tag.ID}, Name: tag.Name})
 	}
 }
 

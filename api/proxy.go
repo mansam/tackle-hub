@@ -162,7 +162,7 @@ func (h ProxyHandler) Update(ctx *gin.Context) {
 //
 // Proxy REST resource.
 type Proxy struct {
-	ID         uint   `json:"id"`
+	Resource
 	Kind       string `json:"kind"`
 	Host       string `json:"host"`
 	Port       int    `json:"port"`
@@ -172,7 +172,7 @@ type Proxy struct {
 //
 // With updates the resource with the model.
 func (r *Proxy) With(m *model.Proxy) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.Kind = m.Kind
 	r.Host = m.Host
 	r.Port = m.Port

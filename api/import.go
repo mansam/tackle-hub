@@ -116,7 +116,7 @@ func (h ImportHandler) ListImports(ctx *gin.Context) {
 		h.listFailed(ctx, result.Error)
 		return
 	}
-	resources := []map[string]interface{}{}
+	resources := []Import{}
 	for i := range list {
 		resources = append(resources, list[i].AsMap())
 	}
@@ -388,12 +388,14 @@ func (h ImportHandler) applicationFromRow(fileName string, row []string) (app mo
 
 //
 // Import REST resource.
-type Import = model.Import
+type Import map[string]interface{}
 
 //
 // ImportSummary REST resource.
 type ImportSummary struct {
-	model.ImportSummary
+	Resource
+	Filename     string    `json:"filename"`
+	ImportStatus string    `json:"importStatus"`
 	ImportTime   time.Time `json:"importTime"`
 	ValidCount   int       `json:"validCount"`
 	InvalidCount int       `json:"invalidCount"`
@@ -402,9 +404,10 @@ type ImportSummary struct {
 //
 // With updates the resource with the model.
 func (r *ImportSummary) With(m *model.ImportSummary) {
-	r.ImportSummary = *m
+	r.Resource.With(&m.Model)
+	r.Filename = m.Filename
 	r.ImportTime = m.CreateTime
-	for _, imp := range r.Imports {
+	for _, imp := range m.Imports {
 		if imp.Processed {
 			if imp.IsValid {
 				r.ValidCount++
@@ -413,7 +416,7 @@ func (r *ImportSummary) With(m *model.ImportSummary) {
 			}
 		}
 	}
-	if len(r.Imports) == r.ValidCount+r.InvalidCount {
+	if len(m.Imports) == r.ValidCount+r.InvalidCount {
 		r.ImportStatus = Completed
 	} else {
 		r.ImportStatus = InProgress

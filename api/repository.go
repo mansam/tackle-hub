@@ -223,7 +223,7 @@ func (h RepositoryHandler) Update(ctx *gin.Context) {
 //
 // Repository REST resource.
 type Repository struct {
-	ID            uint   `json:"id"`
+	Resource
 	Kind          string `json:"kind"`
 	URL           string `json:"url"`
 	Branch        string `json:"branch"`
@@ -235,7 +235,7 @@ type Repository struct {
 //
 // With updates the resource with the model.
 func (r *Repository) With(m *model.Repository) {
-	r.ID = m.ID
+	r.Resource.With(&m.Model)
 	r.Kind = m.Kind
 	r.URL = m.URL
 	r.Branch = m.Branch

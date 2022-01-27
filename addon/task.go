@@ -18,7 +18,6 @@ type Task struct {
 	secret *task.Secret
 	// Task report.
 	report api.TaskReport
-
 }
 
 //

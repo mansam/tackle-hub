@@ -25,7 +25,7 @@ type Client struct {
 func (r *Client) Get(path string, object interface{}) (err error) {
 	request := &http.Request{
 		Method: http.MethodGet,
-		URL: r.join(path),
+		URL:    r.join(path),
 	}
 	reply, err := r.http.Do(request)
 	if err != nil {
@@ -66,7 +66,7 @@ func (r *Client) Put(path string, object interface{}) (err error) {
 func (r *Client) Delete(path string) (err error) {
 	request := &http.Request{
 		Method: http.MethodDelete,
-		URL: r.join(path),
+		URL:    r.join(path),
 	}
 	reply, err := r.http.Do(request)
 	if err != nil {
@@ -93,8 +93,8 @@ func (r *Client) post(method string, path string, object interface{}) (err error
 	reader := bytes.NewReader(bfr)
 	request := &http.Request{
 		Method: method,
-		Body: ioutil.NopCloser(reader),
-		URL: r.join(path),
+		Body:   ioutil.NopCloser(reader),
+		URL:    r.join(path),
 	}
 	reply, err := r.http.Do(request)
 	if err != nil {

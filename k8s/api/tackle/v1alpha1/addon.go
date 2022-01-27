@@ -23,7 +23,7 @@ import (
 //
 // Mount specification.
 type Mount struct {
-	Name string `json:"name"`
+	Name  string `json:"name"`
 	Claim string `json:"claim"`
 }
 

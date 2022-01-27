@@ -7,14 +7,14 @@ import (
 //
 // Model Base model.
 type Model struct {
-	ID         uint      `json:"id" gorm:"primaryKey"`
-	CreateUser string    `json:"createUser"`
-	UpdateUser string    `json:"updateUser"`
-	CreateTime time.Time `json:"createTime" gorm:"column:createTime;autoCreateTime"`
+	ID         uint `gorm:"primaryKey"`
+	CreateUser string
+	UpdateUser string
+	CreateTime time.Time `gorm:"autoCreateTime"`
 }
 
 //
 // Seeded model.
 type Seeded struct {
-	ID uint `json:"id" gorm:"primaryKey"`
+	ID uint `gorm:"primaryKey"`
 }
