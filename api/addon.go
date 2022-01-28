@@ -36,7 +36,7 @@ func (h AddonHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} api.Addon
-// @router /addons/:name [get]
+// @router /addons/{name} [get]
 // @param name path string true "Addon name"
 func (h AddonHandler) Get(ctx *gin.Context) {
 	name := ctx.Param(Name)

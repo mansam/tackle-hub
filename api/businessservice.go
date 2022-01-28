@@ -42,7 +42,7 @@ func (h BusinessServiceHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} api.BusinessService
-// @router /controls/business-service/:id [get]
+// @router /controls/business-service/{id} [get]
 // @param id path string true "Business Service ID"
 func (h BusinessServiceHandler) Get(ctx *gin.Context) {
 	m := &model.BusinessService{}
@@ -120,7 +120,7 @@ func (h BusinessServiceHandler) Create(ctx *gin.Context) {
 // @description Delete a business service.
 // @tags delete
 // @success 204
-// @router /controls/business-service/:id [delete]
+// @router /controls/business-service/{id} [delete]
 // @param id path string true "Business service ID"
 func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
@@ -139,7 +139,7 @@ func (h BusinessServiceHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @success 204
-// @router /controls/business-service/:id [put]
+// @router /controls/business-service/{id} [put]
 // @param id path string true "Business service ID"
 // @param business_service body api.BusinessService true "Business service data"
 func (h BusinessServiceHandler) Update(ctx *gin.Context) {

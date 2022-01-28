@@ -45,7 +45,7 @@ func (h BucketHandler) AddRoutes(e *gin.Engine) {
 // @buckets get
 // @produce json
 // @success 200 {object} Bucket
-// @router /controls/bucket/:id [get]
+// @router /controls/bucket/{id} [get]
 // @param id path string true "Bucket ID"
 func (h BucketHandler) Get(ctx *gin.Context) {
 	m := &model.Bucket{}
@@ -93,7 +93,8 @@ func (h BucketHandler) List(ctx *gin.Context) {
 // @buckets get
 // @produce json
 // @success 200 {object} []Bucket
-// @router /controls/bucket [get]
+// @router /application-inventory/application/{id}/bucket [get]
+// @param id path int true "Application ID"
 func (h BucketHandler) ListByApplication(ctx *gin.Context) {
 	var list []model.Bucket
 	appId := ctx.Param(ID)
@@ -146,7 +147,8 @@ func (h BucketHandler) Create(ctx *gin.Context) {
 // @accept json
 // @produce json
 // @success 201 {object} Bucket
-// @router /controls/bucket [post]
+// @router /application-inventory/application/{id}/bucket [post]
+// @param id path int true "Application ID"
 // @param bucket body Bucket true "Bucket data"
 func (h BucketHandler) CreateForApplication(ctx *gin.Context) {
 	bucket := &Bucket{}
@@ -176,7 +178,7 @@ func (h BucketHandler) CreateForApplication(ctx *gin.Context) {
 // @description Delete a bucket.
 // @buckets delete
 // @success 204 {object} Bucket
-// @router /controls/bucket/:id [delete]
+// @router /controls/bucket/{id} [delete]
 // @param id path string true "Bucket ID"
 func (h BucketHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
@@ -202,7 +204,7 @@ func (h BucketHandler) Delete(ctx *gin.Context) {
 // @accept json
 // @produce json
 // @success 204 {object} Bucket
-// @router /controls/bucket/:id [put]
+// @router /controls/bucket/{id} [put]
 // @param id path string true "Bucket ID"
 // @param bucket body Bucket true "Bucket data"
 func (h BucketHandler) Update(ctx *gin.Context) {

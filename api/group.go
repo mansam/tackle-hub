@@ -43,7 +43,7 @@ func (h StakeholderGroupHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} api.StakeholderGroup
-// @router /controls/stakeholder-group/:id [get]
+// @router /controls/stakeholder-group/{id} [get]
 // @param id path string true "Stakeholder Group ID"
 func (h StakeholderGroupHandler) Get(ctx *gin.Context) {
 	m := &model.StakeholderGroup{}
@@ -121,7 +121,7 @@ func (h StakeholderGroupHandler) Create(ctx *gin.Context) {
 // @description Delete a stakeholder group.
 // @tags delete
 // @success 204
-// @router /controls/stakeholder-group/:id [delete]
+// @router /controls/stakeholder-group/{id} [delete]
 // @param id path string true "Stakeholder Group ID"
 func (h StakeholderGroupHandler) Delete(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param(ID))
@@ -142,7 +142,7 @@ func (h StakeholderGroupHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @success 204
-// @router /controls/stakeholder-group/:id [put]
+// @router /controls/stakeholder-group/{id} [put]
 // @param id path string true "Stakeholder Group ID"
 // @param stakeholder_group body api.StakeholderGroup true "Stakeholder Group data"
 func (h StakeholderGroupHandler) Update(ctx *gin.Context) {

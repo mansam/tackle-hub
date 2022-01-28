@@ -42,7 +42,7 @@ func (h TagHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} api.Tag
-// @router /controls/tag/:id [get]
+// @router /controls/tag/{id} [get]
 // @param id path string true "Tag ID"
 func (h TagHandler) Get(ctx *gin.Context) {
 	m := &model.Tag{}
@@ -120,7 +120,7 @@ func (h TagHandler) Create(ctx *gin.Context) {
 // @description Delete a tag.
 // @tags delete
 // @success 204
-// @router /controls/tag/:id [delete]
+// @router /controls/tag/{id} [delete]
 // @param id path string true "Tag ID"
 func (h TagHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
@@ -139,7 +139,7 @@ func (h TagHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @success 204
-// @router /controls/tag/:id [put]
+// @router /controls/tag/{id} [put]
 // @param id path string true "Tag ID"
 // @param tag body api.Tag true "Tag data"
 func (h TagHandler) Update(ctx *gin.Context) {

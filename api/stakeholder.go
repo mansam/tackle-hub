@@ -43,7 +43,7 @@ func (h StakeholderHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} api.Stakeholder
-// @router /controls/stakeholder/:id [get]
+// @router /controls/stakeholder/{id} [get]
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Get(ctx *gin.Context) {
 	m := &model.Stakeholder{}
@@ -129,7 +129,7 @@ func (h StakeholderHandler) Create(ctx *gin.Context) {
 // @description Delete a stakeholder.
 // @tags delete
 // @success 204
-// @router /controls/stakeholder/:id [delete]
+// @router /controls/stakeholder/{id} [delete]
 // @param id path string true "Stakeholder ID"
 func (h StakeholderHandler) Delete(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param(ID))
@@ -150,7 +150,7 @@ func (h StakeholderHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @success 204
-// @router /controls/stakeholder/:id [put]
+// @router /controls/stakeholder/{id} [put]
 // @param id path string true "Stakeholder ID"
 // @param stakeholder body api.Stakeholder true "Stakeholder data"
 func (h StakeholderHandler) Update(ctx *gin.Context) {

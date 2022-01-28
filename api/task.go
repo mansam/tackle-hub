@@ -49,7 +49,7 @@ func (h TaskHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} api.Task
-// @router /tasks/:id [get]
+// @router /tasks/{id} [get]
 // @param id path string true "Task ID"
 func (h TaskHandler) Get(ctx *gin.Context) {
 	task := &model.Task{}
@@ -171,7 +171,7 @@ func (h TaskHandler) AddonCreate(ctx *gin.Context) {
 // @description Delete a task.
 // @tags delete
 // @success 204
-// @router /tasks/:id [delete]
+// @router /tasks/{id} [delete]
 // @param id path string true "Task ID"
 func (h TaskHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
@@ -207,7 +207,7 @@ func (h TaskHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @success 204
-// @router /tasks/:id [put]
+// @router /tasks/{id} [put]
 // @param id path string true "Task ID"
 // @param task body Task true "Task data"
 func (h TaskHandler) Update(ctx *gin.Context) {
@@ -234,7 +234,7 @@ func (h TaskHandler) Update(ctx *gin.Context) {
 // @accept json
 // @produce json
 // @success 201 {object} api.TaskReport
-// @router /tasks/:id [put]
+// @router /tasks/{id}/report [post]
 // @param id path string true "TaskReport ID"
 // @param task body api.TaskReport true "TaskReport data"
 func (h TaskHandler) CreateReport(ctx *gin.Context) {
@@ -263,7 +263,7 @@ func (h TaskHandler) CreateReport(ctx *gin.Context) {
 // @accept json
 // @produce json
 // @success 200 {object} api.TaskReport
-// @router /tasks/:id [put]
+// @router /tasks/{id}/report [put]
 // @param id path string true "TaskReport ID"
 // @param task body api.TaskReport true "TaskReport data"
 func (h TaskHandler) UpdateReport(ctx *gin.Context) {
@@ -295,7 +295,7 @@ type Task struct {
 	Name       string      `json:"name" binding:"required"`
 	Addon      string      `json:"addon" binding:"required"`
 	Isolated   bool        `json:"isolated,omitempty"`
-	Data       model.JSON  `json:"data"`
+	Data       model.JSON  `json:"data" swaggertype:"object"`
 	Image      string      `json:"image"`
 	Started    *time.Time  `json:"started"`
 	Terminated *time.Time  `json:"terminated"`

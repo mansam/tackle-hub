@@ -44,7 +44,7 @@ func (h ReviewHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} []api.Review
-// @router /application-inventory/review/:id [get]
+// @router /application-inventory/review/{id} [get]
 // @param id path string true "Review ID"
 func (h ReviewHandler) Get(ctx *gin.Context) {
 	m := &model.Review{}
@@ -121,7 +121,7 @@ func (h ReviewHandler) Create(ctx *gin.Context) {
 // @description Delete a review.
 // @tags delete
 // @success 204
-// @router /application-inventory/review/:id [delete]
+// @router /application-inventory/review/{id} [delete]
 // @param id path string true "Review ID"
 func (h ReviewHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
@@ -140,7 +140,7 @@ func (h ReviewHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @success 204
-// @router /application-inventory/review/:id [put]
+// @router /application-inventory/review/{id} [put]
 // @param id path string true "Review ID"
 // @param review body api.Review true "Review data"
 func (h ReviewHandler) Update(ctx *gin.Context) {

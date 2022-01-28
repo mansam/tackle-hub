@@ -34,7 +34,7 @@ func (h ProxyHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} Proxy
-// @router /proxies/:id [get]
+// @router /proxies/{id} [get]
 // @param id path string true "Proxy ID"
 func (h ProxyHandler) Get(ctx *gin.Context) {
 	proxy := &model.Proxy{}
@@ -111,7 +111,7 @@ func (h ProxyHandler) Create(ctx *gin.Context) {
 // @description Delete an proxy.
 // @tags delete
 // @success 204
-// @router /proxies/:id [delete]
+// @router /proxies/{id} [delete]
 // @param id path string true "Proxy ID"
 func (h ProxyHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
@@ -136,7 +136,7 @@ func (h ProxyHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @success 204
-// @router /proxies/:id [put]
+// @router /proxies/{id} [put]
 // @param id path string true "Proxy ID"
 // @param proxy body Proxy true "Proxy data"
 func (h ProxyHandler) Update(ctx *gin.Context) {

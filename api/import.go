@@ -71,7 +71,7 @@ func (h ImportHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} api.Import
-// @router /application-inventory/application-import/:id [get]
+// @router /application-inventory/application-import/{id} [get]
 // @param id path string true "Import ID"
 func (h ImportHandler) GetImport(ctx *gin.Context) {
 	m := &model.Import{}
@@ -130,7 +130,7 @@ func (h ImportHandler) ListImports(ctx *gin.Context) {
 // @description Delete an import. This leaves any created application or dependency.
 // @tags delete
 // @success 204
-// @router /application-inventory/application-import/:id [delete]
+// @router /application-inventory/application-import/{id} [delete]
 // @param id path string true "Import ID"
 func (h ImportHandler) DeleteImport(ctx *gin.Context) {
 	id := ctx.Param(ID)
@@ -150,7 +150,7 @@ func (h ImportHandler) DeleteImport(ctx *gin.Context) {
 // @tags get
 // @produce json
 // @success 200 {object} api.ImportSummary
-// @router /application-inventory/import-summary/:id [get]
+// @router /application-inventory/import-summary/{id} [get]
 // @param id path string true "ImportSummary ID"
 func (h ImportHandler) GetSummary(ctx *gin.Context) {
 	m := &model.ImportSummary{}
@@ -200,7 +200,7 @@ func (h ImportHandler) ListSummaries(ctx *gin.Context) {
 // @description Delete an import summary and associated import records.
 // @tags delete
 // @success 204
-// @router /application-inventory/import-summary/:id [delete]
+// @router /application-inventory/import-summary/{id} [delete]
 // @param id path string true "ImportSummary ID"
 func (h ImportHandler) DeleteSummary(ctx *gin.Context) {
 	id := ctx.Param(ID)
@@ -301,9 +301,9 @@ func (h ImportHandler) UploadCSV(ctx *gin.Context) {
 // @description Export the source CSV for a particular import summary.
 // @tags export
 // @produce text/csv
-// @success 200 binary file
+// @success 200 file csv
 // @router /application-inventory/csv-export [get]
-// @param importSummary.id query string true "ImportSummary ID
+// @param importSummary.id query string true "ImportSummary ID"
 func (h ImportHandler) DownloadCSV(ctx *gin.Context) {
 	id := ctx.Query("importSummary.id")
 	m := &model.ImportSummary{}

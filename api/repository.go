@@ -37,7 +37,7 @@ func (h RepositoryHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} Repository
-// @router /repositories/:id [get]
+// @router /repositories/{id} [get]
 // @param id path string true "Repository ID"
 func (h RepositoryHandler) Get(ctx *gin.Context) {
 	repository := &model.Repository{}
@@ -85,7 +85,8 @@ func (h RepositoryHandler) List(ctx *gin.Context) {
 // @tags get
 // @produce json
 // @success 200 {object} []Repository
-// @router /application-inventory/application/:id/repositories [get]
+// @router /application-inventory/application/{id}/repositories [get]
+// @param id path int true "Application ID"
 func (h RepositoryHandler) ListByApplication(ctx *gin.Context) {
 	var list []model.Repository
 	appId := ctx.Param(ID)
@@ -140,7 +141,8 @@ func (h RepositoryHandler) Create(ctx *gin.Context) {
 // @accept json
 // @produce json
 // @success 201 {object} Repository
-// @router /application-inventory/application/:id/repositories [post]
+// @router /application-inventory/application/{id}/repositories [post]
+// @param id path int true "Application ID"
 // @param repo body Repository true "Repository data"
 func (h RepositoryHandler) CreateForApplication(ctx *gin.Context) {
 	repository := &Repository{}
@@ -172,7 +174,7 @@ func (h RepositoryHandler) CreateForApplication(ctx *gin.Context) {
 // @description Delete a repository.
 // @tags delete
 // @success 204
-// @router /repositories/:id [delete]
+// @router /repositories/{id} [delete]
 // @param id path string true "Repository ID"
 func (h RepositoryHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
@@ -197,7 +199,7 @@ func (h RepositoryHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @success 204
-// @router /repositories/:id [put]
+// @router /repositories/{id} [put]
 // @param id path string true "Repository ID"
 // @param repo body Repository true "Repository data"
 func (h RepositoryHandler) Update(ctx *gin.Context) {

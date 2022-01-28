@@ -42,7 +42,7 @@ func (h TagTypeHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} api.TagType
-// @router /controls/tag-type/:id [get]
+// @router /controls/tag-type/{id} [get]
 // @param id path string true "Tag Type ID"
 func (h TagTypeHandler) Get(ctx *gin.Context) {
 	m := &model.TagType{}
@@ -120,7 +120,7 @@ func (h TagTypeHandler) Create(ctx *gin.Context) {
 // @description Delete a tag type.
 // @tags delete
 // @success 204
-// @router /controls/tag-type/:id [delete]
+// @router /controls/tag-type/{id} [delete]
 // @param id path string true "Tag Type ID"
 func (h TagTypeHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
@@ -139,7 +139,7 @@ func (h TagTypeHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @success 204
-// @router /controls/tag-type/:id [put]
+// @router /controls/tag-type/{id} [put]
 // @param id path string true "Tag Type ID"
 // @param tag_type body api.TagType true "Tag Type data"
 func (h TagTypeHandler) Update(ctx *gin.Context) {

@@ -43,7 +43,7 @@ func (h ApplicationHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} api.Application
-// @router /application-inventory/application/:id [get]
+// @router /application-inventory/application/{id} [get]
 // @param id path int true "Application ID"
 func (h ApplicationHandler) Get(ctx *gin.Context) {
 	m := &model.Application{}
@@ -134,7 +134,7 @@ func (h ApplicationHandler) Create(ctx *gin.Context) {
 // @description Delete an application.
 // @tags delete
 // @success 204
-// @router /application-inventory/application/:id [delete]
+// @router /application-inventory/application/{id} [delete]
 // @param id path int true "Application id"
 func (h ApplicationHandler) Delete(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param(ID))
@@ -155,7 +155,7 @@ func (h ApplicationHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @success 204
-// @router /application-inventory/application/:id [put]
+// @router /application-inventory/application/{id} [put]
 // @param id path int true "Application id"
 // @param application body api.Application true "Application data"
 func (h ApplicationHandler) Update(ctx *gin.Context) {

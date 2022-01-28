@@ -38,7 +38,7 @@ func (h IdentityHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} Identity
-// @router /identities/:id [get]
+// @router /identities/{id} [get]
 // @param id path string true "Identity ID"
 func (h IdentityHandler) Get(ctx *gin.Context) {
 	m := &model.Identity{}
@@ -86,7 +86,8 @@ func (h IdentityHandler) List(ctx *gin.Context) {
 // @tags get
 // @produce json
 // @success 200 {object} []Identity
-// @router /identities [get]
+// @router /application-inventory/application/{id}/identities [get]
+// @param id path int true "Application ID"
 func (h IdentityHandler) ListByApplication(ctx *gin.Context) {
 	var list []model.Identity
 	appId := ctx.Param(ID)
@@ -142,7 +143,8 @@ func (h IdentityHandler) Create(ctx *gin.Context) {
 // @accept json
 // @produce json
 // @success 201 {object} Identity
-// @router /identities [post]
+// @router /application-inventory/application/{id}/identities [post]
+// @param id path int true "Application ID"
 // @param identity body Identity true "Identity data"
 func (h IdentityHandler) CreateForApplication(ctx *gin.Context) {
 	r := &Identity{}
@@ -175,7 +177,7 @@ func (h IdentityHandler) CreateForApplication(ctx *gin.Context) {
 // @description Delete an identity.
 // @tags delete
 // @success 204
-// @router /identities/:id [delete]
+// @router /identities/{id} [delete]
 // @param id path string true "Identity ID"
 func (h IdentityHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
@@ -200,7 +202,7 @@ func (h IdentityHandler) Delete(ctx *gin.Context) {
 // @tags update
 // @accept json
 // @success 204
-// @router /identities/:id [put]
+// @router /identities/{id} [put]
 // @param id path string true "Identity ID"
 // @param identity body Identity true "Identity data"
 func (h IdentityHandler) Update(ctx *gin.Context) {

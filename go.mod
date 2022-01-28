@@ -8,6 +8,7 @@ require (
 	github.com/konveyor/controller v0.8.0
 	github.com/mattn/go-sqlite3 v1.14.9
 	github.com/onsi/gomega v1.7.0
+	github.com/swaggo/swag v1.7.8
 	gorm.io/datatypes v1.0.5
 	gorm.io/driver/postgres v1.2.3 // indirect
 	gorm.io/driver/sqlite v1.2.4

@@ -41,7 +41,7 @@ func (h DependencyHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} api.Dependency
-// @router /application-inventory/applications-dependency/:id [get]
+// @router /application-inventory/applications-dependency/{id} [get]
 // @param id path string true "Dependency ID"
 func (h DependencyHandler) Get(ctx *gin.Context) {
 	m := &model.Dependency{}
@@ -131,7 +131,7 @@ func (h DependencyHandler) Create(ctx *gin.Context) {
 // @tags delete
 // @accept json
 // @success 204
-// @router /application-inventory/applications-dependency/:id [delete]
+// @router /application-inventory/applications-dependency/{id} [delete]
 // @param id path string true "Dependency id"
 func (h DependencyHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
