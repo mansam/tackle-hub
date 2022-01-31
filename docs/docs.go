@@ -326,6 +326,9 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "get"
+                ],
                 "summary": "List all buckets.",
                 "parameters": [
                     {
@@ -355,6 +358,9 @@ var doc = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "create"
                 ],
                 "summary": "Create a bucket for an application.",
                 "parameters": [
@@ -932,6 +938,9 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "get"
+                ],
                 "summary": "List all buckets.",
                 "responses": {
                     "200": {
@@ -952,6 +961,9 @@ var doc = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "create"
                 ],
                 "summary": "Create a bucket.",
                 "parameters": [
@@ -981,6 +993,9 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "get"
+                ],
                 "summary": "Get a bucket by ID.",
                 "parameters": [
                     {
@@ -1007,6 +1022,9 @@ var doc = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "update"
                 ],
                 "summary": "Update a bucket.",
                 "parameters": [
@@ -1038,6 +1056,9 @@ var doc = `{
             },
             "delete": {
                 "description": "Delete a bucket.",
+                "tags": [
+                    "delete"
+                ],
                 "summary": "Delete a bucket.",
                 "parameters": [
                     {
@@ -2813,6 +2834,9 @@ var doc = `{
         },
         "api.Proxy": {
             "type": "object",
+            "required": [
+                "host"
+            ],
             "properties": {
                 "createTime": {
                     "type": "string"
@@ -2830,7 +2854,11 @@ var doc = `{
                     "type": "integer"
                 },
                 "kind": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "http",
+                        "https"
+                    ]
                 },
                 "port": {
                     "type": "integer"
@@ -2842,6 +2870,9 @@ var doc = `{
         },
         "api.Repository": {
             "type": "object",
+            "required": [
+                "kind"
+            ],
             "properties": {
                 "application": {
                     "type": "integer"

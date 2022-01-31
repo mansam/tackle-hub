@@ -307,6 +307,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "get"
+                ],
                 "summary": "List all buckets.",
                 "parameters": [
                     {
@@ -336,6 +339,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "create"
                 ],
                 "summary": "Create a bucket for an application.",
                 "parameters": [
@@ -913,6 +919,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "get"
+                ],
                 "summary": "List all buckets.",
                 "responses": {
                     "200": {
@@ -933,6 +942,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "create"
                 ],
                 "summary": "Create a bucket.",
                 "parameters": [
@@ -962,6 +974,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "get"
+                ],
                 "summary": "Get a bucket by ID.",
                 "parameters": [
                     {
@@ -988,6 +1003,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "update"
                 ],
                 "summary": "Update a bucket.",
                 "parameters": [
@@ -1019,6 +1037,9 @@
             },
             "delete": {
                 "description": "Delete a bucket.",
+                "tags": [
+                    "delete"
+                ],
                 "summary": "Delete a bucket.",
                 "parameters": [
                     {
@@ -2794,6 +2815,9 @@
         },
         "api.Proxy": {
             "type": "object",
+            "required": [
+                "host"
+            ],
             "properties": {
                 "createTime": {
                     "type": "string"
@@ -2811,7 +2835,11 @@
                     "type": "integer"
                 },
                 "kind": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "http",
+                        "https"
+                    ]
                 },
                 "port": {
                     "type": "integer"
@@ -2823,6 +2851,9 @@
         },
         "api.Repository": {
             "type": "object",
+            "required": [
+                "kind"
+            ],
             "properties": {
                 "application": {
                     "type": "integer"

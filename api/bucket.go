@@ -42,7 +42,7 @@ func (h BucketHandler) AddRoutes(e *gin.Engine) {
 // Get godoc
 // @summary Get a bucket by ID.
 // @description Get a bucket by ID.
-// @buckets get
+// @tags get
 // @produce json
 // @success 200 {object} Bucket
 // @router /controls/bucket/{id} [get]
@@ -64,7 +64,7 @@ func (h BucketHandler) Get(ctx *gin.Context) {
 // List godoc
 // @summary List all buckets.
 // @description List all buckets.
-// @buckets get
+// @tags get
 // @produce json
 // @success 200 {object} []Bucket
 // @router /controls/bucket [get]
@@ -90,7 +90,7 @@ func (h BucketHandler) List(ctx *gin.Context) {
 // ListByApplication godoc
 // @summary List all buckets.
 // @description List all buckets.
-// @buckets get
+// @tags get
 // @produce json
 // @success 200 {object} []Bucket
 // @router /application-inventory/application/{id}/bucket [get]
@@ -119,7 +119,7 @@ func (h BucketHandler) ListByApplication(ctx *gin.Context) {
 // Create godoc
 // @summary Create a bucket.
 // @description Create a bucket.
-// @buckets create
+// @tags create
 // @accept json
 // @produce json
 // @success 201 {object} Bucket
@@ -143,7 +143,7 @@ func (h BucketHandler) Create(ctx *gin.Context) {
 // CreateForApplication godoc
 // @summary Create a bucket for an application.
 // @description Create a bucket for an application.
-// @buckets create
+// @tags create
 // @accept json
 // @produce json
 // @success 201 {object} Bucket
@@ -176,7 +176,7 @@ func (h BucketHandler) CreateForApplication(ctx *gin.Context) {
 // Delete godoc
 // @summary Delete a bucket.
 // @description Delete a bucket.
-// @buckets delete
+// @tags delete
 // @success 204 {object} Bucket
 // @router /controls/bucket/{id} [delete]
 // @param id path string true "Bucket ID"
@@ -200,7 +200,7 @@ func (h BucketHandler) Delete(ctx *gin.Context) {
 // Update godoc
 // @summary Update a bucket.
 // @description Update a bucket.
-// @buckets update
+// @tags update
 // @accept json
 // @produce json
 // @success 204 {object} Bucket
