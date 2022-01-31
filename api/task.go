@@ -23,6 +23,10 @@ const (
 	AddonTasksRoot = AddonRoot + "/tasks"
 )
 
+const (
+	LocatorParam = "locator"
+)
+
 //
 // TaskHandler handles task routes.
 type TaskHandler struct {
@@ -77,6 +81,10 @@ func (h TaskHandler) List(ctx *gin.Context) {
 	var list []model.Task
 	pagination := NewPagination(ctx)
 	db := pagination.apply(h.DB)
+	locator := ctx.Query(LocatorParam)
+	if locator != "" {
+		db = db.Where("locator", locator)
+	}
 	db = db.Preload("Report")
 	result := db.Find(&list)
 	if result.Error != nil {
@@ -294,6 +302,7 @@ type Task struct {
 	Resource
 	Name       string      `json:"name" binding:"required"`
 	Addon      string      `json:"addon" binding:"required"`
+	Locator    string      `json:"locator"`
 	Isolated   bool        `json:"isolated,omitempty"`
 	Data       model.JSON  `json:"data" swaggertype:"object"`
 	Image      string      `json:"image"`
@@ -312,6 +321,7 @@ func (r *Task) With(m *model.Task) {
 	r.Name = m.Name
 	r.Image = m.Image
 	r.Addon = m.Addon
+	r.Locator = m.Locator
 	r.Isolated = m.Isolated
 	r.Data = m.Data
 	r.Started = m.Started
@@ -332,6 +342,7 @@ func (r *Task) Model() (m *model.Task) {
 	m = &model.Task{
 		Name:     r.Name,
 		Addon:    r.Addon,
+		Locator:  r.Locator,
 		Isolated: r.Isolated,
 		Data:     r.Data,
 	}
