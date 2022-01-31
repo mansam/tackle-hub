@@ -17,9 +17,10 @@ type TaskReport struct {
 
 type Task struct {
 	Model
-	Name       string
+	Name       string `gorm:"index"`
+	Addon      string `gorm:"index"`
+	Locator    string `gorm:"index"`
 	Image      string
-	Addon      string
 	Isolated   bool
 	Data       JSON
 	Started    *time.Time

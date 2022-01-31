@@ -7,6 +7,7 @@ curl -X POST ${host}/tasks -d \
     "createUser": "tackle",
     "username": "tackle",
     "name":"Test",
+    "locator": "app.1.test",
     "addon": "test",
     "data": {
       "application": 1,
