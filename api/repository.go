@@ -11,7 +11,7 @@ import (
 const (
 	RepositoriesRoot    = "/repositories"
 	RepositoryRoot      = RepositoriesRoot + "/:" + ID
-	AppRepositoriesRoot = ApplicationRoot + RepositoriesRoot
+	AppRepositoryRoot = ApplicationRoot + "/repository"
 )
 
 //
@@ -27,8 +27,8 @@ func (h RepositoryHandler) AddRoutes(e *gin.Engine) {
 	e.GET(RepositoryRoot, h.Get)
 	e.PUT(RepositoryRoot, h.Update)
 	e.DELETE(RepositoryRoot, h.Delete)
-	e.POST(AppRepositoriesRoot, h.CreateForApplication)
-	e.GET(AppRepositoriesRoot, h.ListByApplication)
+	e.POST(AppRepositoryRoot, h.CreateForApplication)
+	e.GET(AppRepositoryRoot, h.GetByApplication)
 }
 
 // Get godoc
@@ -79,33 +79,26 @@ func (h RepositoryHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resources)
 }
 
-// ListByApplication godoc
-// @summary List all repositories that belong to an application.
-// @description List all repositories that belong to an application.
+// GetByApplication godoc
+// @summary Get the repository for an application.
+// @description Get the repository for an application.
 // @tags get
 // @produce json
-// @success 200 {object} []Repository
-// @router /application-inventory/application/{id}/repositories [get]
+// @success 200 {object} Repository
+// @router /application-inventory/application/{id}/repository [get]
 // @param id path int true "Application ID"
-func (h RepositoryHandler) ListByApplication(ctx *gin.Context) {
-	var list []model.Repository
+func (h RepositoryHandler) GetByApplication(ctx *gin.Context) {
+	m := &model.Repository{}
 	appId := ctx.Param(ID)
-	pagination := NewPagination(ctx)
-	db := pagination.apply(h.DB)
-	db = db.Where("applicationid", appId)
-	result := db.Find(&list)
+	result := h.DB.First(m, "applicationid", appId)
 	if result.Error != nil {
 		h.listFailed(ctx, result.Error)
 		return
 	}
-	resources := []Repository{}
-	for i := range list {
-		r := Repository{}
-		r.With(&list[i])
-		resources = append(resources, r)
-	}
+	r := Repository{}
+	r.With(m)
 
-	ctx.JSON(http.StatusOK, resources)
+	ctx.JSON(http.StatusOK, r)
 }
 
 // Create godoc
@@ -141,7 +134,7 @@ func (h RepositoryHandler) Create(ctx *gin.Context) {
 // @accept json
 // @produce json
 // @success 201 {object} Repository
-// @router /application-inventory/application/{id}/repositories [post]
+// @router /application-inventory/application/{id}/repository [post]
 // @param id path int true "Application ID"
 // @param repo body Repository true "Repository data"
 func (h RepositoryHandler) CreateForApplication(ctx *gin.Context) {

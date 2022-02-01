@@ -14,3 +14,4 @@ curl -X POST ${host}/tasks -d \
       "path": "/etc"
     }
 }' | jq -M .
+

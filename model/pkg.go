@@ -11,7 +11,7 @@ var (
 
 //
 // Field (data) types.
-type JSON datatypes.JSON
+type JSON = datatypes.JSON
 
 //
 // All builds all models.
