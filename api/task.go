@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	crd "github.com/konveyor/tackle-hub/k8s/api/tackle/v1alpha1"
 	"github.com/konveyor/tackle-hub/model"
@@ -297,14 +298,24 @@ func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 }
 
 //
+// AddonTask REST resource.
+type AddonTask struct {
+	Resource
+	Name       string      `json:"name"`
+	Locator    string      `json:"locator"`
+	Isolated   bool        `json:"isolated,omitempty"`
+	Data       interface{} `json:"data"`
+}
+
+//
 // Task REST resource.
 type Task struct {
 	Resource
-	Name       string      `json:"name" binding:"required"`
-	Addon      string      `json:"addon" binding:"required"`
+	Name       string      `json:"name"`
 	Locator    string      `json:"locator"`
 	Isolated   bool        `json:"isolated,omitempty"`
-	Data       model.JSON  `json:"data" swaggertype:"object"`
+	Data       interface{} `json:"data"`
+	Addon      string      `json:"addon"`
 	Image      string      `json:"image"`
 	Started    *time.Time  `json:"started"`
 	Terminated *time.Time  `json:"terminated"`
@@ -323,12 +334,12 @@ func (r *Task) With(m *model.Task) {
 	r.Addon = m.Addon
 	r.Locator = m.Locator
 	r.Isolated = m.Isolated
-	r.Data = m.Data
 	r.Started = m.Started
 	r.Terminated = m.Terminated
 	r.Status = m.Status
 	r.Error = m.Error
 	r.Job = m.Job
+	_ = json.Unmarshal(m.Data, &r.Data)
 	if m.Report != nil {
 		report := &TaskReport{}
 		report.With(m.Report)
@@ -344,13 +355,9 @@ func (r *Task) Model() (m *model.Task) {
 		Addon:    r.Addon,
 		Locator:  r.Locator,
 		Isolated: r.Isolated,
-		Data:     r.Data,
 	}
+	m.Data, _ = json.Marshal(r.Data)
 	m.ID = r.ID
-	if r.Report != nil {
-		m.Report = r.Report.Model()
-	}
-
 	return
 }
 
