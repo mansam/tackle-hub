@@ -27,8 +27,8 @@ func (h RepositoryHandler) AddRoutes(e *gin.Engine) {
 	e.GET(RepositoryRoot, h.Get)
 	e.PUT(RepositoryRoot, h.Update)
 	e.DELETE(RepositoryRoot, h.Delete)
-	e.POST(AppRepositoryRoot, h.CreateForApplication)
-	e.GET(AppRepositoryRoot, h.GetByApplication)
+	e.GET(AppRepositoryRoot, h.AppGet)
+	e.POST(AppRepositoryRoot, h.AppCreate)
 }
 
 // Get godoc
@@ -79,7 +79,7 @@ func (h RepositoryHandler) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resources)
 }
 
-// GetByApplication godoc
+// AppGet godoc
 // @summary Get the repository for an application.
 // @description Get the repository for an application.
 // @tags get
@@ -87,7 +87,7 @@ func (h RepositoryHandler) List(ctx *gin.Context) {
 // @success 200 {object} Repository
 // @router /application-inventory/application/{id}/repository [get]
 // @param id path int true "Application ID"
-func (h RepositoryHandler) GetByApplication(ctx *gin.Context) {
+func (h RepositoryHandler) AppGet(ctx *gin.Context) {
 	m := &model.Repository{}
 	appId := ctx.Param(ID)
 	result := h.DB.First(m, "applicationid", appId)
@@ -127,7 +127,7 @@ func (h RepositoryHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, repository)
 }
 
-// CreateForApplication godoc
+// AppCreate godoc
 // @summary Create a repository for an application.
 // @description Create a repository for an application.
 // @tags create
@@ -137,7 +137,7 @@ func (h RepositoryHandler) Create(ctx *gin.Context) {
 // @router /application-inventory/application/{id}/repository [post]
 // @param id path int true "Application ID"
 // @param repo body Repository true "Repository data"
-func (h RepositoryHandler) CreateForApplication(ctx *gin.Context) {
+func (h RepositoryHandler) AppCreate(ctx *gin.Context) {
 	repository := &Repository{}
 	err := ctx.BindJSON(repository)
 	if err != nil {
