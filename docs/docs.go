@@ -462,16 +462,16 @@ var doc = `{
                 }
             }
         },
-        "/application-inventory/application/{id}/repositories": {
+        "/application-inventory/application/{id}/repository": {
             "get": {
-                "description": "List all repositories that belong to an application.",
+                "description": "Get the repository for an application.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "get"
                 ],
-                "summary": "List all repositories that belong to an application.",
+                "summary": "Get the repository for an application.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -485,10 +485,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/api.Repository"
-                            }
+                            "$ref": "#/definitions/api.Repository"
                         }
                     }
                 }
@@ -3115,10 +3112,6 @@ var doc = `{
         },
         "api.Task": {
             "type": "object",
-            "required": [
-                "addon",
-                "name"
-            ],
             "properties": {
                 "addon": {
                     "type": "string"
@@ -3145,6 +3138,9 @@ var doc = `{
                     "type": "boolean"
                 },
                 "job": {
+                    "type": "string"
+                },
+                "locator": {
                     "type": "string"
                 },
                 "name": {

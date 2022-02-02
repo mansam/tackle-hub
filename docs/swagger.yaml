@@ -395,6 +395,8 @@ definitions:
         type: boolean
       job:
         type: string
+      locator:
+        type: string
       name:
         type: string
       report:
@@ -407,9 +409,6 @@ definitions:
         type: string
       updateUser:
         type: string
-    required:
-    - addon
-    - name
     type: object
   api.TaskReport:
     properties:
@@ -939,9 +938,9 @@ paths:
       summary: Create an identity for an application.
       tags:
       - create
-  /application-inventory/application/{id}/repositories:
+  /application-inventory/application/{id}/repository:
     get:
-      description: List all repositories that belong to an application.
+      description: Get the repository for an application.
       parameters:
       - description: Application ID
         in: path
@@ -954,10 +953,8 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/api.Repository'
-            type: array
-      summary: List all repositories that belong to an application.
+            $ref: '#/definitions/api.Repository'
+      summary: Get the repository for an application.
       tags:
       - get
     post:

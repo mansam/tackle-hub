@@ -304,7 +304,7 @@ type AddonTask struct {
 	Name       string      `json:"name"`
 	Locator    string      `json:"locator"`
 	Isolated   bool        `json:"isolated,omitempty"`
-	Data       interface{} `json:"data"`
+	Data       interface{} `json:"data" swaggertype:"object"`
 }
 
 //
@@ -314,7 +314,7 @@ type Task struct {
 	Name       string      `json:"name"`
 	Locator    string      `json:"locator"`
 	Isolated   bool        `json:"isolated,omitempty"`
-	Data       interface{} `json:"data"`
+	Data       interface{} `json:"data" swaggertype:"object"`
 	Addon      string      `json:"addon"`
 	Image      string      `json:"image"`
 	Started    *time.Time  `json:"started"`
