@@ -301,10 +301,10 @@ func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 // AddonTask REST resource.
 type AddonTask struct {
 	Resource
-	Name       string      `json:"name"`
-	Locator    string      `json:"locator"`
-	Isolated   bool        `json:"isolated,omitempty"`
-	Data       interface{} `json:"data" swaggertype:"object"`
+	Name     string      `json:"name"`
+	Locator  string      `json:"locator"`
+	Isolated bool        `json:"isolated,omitempty"`
+	Data     interface{} `json:"data" swaggertype:"object"`
 }
 
 //

@@ -7,6 +7,7 @@ type Application struct {
 	Name              string `gorm:"index;unique;not null"`
 	Description       string
 	Review            *Review
+	Repository        JSON
 	Comments          string
 	Tags              []Tag      `gorm:"many2many:applicationTags"`
 	Identities        []Identity `gorm:"many2many:appIdentity"`
@@ -20,16 +21,6 @@ type Dependency struct {
 	To     *Application `gorm:"foreignKey:ToID;constraint:OnDelete:CASCADE"`
 	FromID uint         `gorm:"index"`
 	From   *Application `gorm:"foreignKey:FromID;constraint:OnDelete:CASCADE"`
-}
-
-type Repository struct {
-	Model
-	Kind          string
-	URL           string
-	Branch        string
-	Tag           string
-	Path          string `gorm:"default:/"`
-	ApplicationID uint   `gorm:"index;unique"`
 }
 
 type Review struct {
