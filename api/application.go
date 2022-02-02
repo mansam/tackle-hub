@@ -106,7 +106,7 @@ func (h ApplicationHandler) List(ctx *gin.Context) {
 // @produce json
 // @success 201 {object} api.Application
 // @router /application-inventory/application [post]
-// @param application body model.Application true "Application data"
+// @param application body api.Application true "Application data"
 func (h ApplicationHandler) Create(ctx *gin.Context) {
 	r := &Application{}
 	err := ctx.BindJSON(r)

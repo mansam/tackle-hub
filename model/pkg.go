@@ -19,6 +19,7 @@ type JSON = datatypes.JSON
 // all the other models on which they may depend.
 func All() []interface{} {
 	return []interface{}{
+		Setting{},
 		ImportSummary{},
 		Import{},
 		ImportTag{},
