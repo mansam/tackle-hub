@@ -1,10 +1,10 @@
-FROM registry.access.redhat.com/ubi8/go-toolset:1.16.7 as builder
+FROM registry.access.redhat.com/ubi8/go-toolset:1.16.12 as builder
 ENV GOPATH=$APP_ROOT
 COPY . .
-RUN make hub
+RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o hub github.com/konveyor/tackle-hub/cmd
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4
-COPY --from=builder /opt/app-root/src/bin/hub /usr/local/bin/tackle-hub
+COPY --from=builder /opt/app-root/src/hub /usr/local/bin/tackle-hub
 ENTRYPOINT ["/usr/local/bin/tackle-hub"]
 
 LABEL name="konveyor/tackle-hub" \
