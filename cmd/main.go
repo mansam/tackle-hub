@@ -127,12 +127,13 @@ func seed(db *gorm.DB, models []interface{}) (err error) {
 
 	for _, m := range models {
 		err = func() (err error) {
+			db.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&m)
+
 			kind := reflect.TypeOf(m).Name()
 			fileName := strings.ToLower(kind) + ".json"
 			filePath := path.Join(settings.Settings.DB.SeedPath, fileName)
 			file, err := os.Open(filePath)
 			if err != nil {
-				log.Info("Could not open seed file.", "model", kind, "path", filePath)
 				err = nil
 				return
 			}

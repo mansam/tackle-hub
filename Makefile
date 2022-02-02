@@ -10,6 +10,8 @@ PKG = ./addon/... \
       ./settings/... \
       ./task/...
 
+BUILD = --tags json1 -o bin/hub github.com/konveyor/tackle-hub/cmd
+
 # Build ALL commands.
 cmd: hub addon
 
@@ -23,11 +25,14 @@ vet:
 
 # Build hub
 hub: generate fmt vet
-	go build --tags json1 -o bin/hub github.com/konveyor/tackle-hub/cmd
+	go build ${BUILD}
 
 # Build manager binary with compiler optimizations disabled
-debug: fmt vet
-	go build -o bin/hub -gcflags=all="-N -l" github.com/konveyor/tackle-hub/cmd
+debug: generate fmt vet
+	go build -gcflags=all="-N -l" ${BUILD}
+
+docker: vet
+	go build ${BUILD}
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: fmt vet
