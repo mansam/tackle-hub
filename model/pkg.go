@@ -31,7 +31,6 @@ func All() []interface{} {
 		Application{},
 		Dependency{},
 		Review{},
-		Repository{},
 		Identity{},
 		Task{},
 		TaskReport{},

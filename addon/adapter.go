@@ -38,8 +38,6 @@ type Adapter struct {
 	Task
 	// Application API.
 	Application Application
-	// Repository API.
-	Repository Repository
 	// Bucket API.
 	Bucket Bucket
 	// Identity API.
@@ -88,9 +86,6 @@ func newAdapter() (adapter *Adapter) {
 			secret: secret,
 		},
 		Application: Application{
-			client: client,
-		},
-		Repository: Repository{
 			client: client,
 		},
 		Bucket: Bucket{

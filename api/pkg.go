@@ -39,7 +39,6 @@ func All() []Handler {
 		&DependencyHandler{},
 		&ImportHandler{},
 		&JobFunctionHandler{},
-		&RepositoryHandler{},
 		&IdentityHandler{},
 		&ProxyHandler{},
 		&ReviewHandler{},

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/konveyor/tackle-hub/model"
 	"net/http"
@@ -185,12 +186,13 @@ func (h ApplicationHandler) Update(ctx *gin.Context) {
 // Application REST resource.
 type Application struct {
 	Resource
-	Name            string   `json:"name" binding:"required"`
-	Description     string   `json:"description"`
-	Review          *Review  `json:"review"`
-	Comments        string   `json:"comments"`
-	Tags            []string `json:"tags"`
-	BusinessService string   `json:"businessService"`
+	Name            string      `json:"name" binding:"required"`
+	Description     string      `json:"description"`
+	Repository      *Repository `json:"repository"`
+	Review          *Review     `json:"review"`
+	Comments        string      `json:"comments"`
+	Tags            []string    `json:"tags"`
+	BusinessService string      `json:"businessService"`
 }
 
 //
@@ -200,6 +202,7 @@ func (r *Application) With(m *model.Application) {
 	r.Name = m.Name
 	r.Description = m.Description
 	r.Comments = m.Comments
+	_ = json.Unmarshal(m.Repository, &r.Repository)
 	if m.Review != nil {
 		r.Review = &Review{Resource: Resource{ID: m.Review.ID}}
 	}
@@ -220,6 +223,7 @@ func (r *Application) Model() (m *model.Application) {
 		Comments:    r.Comments,
 	}
 	m.ID = r.ID
+	m.Repository, _ = json.Marshal(r.Repository)
 	if len(r.BusinessService) > 0 {
 		id, _ := strconv.Atoi(r.BusinessService)
 		m.BusinessServiceID = uint(id)
@@ -236,4 +240,14 @@ func (r *Application) Model() (m *model.Application) {
 	}
 
 	return
+}
+
+//
+// Repository REST nested resource.
+type Repository struct {
+	Kind   string `json:"kind" binding:"required"`
+	URL    string `json:"url" binding:"url"`
+	Branch string `json:"branch"`
+	Tag    string `json:"tag"`
+	Path   string `json:"path"`
 }
