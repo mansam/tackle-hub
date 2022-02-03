@@ -36,6 +36,8 @@ func init() {
 type Adapter struct {
 	// Task API.
 	Task
+	// Settings API
+	Setting Setting
 	// Application API.
 	Application Application
 	// Bucket API.
@@ -84,6 +86,9 @@ func newAdapter() (adapter *Adapter) {
 		Task: Task{
 			client: client,
 			secret: secret,
+		},
+		Setting: Setting{
+			client: client,
 		},
 		Application: Application{
 			client: client,
