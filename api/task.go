@@ -287,7 +287,7 @@ func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 	m := report.Model()
 	db := h.DB.Model(&model.TaskReport{})
 	db = db.Where("taskid", task)
-	db = db.Omit("id")
+	db = db.Omit("id", "taskid")
 	result := db.Updates(m)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)

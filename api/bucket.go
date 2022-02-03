@@ -218,7 +218,7 @@ func (h BucketHandler) Update(ctx *gin.Context) {
 	m := r.Model()
 	db := h.DB.Model(&model.Bucket{})
 	db = db.Where("id", id)
-	db = db.Omit("id", "location")
+	db = db.Omit("id", "path", "applicationid")
 	result := db.Updates(m)
 	if result.Error != nil {
 		h.updateFailed(ctx, result.Error)
