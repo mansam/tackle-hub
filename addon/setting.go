@@ -1,6 +1,7 @@
 package addon
 
 import (
+	"errors"
 	"github.com/konveyor/tackle-hub/api"
 	pathlib "path"
 )
@@ -22,5 +23,47 @@ func (h *Setting) Get(key string) (v interface{}, err error) {
 			key),
 		r)
 	v = r.Value
+	return
+}
+
+//
+// Bool setting value.
+func (h *Setting) Bool(key string) (b bool, err error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return
+	}
+	b, cast := v.(bool)
+	if !cast {
+		err = errors.New(key + " not <boolean>")
+	}
+	return
+}
+
+//
+// Str setting value.
+func (h *Setting) Str(key string) (s string, err error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return
+	}
+	s, cast := v.(string)
+	if !cast {
+		err = errors.New(key + " not <string>")
+	}
+	return
+}
+
+//
+// Int setting value.
+func (h *Setting) Int(key string) (n int, err error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return
+	}
+	n, cast := v.(int)
+	if !cast {
+		err = errors.New(key + " not <int>")
+	}
 	return
 }
