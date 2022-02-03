@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -42,6 +43,40 @@ func init() {
 //
 // Setup the DB and models.
 func Setup() (db *gorm.DB, err error) {
+	db, err = open()
+	if err != nil {
+		return
+	}
+	if seeded(db) {
+		log.Info("Database already seeded, skipping.")
+		return
+	}
+
+	var sqlDB *sql.DB
+	sqlDB, err = db.DB()
+	if err != nil {
+		return
+	}
+	_ = sqlDB.Close()
+	err = os.Remove(Settings.DB.Path)
+	if err != nil {
+		return
+	}
+	db, err = open()
+	if err != nil {
+		return
+	}
+	err = seed(db, model.All())
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+//
+// Open and automigrate the DB.
+func open() (db *gorm.DB, err error) {
 	db, err = gorm.Open(
 		sqlite.Open(fmt.Sprintf(ConnectionString, Settings.DB.Path)),
 		&gorm.Config{
@@ -53,17 +88,18 @@ func Setup() (db *gorm.DB, err error) {
 	if err != nil {
 		return
 	}
-	err = db.AutoMigrate(append(model.All(), &model.Seeded{})...)
+	err = db.AutoMigrate(append(model.All())...)
 	if err != nil {
 		return
 	}
-
-	err = seed(db, model.All())
-	if err != nil {
-		return
-	}
-
 	return
+}
+
+//
+// Check whether the DB has been seeded.
+func seeded(db *gorm.DB) (seeded bool) {
+	result := db.Find(&model.Setting{Key: ".hub.db.seeded"})
+	return result.RowsAffected > 0
 }
 
 //
@@ -119,12 +155,6 @@ func main() {
 // Seed the database with the contents of json
 // files contained in DB_SEED_PATH.
 func seed(db *gorm.DB, models []interface{}) (err error) {
-	result := db.Find(&model.Seeded{})
-	if result.RowsAffected != 0 {
-		log.Info("Database already seeded, skipping.")
-		return
-	}
-
 	for _, m := range models {
 		err = func() (err error) {
 			kind := reflect.TypeOf(m).Name()
@@ -132,7 +162,6 @@ func seed(db *gorm.DB, models []interface{}) (err error) {
 			filePath := path.Join(settings.Settings.DB.SeedPath, fileName)
 			file, err := os.Open(filePath)
 			if err != nil {
-				log.Info("Could not open seed file.", "model", kind, "path", filePath)
 				err = nil
 				return
 			}
@@ -161,8 +190,9 @@ func seed(db *gorm.DB, models []interface{}) (err error) {
 		}
 	}
 
-	seeded := model.Seeded{}
-	result = db.Create(&seeded)
+	seeded, _ := json.Marshal(true)
+	setting := model.Setting{Key: ".hub.db.seeded", Value: seeded}
+	result := db.Create(&setting)
 	if result.Error != nil {
 		err = result.Error
 		return

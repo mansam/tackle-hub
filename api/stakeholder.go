@@ -180,10 +180,10 @@ func (h StakeholderHandler) Update(ctx *gin.Context) {
 // Stakeholder REST resource.
 type Stakeholder struct {
 	Resource
-	DisplayName      string                   `json:"displayName" binding:"required"`
-	Email            string                   `json:"email" binding:"required"`
-	Groups           []model.StakeholderGroup `json:"stakeholderGroups"`
-	BusinessServices []model.BusinessService  `json:"businessServices"`
+	DisplayName      string             `json:"displayName" binding:"required"`
+	Email            string             `json:"email" binding:"required"`
+	Groups           []StakeholderGroup `json:"stakeholderGroups"`
+	BusinessServices []BusinessService  `json:"businessServices"`
 	JobFunction      struct {
 		ID   *uint  `json:"id"`
 		Role string `json:"role"`
@@ -196,11 +196,19 @@ func (r *Stakeholder) With(m *model.Stakeholder) {
 	r.Resource.With(&m.Model)
 	r.DisplayName = m.DisplayName
 	r.Email = m.Email
-	r.Groups = m.Groups
-	r.BusinessServices = m.BusinessServices
 	r.JobFunction.ID = m.JobFunctionID
 	if m.JobFunction != nil {
 		r.JobFunction.Role = m.JobFunction.Role
+	}
+	for _, g := range m.Groups {
+		group := StakeholderGroup{}
+		group.With(&g)
+		r.Groups = append(r.Groups, group)
+	}
+	for _, b := range m.BusinessServices {
+		business := BusinessService{}
+		business.With(&b)
+		r.BusinessServices = append(r.BusinessServices, business)
 	}
 }
 
@@ -208,12 +216,16 @@ func (r *Stakeholder) With(m *model.Stakeholder) {
 // Model builds a model.
 func (r *Stakeholder) Model() (m *model.Stakeholder) {
 	m = &model.Stakeholder{
-		DisplayName:      r.DisplayName,
-		Email:            r.Email,
-		Groups:           r.Groups,
-		BusinessServices: r.BusinessServices,
-		JobFunctionID:    r.JobFunction.ID,
+		DisplayName:   r.DisplayName,
+		Email:         r.Email,
+		JobFunctionID: r.JobFunction.ID,
 	}
 	m.ID = r.ID
+	for _, g := range r.Groups {
+		m.Groups = append(m.Groups, *g.Model())
+	}
+	for _, b := range r.BusinessServices {
+		m.BusinessServices = append(m.BusinessServices, *b.Model())
+	}
 	return
 }

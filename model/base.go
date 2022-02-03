@@ -12,9 +12,3 @@ type Model struct {
 	UpdateUser string
 	CreateTime time.Time `gorm:"autoCreateTime"`
 }
-
-//
-// Seeded model.
-type Seeded struct {
-	ID uint `gorm:"primaryKey"`
-}

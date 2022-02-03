@@ -150,7 +150,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Application"
+                            "$ref": "#/definitions/api.Application"
                         }
                     }
                 ],
@@ -457,74 +457,6 @@ var doc = `{
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/api.Identity"
-                        }
-                    }
-                }
-            }
-        },
-        "/application-inventory/application/{id}/repository": {
-            "get": {
-                "description": "Get the repository for an application.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "get"
-                ],
-                "summary": "Get the repository for an application.",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Application ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api.Repository"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a repository for an application.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "create"
-                ],
-                "summary": "Create a repository for an application.",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Application ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Repository data",
-                        "name": "repo",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/api.Repository"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/api.Repository"
                         }
                     }
                 }
@@ -2180,30 +2112,31 @@ var doc = `{
                 }
             }
         },
-        "/repositories": {
+        "/settings": {
             "get": {
-                "description": "List all repositories.",
+                "description": "List all settings.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "get"
+                    "list",
+                    "setting"
                 ],
-                "summary": "List all repositories.",
+                "summary": "List all settings.",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/api.Repository"
+                                "$ref": "#/definitions/api.Setting"
                             }
                         }
                     }
                 }
             },
             "post": {
-                "description": "Create a repository.",
+                "description": "Create a setting.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2211,17 +2144,18 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "create"
+                    "create",
+                    "setting"
                 ],
-                "summary": "Create a repository.",
+                "summary": "Create a setting.",
                 "parameters": [
                     {
-                        "description": "Repository data",
-                        "name": "repo",
+                        "description": "Setting data",
+                        "name": "setting",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.Repository"
+                            "$ref": "#/definitions/api.Setting"
                         }
                     }
                 ],
@@ -2229,27 +2163,28 @@ var doc = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/api.Repository"
+                            "$ref": "#/definitions/api.Setting"
                         }
                     }
                 }
             }
         },
-        "/repositories/{id}": {
+        "/settings/{key}": {
             "get": {
-                "description": "Get a repository by ID.",
+                "description": "Get a setting by its key.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "get"
+                    "get",
+                    "setting"
                 ],
-                "summary": "Get a repository by ID.",
+                "summary": "Get a setting by its key.",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Repository ID",
-                        "name": "id",
+                        "description": "Key",
+                        "name": "key",
                         "in": "path",
                         "required": true
                     }
@@ -2258,36 +2193,31 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.Repository"
+                            "$ref": "#/definitions/api.Setting"
                         }
                     }
                 }
             },
             "put": {
-                "description": "Update a repository.",
+                "description": "Update a setting.",
                 "consumes": [
                     "application/json"
                 ],
-                "tags": [
-                    "update"
+                "produces": [
+                    "application/json"
                 ],
-                "summary": "Update a repository.",
+                "tags": [
+                    "update",
+                    "setting"
+                ],
+                "summary": "Update a setting.",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Repository ID",
-                        "name": "id",
+                        "description": "Key",
+                        "name": "key",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "description": "Repository data",
-                        "name": "repo",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/api.Repository"
-                        }
                     }
                 ],
                 "responses": {
@@ -2297,16 +2227,17 @@ var doc = `{
                 }
             },
             "delete": {
-                "description": "Delete a repository.",
+                "description": "Delete a setting.",
                 "tags": [
-                    "delete"
+                    "delete",
+                    "setting"
                 ],
-                "summary": "Delete a repository.",
+                "summary": "Delete a setting.",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Repository ID",
-                        "name": "id",
+                        "description": "Key",
+                        "name": "key",
                         "in": "path",
                         "required": true
                     }
@@ -2575,6 +2506,9 @@ var doc = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "repository": {
+                    "$ref": "#/definitions/api.Repository"
                 },
                 "review": {
                     "$ref": "#/definitions/api.Review"
@@ -2871,20 +2805,8 @@ var doc = `{
                 "kind"
             ],
             "properties": {
-                "application": {
-                    "type": "integer"
-                },
                 "branch": {
                     "type": "string"
-                },
-                "createTime": {
-                    "type": "string"
-                },
-                "createUser": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 },
                 "kind": {
                     "type": "string"
@@ -2893,9 +2815,6 @@ var doc = `{
                     "type": "string"
                 },
                 "tag": {
-                    "type": "string"
-                },
-                "updateUser": {
                     "type": "string"
                 },
                 "url": {
@@ -2949,6 +2868,15 @@ var doc = `{
                 }
             }
         },
+        "api.Setting": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "value": {}
+            }
+        },
         "api.Stakeholder": {
             "type": "object",
             "required": [
@@ -2959,7 +2887,7 @@ var doc = `{
                 "businessServices": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.BusinessService"
+                        "$ref": "#/definitions/api.BusinessService"
                     }
                 },
                 "createTime": {
@@ -2991,7 +2919,7 @@ var doc = `{
                 "stakeholderGroups": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.StakeholderGroup"
+                        "$ref": "#/definitions/api.StakeholderGroup"
                     }
                 },
                 "updateUser": {
@@ -3194,330 +3122,6 @@ var doc = `{
                     "type": "integer"
                 },
                 "updateUser": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.Application": {
-            "type": "object",
-            "properties": {
-                "businessService": {
-                    "$ref": "#/definitions/model.BusinessService"
-                },
-                "businessServiceID": {
-                    "type": "integer"
-                },
-                "comments": {
-                    "type": "string"
-                },
-                "createTime": {
-                    "type": "string"
-                },
-                "createUser": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "identities": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Identity"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                },
-                "review": {
-                    "$ref": "#/definitions/model.Review"
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Tag"
-                    }
-                },
-                "updateUser": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.BusinessService": {
-            "type": "object",
-            "properties": {
-                "createTime": {
-                    "type": "string"
-                },
-                "createUser": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "owner": {
-                    "$ref": "#/definitions/model.Stakeholder"
-                },
-                "ownerID": {
-                    "type": "integer"
-                },
-                "updateUser": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.Identity": {
-            "type": "object",
-            "properties": {
-                "applicationID": {
-                    "type": "integer"
-                },
-                "createTime": {
-                    "type": "string"
-                },
-                "createUser": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "encrypted": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "key": {
-                    "type": "string"
-                },
-                "kind": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "settings": {
-                    "type": "string"
-                },
-                "updateUser": {
-                    "type": "string"
-                },
-                "user": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.JobFunction": {
-            "type": "object",
-            "properties": {
-                "createTime": {
-                    "type": "string"
-                },
-                "createUser": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "stakeholders": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Stakeholder"
-                    }
-                },
-                "updateUser": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.Review": {
-            "type": "object",
-            "properties": {
-                "application": {
-                    "$ref": "#/definitions/model.Application"
-                },
-                "applicationID": {
-                    "type": "integer"
-                },
-                "businessCriticality": {
-                    "type": "integer"
-                },
-                "comments": {
-                    "type": "string"
-                },
-                "createTime": {
-                    "type": "string"
-                },
-                "createUser": {
-                    "type": "string"
-                },
-                "effortEstimate": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "proposedAction": {
-                    "type": "string"
-                },
-                "updateUser": {
-                    "type": "string"
-                },
-                "workPriority": {
-                    "type": "integer"
-                }
-            }
-        },
-        "model.Stakeholder": {
-            "type": "object",
-            "properties": {
-                "businessServices": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.BusinessService"
-                    }
-                },
-                "createTime": {
-                    "type": "string"
-                },
-                "createUser": {
-                    "type": "string"
-                },
-                "displayName": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "groups": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.StakeholderGroup"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "jobFunction": {
-                    "$ref": "#/definitions/model.JobFunction"
-                },
-                "jobFunctionID": {
-                    "type": "integer"
-                },
-                "updateUser": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.StakeholderGroup": {
-            "type": "object",
-            "properties": {
-                "createTime": {
-                    "type": "string"
-                },
-                "createUser": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "stakeholders": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Stakeholder"
-                    }
-                },
-                "updateUser": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.Tag": {
-            "type": "object",
-            "properties": {
-                "createTime": {
-                    "type": "string"
-                },
-                "createUser": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "tagType": {
-                    "$ref": "#/definitions/model.TagType"
-                },
-                "tagTypeID": {
-                    "type": "integer"
-                },
-                "updateUser": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.TagType": {
-            "type": "object",
-            "properties": {
-                "color": {
-                    "type": "string"
-                },
-                "createTime": {
-                    "type": "string"
-                },
-                "createUser": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "rank": {
-                    "type": "integer"
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Tag"
-                    }
-                },
-                "updateUser": {
-                    "type": "string"
-                },
-                "username": {
                     "type": "string"
                 }
             }

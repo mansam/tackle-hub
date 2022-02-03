@@ -24,6 +24,7 @@ const (
 // Params
 const (
 	ID       = "id"
+	Key      = "key"
 	Name     = "name"
 	Wildcard = "Wildcard"
 )
@@ -42,6 +43,7 @@ func All() []Handler {
 		&IdentityHandler{},
 		&ProxyHandler{},
 		&ReviewHandler{},
+		&SettingHandler{},
 		&StakeholderHandler{},
 		&StakeholderGroupHandler{},
 		&TagHandler{},
