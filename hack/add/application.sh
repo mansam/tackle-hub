@@ -32,3 +32,17 @@ curl -X POST ${host}/application-inventory/application -d \
     ]
 }' | jq -M .
 
+curl -X POST ${host}/application-inventory/application -d \
+'{
+    "createUser": "tackle",
+    "name":"Pathfinder",
+    "description": "Tackle Pathfinder application.",
+    "repository": {
+      "name": "konveyor tackle-pathfinder",
+      "kind": "git",
+      "url": "https://github.com/konveyor/tackle-pathfinder",
+      "branch": "1.2.0"
+    },
+    "businessService": "1"
+}' | jq -M .
+
