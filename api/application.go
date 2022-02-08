@@ -6,7 +6,6 @@ import (
 	"github.com/konveyor/tackle-hub/model"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 //
@@ -225,7 +224,6 @@ func (r *Application) Model() (m *model.Application) {
 	}
 	m.ID = r.ID
 	if r.Repository != nil {
-		r.Repository.setKind()
 		m.Repository, _ = json.Marshal(r.Repository)
 	}
 	if len(r.BusinessService) > 0 {
@@ -254,12 +252,4 @@ type Repository struct {
 	Branch string `json:"branch"`
 	Tag    string `json:"tag"`
 	Path   string `json:"path"`
-}
-
-//
-// setKind based on URL.
-func (r *Repository) setKind() {
-	if strings.HasSuffix(r.URL, ".git") {
-		r.Kind = "git"
-	}
 }
