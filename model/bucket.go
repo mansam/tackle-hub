@@ -7,9 +7,9 @@ import (
 
 type Bucket struct {
 	Model
-	Name          string
+	Name          string `gorm:"uniqueIndex:A"`
 	Path          string
-	ApplicationID uint
+	ApplicationID uint `gorm:"uniqueIndex:A"`
 }
 
 func (m *Bucket) AfterDelete(db *gorm.DB) (err error) {

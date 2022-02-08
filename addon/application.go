@@ -2,8 +2,6 @@ package addon
 
 import (
 	"github.com/konveyor/tackle-hub/api"
-	pathlib "path"
-	"strconv"
 )
 
 //
@@ -15,13 +13,10 @@ type Application struct {
 
 //
 // Get an application by ID.
-func (h *Application) Get(id uint) (m *api.Application, err error) {
-	m = &api.Application{}
-	err = h.client.Get(
-		pathlib.Join(
-			api.ApplicationsRoot,
-			strconv.Itoa(int(id))),
-		m)
+func (h *Application) Get(id uint) (r *api.Application, err error) {
+	r = &api.Application{}
+	path := Params{api.ID: id}.inject(api.ApplicationRoot)
+	err = h.client.Get(path, r)
 	return
 }
 
@@ -35,17 +30,14 @@ func (h *Application) List() (list []api.Application, err error) {
 
 //
 // Update an application by ID.
-func (h *Application) Update(m *api.Application) (err error) {
-	err = h.client.Put(
-		pathlib.Join(
-			api.ApplicationsRoot,
-			strconv.Itoa(int(m.ID))),
-		m)
+func (h *Application) Update(r *api.Application) (err error) {
+	path := Params{api.ID: r.ID}.inject(api.ApplicationRoot)
+	err = h.client.Put(path, r)
 	if err == nil {
 		Log.Info(
 			"Addon updated: application.",
 			"id",
-			m.ID)
+			r.ID)
 	}
 	return
 }

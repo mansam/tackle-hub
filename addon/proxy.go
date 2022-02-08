@@ -2,8 +2,6 @@ package addon
 
 import (
 	"github.com/konveyor/tackle-hub/api"
-	pathlib "path"
-	"strconv"
 )
 
 //
@@ -15,13 +13,10 @@ type Proxy struct {
 
 //
 // Get a proxy by ID.
-func (h *Proxy) Get(id uint) (m *api.Proxy, err error) {
-	m = &api.Proxy{}
-	err = h.client.Get(
-		pathlib.Join(
-			api.ProxiesRoot,
-			strconv.Itoa(int(id))),
-		m)
+func (h *Proxy) Get(id uint) (r *api.Proxy, err error) {
+	r = &api.Proxy{}
+	path := Params{api.ID: id}.inject(api.ProxyRoot)
+	err = h.client.Get(path, r)
 	return
 }
 
@@ -38,11 +33,8 @@ func (h *Proxy) List() (list []api.Proxy, err error) {
 
 //
 // Update a proxy by ID.
-func (h *Proxy) Update(m *api.Proxy) (err error) {
-	err = h.client.Put(
-		pathlib.Join(
-			api.ProxiesRoot,
-			strconv.Itoa(int(m.ID))),
-		m)
+func (h *Proxy) Update(r *api.Proxy) (err error) {
+	path := Params{api.ID: r.ID}.inject(api.ProxyRoot)
+	err = h.client.Put(path, r)
 	return
 }

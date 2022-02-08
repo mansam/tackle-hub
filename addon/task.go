@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"github.com/konveyor/tackle-hub/api"
 	"github.com/konveyor/tackle-hub/task"
-	pathlib "path"
-	"strconv"
 )
 
 //
@@ -40,7 +38,7 @@ func (h *Task) DataWith(object interface{}) (err error) {
 // Started report addon started.
 func (h *Task) Started() (err error) {
 	h.report.Status = task.Running
-	err = h.postReport()
+	err = h.pushReport()
 	Log.Info("Addon reported started.")
 	return
 }
@@ -49,7 +47,7 @@ func (h *Task) Started() (err error) {
 // Succeeded report addon succeeded.
 func (h *Task) Succeeded() (err error) {
 	h.report.Status = task.Succeeded
-	err = h.putReport()
+	err = h.pushReport()
 	Log.Info("Addon reported: succeeded.")
 	return
 }
@@ -60,7 +58,7 @@ func (h *Task) Succeeded() (err error) {
 func (h *Task) Failed(reason string, x ...interface{}) (err error) {
 	h.report.Status = task.Failed
 	h.report.Error = fmt.Sprintf(reason, x...)
-	err = h.putReport()
+	err = h.pushReport()
 	Log.Info(
 		"Addon reported: failed.",
 		"error",
@@ -73,7 +71,7 @@ func (h *Task) Failed(reason string, x ...interface{}) (err error) {
 // The description can be a printf style format.
 func (h *Task) Activity(description string, x ...interface{}) (err error) {
 	h.report.Activity = fmt.Sprintf(description, x...)
-	err = h.putReport()
+	err = h.pushReport()
 	Log.Info(
 		"Addon reported: activity.",
 		"activity",
@@ -85,7 +83,7 @@ func (h *Task) Activity(description string, x ...interface{}) (err error) {
 // Total report addon total items.
 func (h *Task) Total(n int) (err error) {
 	h.report.Total = n
-	err = h.putReport()
+	err = h.pushReport()
 	Log.Info(
 		"Addon updated: total.",
 		"total",
@@ -97,7 +95,7 @@ func (h *Task) Total(n int) (err error) {
 // Increment report addon completed (+1) items.
 func (h *Task) Increment() (err error) {
 	h.report.Completed++
-	err = h.putReport()
+	err = h.pushReport()
 	Log.Info(
 		"Addon updated: total.",
 		"total",
@@ -109,34 +107,21 @@ func (h *Task) Increment() (err error) {
 // Completed report addon completed (N) items.
 func (h *Task) Completed(n int) (err error) {
 	h.report.Completed = n
-	err = h.putReport()
+	err = h.pushReport()
 	Log.Info("Addon reported: completed.")
 	return
 }
 
 //
-// postReport creates/updates the task report.
-func (h *Task) postReport() (err error) {
-	taskID := strconv.Itoa(int(h.secret.Hub.Task))
-	err = h.client.Post(
-		pathlib.Join(
-			api.TasksRoot,
-			taskID,
-			"report"),
-		&h.report)
-	if errors.Is(err, &ConflictError{}) {
-		err = h.putReport()
+// pushReport create/update the task report.
+func (h *Task) pushReport() (err error) {
+	params := Params{
+		api.ID: h.secret.Hub.Task,
 	}
-	return
-}
-
-func (h *Task) putReport() (err error) {
-	taskID := strconv.Itoa(int(h.secret.Hub.Task))
-	err = h.client.Put(
-		pathlib.Join(
-			api.TasksRoot,
-			taskID,
-			"report"),
-		&h.report)
+	path := params.inject(api.TaskReportRoot)
+	err = h.client.Post(path, &h.report)
+	if errors.Is(err, &Conflict{}) {
+		err = h.client.Put(path, &h.report)
+	}
 	return
 }

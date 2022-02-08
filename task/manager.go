@@ -242,7 +242,7 @@ func (r *Task) job(secret *core.Secret) (job batch.Job) {
 	backOff := int32(2)
 	job = batch.Job{
 		Spec: batch.JobSpec{
-			Template: template,
+			Template:     template,
 			BackoffLimit: &backOff,
 		},
 		ObjectMeta: meta.ObjectMeta{

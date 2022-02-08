@@ -13,7 +13,6 @@ import (
 
 //
 // Client provides a REST client.
-// TODO: REPLACE WITH CLIENT IN controller/rest (TBD).
 type Client struct {
 	// baseURL for the nub.
 	baseURL string
@@ -36,29 +35,98 @@ func (r *Client) Get(path string, object interface{}) (err error) {
 		_ = reply.Body.Close()
 	}()
 	status := reply.StatusCode
-	if status != http.StatusOK {
+	switch status {
+	case http.StatusOK:
+		var body []byte
+		body, err = io.ReadAll(reply.Body)
+		if err != nil {
+			return
+		}
+		err = json.Unmarshal(body, object)
+	case http.StatusNotFound:
+		err = &NotFound{path}
+	default:
 		err = errors.New(http.StatusText(status))
-		return
 	}
-	body, err := io.ReadAll(reply.Body)
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(body, object)
+
 	return
 }
 
 //
 // Post a resource.
 func (r *Client) Post(path string, object interface{}) (err error) {
-	err = r.post(http.MethodPost, path, object)
+	bfr, err := json.Marshal(object)
+	if err != nil {
+		return
+	}
+	reader := bytes.NewReader(bfr)
+	request := &http.Request{
+		Method: http.MethodPost,
+		Body:   ioutil.NopCloser(reader),
+		URL:    r.join(path),
+	}
+	reply, err := r.http.Do(request)
+	if err != nil {
+		return
+	}
+	status := reply.StatusCode
+	switch status {
+	case http.StatusOK,
+		http.StatusCreated:
+		var body []byte
+		body, err = ioutil.ReadAll(reply.Body)
+		if err != nil {
+			return
+		}
+		err = json.Unmarshal(body, object)
+		if err != nil {
+			return
+		}
+	case http.StatusConflict:
+		err = &Conflict{path}
+	default:
+		err = errors.New(http.StatusText(status))
+	}
+
 	return
 }
 
 //
 // Put a resource.
 func (r *Client) Put(path string, object interface{}) (err error) {
-	err = r.post(http.MethodPut, path, object)
+	bfr, err := json.Marshal(object)
+	if err != nil {
+		return
+	}
+	reader := bytes.NewReader(bfr)
+	request := &http.Request{
+		Method: http.MethodPut,
+		Body:   ioutil.NopCloser(reader),
+		URL:    r.join(path),
+	}
+	reply, err := r.http.Do(request)
+	if err != nil {
+		return
+	}
+	status := reply.StatusCode
+	switch status {
+	case http.StatusNoContent:
+	case http.StatusOK:
+		var body []byte
+		body, err = ioutil.ReadAll(reply.Body)
+		if err != nil {
+			return
+		}
+		err = json.Unmarshal(body, object)
+		if err != nil {
+			return
+		}
+	case http.StatusNotFound:
+		err = &NotFound{path}
+	default:
+		err = errors.New(http.StatusText(status))
+	}
+
 	return
 }
 
@@ -77,51 +145,13 @@ func (r *Client) Delete(path string) (err error) {
 		_ = reply.Body.Close()
 	}()
 	status := reply.StatusCode
-	if status != http.StatusNoContent {
-		err = errors.New(http.StatusText(status))
-		return
-	}
-	return
-}
-
-//
-// Post a resource.
-func (r *Client) post(method string, path string, object interface{}) (err error) {
-	bfr, err := json.Marshal(object)
-	if err != nil {
-		return
-	}
-	reader := bytes.NewReader(bfr)
-	request := &http.Request{
-		Method: method,
-		Body:   ioutil.NopCloser(reader),
-		URL:    r.join(path),
-	}
-	reply, err := r.http.Do(request)
-	if err != nil {
-		return
-	}
-	status := reply.StatusCode
 	switch status {
 	case http.StatusOK,
-		http.StatusCreated:
-		var content []byte
-		content, err = ioutil.ReadAll(reply.Body)
-		if err != nil {
-			return
-		}
-		err = json.Unmarshal(content, object)
-		if err != nil {
-			return
-		}
-	case http.StatusConflict:
-		err = &ConflictError{path}
-		return
-	case http.StatusNoContent:
-		return
+		http.StatusNoContent:
+	case http.StatusNotFound:
+		err = &NotFound{path}
 	default:
 		err = errors.New(http.StatusText(status))
-		return
 	}
 
 	return
@@ -134,16 +164,31 @@ func (r *Client) join(path string) (parsedURL *url.URL) {
 }
 
 //
-// ConflictError reports 409 error.
-type ConflictError struct {
+// Conflict reports 409 error.
+type Conflict struct {
 	Path string
 }
 
-func (e ConflictError) Error() string {
-	return fmt.Sprintf("POST: path:%s - conflict", e.Path)
+func (e Conflict) Error() string {
+	return fmt.Sprintf("POST: path:%s [conflict]", e.Path)
 }
 
-func (e *ConflictError) Is(err error) (matched bool) {
-	_, matched = err.(*ConflictError)
+func (e *Conflict) Is(err error) (matched bool) {
+	_, matched = err.(*Conflict)
+	return
+}
+
+//
+// NotFound reports 404 error.
+type NotFound struct {
+	Path string
+}
+
+func (e NotFound) Error() string {
+	return fmt.Sprintf("GET: path:%s [not-found]", e.Path)
+}
+
+func (e *NotFound) Is(err error) (matched bool) {
+	_, matched = err.(*NotFound)
 	return
 }

@@ -6,11 +6,13 @@ package addon
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/konveyor/controller/pkg/logging"
 	"github.com/konveyor/tackle-hub/settings"
 	"github.com/konveyor/tackle-hub/task"
 	"net/http"
 	"os"
+	"strings"
 )
 
 var (
@@ -116,5 +118,26 @@ func newAdapter() (adapter *Adapter) {
 		"data",
 		adapter.Data())
 
+	return
+}
+
+//
+// Params mapping.
+type Params map[string]interface{}
+
+//
+// inject values into path.
+func (p Params) inject(path string) (s string) {
+	in := strings.Split(path, "/")
+	for i := range in {
+		if len(in[i]) < 1 {
+			continue
+		}
+		key := in[i][1:]
+		if v, found := p[key]; found {
+			in[i] = fmt.Sprintf("%v", v)
+		}
+	}
+	s = strings.Join(in, "/")
 	return
 }

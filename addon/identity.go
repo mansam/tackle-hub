@@ -2,8 +2,6 @@ package addon
 
 import (
 	"github.com/konveyor/tackle-hub/api"
-	pathlib "path"
-	"strconv"
 )
 
 //
@@ -17,11 +15,8 @@ type Identity struct {
 // Get an identity by ID.
 func (h *Identity) Get(id uint) (r *api.Identity, err error) {
 	r = &api.Identity{}
-	err = h.client.Get(
-		pathlib.Join(
-			api.IdentitiesRoot,
-			strconv.Itoa(int(id))),
-		r)
+	path := Params{api.ID: id}.inject(api.IdentityRoot)
+	err = h.client.Get(path, r)
 	if err != nil {
 		return
 	}

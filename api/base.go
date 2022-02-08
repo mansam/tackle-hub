@@ -24,7 +24,7 @@ type BaseHandler struct {
 
 // With database and k8s client.
 func (h *BaseHandler) With(db *gorm.DB, client client.Client) {
-	h.DB = db
+	h.DB = db.Debug()
 	h.Client = client
 }
 

@@ -9,8 +9,7 @@ curl -X POST ${host}/buckets -d \
     "name": "created-directly"
 }' | jq -M .
 
-curl -X POST ${host}/application-inventory/application/1/buckets -d \
+curl -X POST ${host}/application-inventory/application/1/buckets/created-for-application -d \
 '{
-    "createUser": "tackle",
-    "name": "created-for-application"
+    "createUser": "tackle"
 }' | jq -M .

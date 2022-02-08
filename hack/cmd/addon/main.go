@@ -30,30 +30,35 @@ var (
 func main() {
 	var err error
 	//
-	// Get the addon data associated with the task.
-	d := &Data{}
-	_ = addon.DataWith(d)
-	//
 	// Error handler.
 	defer func() {
 		if err != nil {
 			log.Error(err, "Addon failed.")
 			_ = addon.Failed(err.Error())
-			d.delay()
 			os.Exit(1)
 		}
 	}()
 	//
+	// Get the addon data associated with the task.
+	d := &Data{}
+	_ = addon.DataWith(d)
+	if err != nil {
+		return
+	}
+	//
 	// Task update: The addon has started.
 	// This MUST be called before reporting any
 	// other progress.
-	_ = addon.Started()
+	err = addon.Started()
+	if err != nil {
+		return
+	}
 	//
 	// Find files.
 	paths, _ := find(d.Path, 25)
 	//
-	// Create bucket.
-	err = createBucket(d, paths)
+	// Ensure bucket.
+	err = ensureBucket(d, paths)
 	if err != nil {
 		return
 	}
@@ -63,8 +68,8 @@ func main() {
 }
 
 //
-// createBucket builds and populates the bucket.
-func createBucket(d *Data, paths []string) (err error) {
+// ensureBucket builds and populates the bucket.
+func ensureBucket(d *Data, paths []string) (err error) {
 	//
 	// Task update: Update the task with total number of
 	// items to be processed by the addon.
@@ -72,10 +77,7 @@ func createBucket(d *Data, paths []string) (err error) {
 	if err != nil {
 		return
 	}
-	bucket := &api.Bucket{}
-	bucket.Name = "Listing"
-	bucket.ApplicationID = d.Application
-	err = addon.Bucket.Create(bucket)
+	bucket, err := addon.Bucket.Ensure(d.Application, "Listing")
 	if err != nil {
 		return
 	}
@@ -84,6 +86,10 @@ func createBucket(d *Data, paths []string) (err error) {
 			_ = addon.Bucket.Delete(bucket)
 		}
 	}()
+	err = addon.Bucket.Purge(bucket)
+	if err != nil {
+		return
+	}
 	//
 	// Write files.
 	for _, p := range paths {

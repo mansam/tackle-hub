@@ -2,8 +2,6 @@ package addon
 
 import (
 	"github.com/konveyor/tackle-hub/api"
-	pathlib "path"
-	"strconv"
 )
 
 //
@@ -15,26 +13,23 @@ type Tag struct {
 
 //
 // Create a tag.
-func (h *Tag) Create(m *api.Tag) (err error) {
-	err = h.client.Post(api.TagsRoot, m)
+func (h *Tag) Create(r *api.Tag) (err error) {
+	err = h.client.Post(api.TagsRoot, r)
 	if err == nil {
 		Log.Info(
 			"Addon created: tag.",
 			"object",
-			m)
+			r)
 	}
 	return
 }
 
 //
 // Get a tag by ID.
-func (h *Tag) Get(id uint) (m *api.Tag, err error) {
-	m = &api.Tag{}
-	err = h.client.Get(
-		pathlib.Join(
-			api.TagsRoot,
-			strconv.Itoa(int(id))),
-		m)
+func (h *Tag) Get(id uint) (r *api.Tag, err error) {
+	r = &api.Tag{}
+	path := Params{api.ID: id}.inject(api.TagRoot)
+	err = h.client.Get(path, r)
 	return
 }
 
@@ -48,16 +43,14 @@ func (h *Tag) List() (list []api.Tag, err error) {
 
 //
 // Delete a tag.
-func (h *Tag) Delete(m *api.Tag) (err error) {
-	err = h.client.Delete(
-		pathlib.Join(
-			api.TagsRoot,
-			strconv.Itoa(int(m.ID))))
+func (h *Tag) Delete(r *api.Tag) (err error) {
+	path := Params{api.ID: r.ID}.inject(api.TagRoot)
+	err = h.client.Delete(path)
 	if err == nil {
 		Log.Info(
 			"Addon deleted: tag.",
 			"object",
-			m)
+			r)
 	}
 	return
 }
@@ -84,13 +77,10 @@ func (h *TagType) Create(m *api.TagType) (err error) {
 
 //
 // Get a tag-type by ID.
-func (h *TagType) Get(id uint) (m *api.TagType, err error) {
-	m = &api.TagType{}
-	err = h.client.Get(
-		pathlib.Join(
-			api.TagTypesRoot,
-			strconv.Itoa(int(id))),
-		m)
+func (h *TagType) Get(id uint) (r *api.TagType, err error) {
+	r = &api.TagType{}
+	path := Params{api.ID: id}.inject(api.TagTypeRoot)
+	err = h.client.Get(path, r)
 	return
 }
 
@@ -104,16 +94,14 @@ func (h *TagType) List() (list []api.TagType, err error) {
 
 //
 // Delete a tag-type.
-func (h *TagType) Delete(m *api.TagType) (err error) {
-	err = h.client.Delete(
-		pathlib.Join(
-			api.TagTypesRoot,
-			strconv.Itoa(int(m.ID))))
+func (h *TagType) Delete(r *api.TagType) (err error) {
+	path := Params{api.ID: r.ID}.inject(api.TagTypeRoot)
+	err = h.client.Delete(path)
 	if err == nil {
 		Log.Info(
 			"Addon deleted: tag(type).",
 			"object",
-			m)
+			r)
 	}
 	return
 }
