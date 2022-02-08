@@ -2,6 +2,7 @@ package addon
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/konveyor/tackle-hub/api"
 	"github.com/konveyor/tackle-hub/task"
@@ -113,6 +114,8 @@ func (h *Task) Completed(n int) (err error) {
 	return
 }
 
+//
+// postReport creates/updates the task report.
 func (h *Task) postReport() (err error) {
 	taskID := strconv.Itoa(int(h.secret.Hub.Task))
 	err = h.client.Post(
@@ -121,6 +124,9 @@ func (h *Task) postReport() (err error) {
 			taskID,
 			"report"),
 		&h.report)
+	if errors.Is(err, &ConflictError{}) {
+		err = h.putReport()
+	}
 	return
 }
 

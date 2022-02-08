@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -113,6 +114,9 @@ func (r *Client) post(method string, path string, object interface{}) (err error
 		if err != nil {
 			return
 		}
+	case http.StatusConflict:
+		err = &ConflictError{path}
+		return
 	case http.StatusNoContent:
 		return
 	default:
@@ -126,5 +130,20 @@ func (r *Client) post(method string, path string, object interface{}) (err error
 func (r *Client) join(path string) (parsedURL *url.URL) {
 	parsedURL, _ = url.Parse(r.baseURL)
 	parsedURL.Path = path
+	return
+}
+
+//
+// ConflictError reports 409 error.
+type ConflictError struct {
+	Path string
+}
+
+func (e ConflictError) Error() string {
+	return fmt.Sprintf("POST: path:%s - conflict", e.Path)
+}
+
+func (e *ConflictError) Is(err error) (matched bool) {
+	_, matched = err.(*ConflictError)
 	return
 }
