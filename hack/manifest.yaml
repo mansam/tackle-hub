@@ -5,7 +5,6 @@ metadata:
   name: bucket
   namespace: tackle-hub
 spec:
-  storageClassName: csi-manila-ceph
   accessModes:
     - ReadWriteMany
   resources:
@@ -37,7 +36,7 @@ spec:
         image: quay.io/jortel/tackle-hub:latest
         env:
           - name: "HUB_BASE_URL"
-            value: "http://tackle-hub.tackle-hub.svc.cluster.local"
+            value: "http://tackle-hub"
           - name: "SECRET_PATH"
             value: "/var/run/secrets/konveyor.io/tackle/addon.json"
           - name: "BUCKET_PATH"
@@ -59,6 +58,7 @@ metadata:
   labels:
     app: tackle-hub
 spec:
+  type: NodePort
   selector:
     app: tackle-hub
   ports:
@@ -67,17 +67,27 @@ spec:
       targetPort: 8080
 
 ---
-apiVersion: route.openshift.io/v1
-kind: Route
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: tackle-hub
+  name:  tackle-hub
+rules:
+- apiGroups: ["", "batch", "tackle.konveyor.io"]
+  resources: ["*"]
+  verbs: ["*"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: tackle-hub
   namespace: tackle-hub
-  labels:
-    app: tackle-hub
-spec:
-  host: konveyor-tackle-hub.apps.cluster-jortel.v2v.bos.redhat.com
-  to:
-    kind: Service
-    name: tackle-hub
-  wildcardPolicy: None
-
+subjects:
+- kind: ServiceAccount
+  name: tackle-hub
+  apiGroup: ""
+roleRef:
+  kind: Role
+  name: tackle-hub
+  apiGroup: ""

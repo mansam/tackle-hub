@@ -11,7 +11,7 @@ type TaskReport struct {
 	Total     int
 	Completed int
 	Activity  string
-	TaskID    uint
+	TaskID    uint `gorm:"uniqueIndex"`
 	Task      *Task
 }
 
