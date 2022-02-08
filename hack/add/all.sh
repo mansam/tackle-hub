@@ -16,6 +16,6 @@ cd ${dir}
 ./business-service.sh
 ./application.sh
 ./review.sh
-./repository.sh
 ./identity.sh
+./proxy.sh
 
