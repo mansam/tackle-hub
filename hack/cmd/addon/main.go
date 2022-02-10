@@ -28,30 +28,25 @@ var (
 //
 // main
 func main() {
-	addon.Run(adapter)
-}
-
-//
-// adapter main.
-func adapter() (err error) {
-	//
-	// Get the addon data associated with the task.
-	d := &Data{}
-	_ = addon.DataWith(d)
-	if err != nil {
+	addon.Run(func() (err error){
+		//
+		// Get the addon data associated with the task.
+		d := &Data{}
+		_ = addon.DataWith(d)
+		if err != nil {
+			return
+		}
+		//
+		// Find files.
+		paths, _ := find(d.Path, 25)
+		//
+		// Ensure bucket.
+		err = ensureBucket(d, paths)
+		if err != nil {
+			return
+		}
 		return
-	}
-	//
-	// Find files.
-	paths, _ := find(d.Path, 25)
-	//
-	// Ensure bucket.
-	err = ensureBucket(d, paths)
-	if err != nil {
-		return
-	}
-
-	return
+	})
 }
 
 //
