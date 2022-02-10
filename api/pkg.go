@@ -26,7 +26,7 @@ const (
 	ID       = "id"
 	Key      = "key"
 	Name     = "name"
-	Wildcard = "Wildcard"
+	Wildcard = "wildcard"
 )
 
 //

@@ -12,11 +12,12 @@ import (
 //
 // Routes
 const (
-	BucketsRoot    = "/buckets"
-	BucketRoot     = BucketsRoot + "/:" + ID
-	BucketContent  = BucketRoot + "/*" + Wildcard
-	AppBucketsRoot = ApplicationRoot + BucketsRoot
-	AppBucketRoot  = AppBucketsRoot + "/:" + Name
+	BucketsRoot          = "/buckets"
+	BucketRoot           = BucketsRoot + "/:" + ID
+	BucketContent        = BucketRoot + "/content/*" + Wildcard
+	AppBucketsRoot       = ApplicationRoot + BucketsRoot
+	AppBucketRoot        = AppBucketsRoot + "/:" + Name
+	AppBucketContentRoot = AppBucketRoot + "/content/*" + Wildcard
 )
 
 //
@@ -38,6 +39,7 @@ func (h BucketHandler) AddRoutes(e *gin.Engine) {
 	e.GET(AppBucketsRoot+"/", h.AppList)
 	e.GET(AppBucketRoot+"/", h.AppGet)
 	e.POST(AppBucketRoot, h.AppCreate)
+	e.GET(AppBucketContentRoot, h.AppContent)
 }
 
 // Get godoc
@@ -46,7 +48,7 @@ func (h BucketHandler) AddRoutes(e *gin.Engine) {
 // @tags get
 // @produce json
 // @success 200 {object} Bucket
-// @router /controls/bucket/{id} [get]
+// @router /buckets/{id} [get]
 // @param id path string true "Bucket ID"
 func (h BucketHandler) Get(ctx *gin.Context) {
 	m := &model.Bucket{}
@@ -68,7 +70,7 @@ func (h BucketHandler) Get(ctx *gin.Context) {
 // @tags get
 // @produce json
 // @success 200 {object} []Bucket
-// @router /controls/bucket [get]
+// @router /buckets [get]
 func (h BucketHandler) List(ctx *gin.Context) {
 	var list []model.Bucket
 	pagination := NewPagination(ctx)
@@ -95,7 +97,7 @@ func (h BucketHandler) List(ctx *gin.Context) {
 // @accept json
 // @produce json
 // @success 201 {object} Bucket
-// @router /controls/bucket [post]
+// @router /buckets [post]
 // @param bucket body Bucket true "Bucket data"
 func (h BucketHandler) Create(ctx *gin.Context) {
 	r := &Bucket{}
@@ -117,7 +119,7 @@ func (h BucketHandler) Create(ctx *gin.Context) {
 // @description Delete a bucket.
 // @tags delete
 // @success 204 {object} Bucket
-// @router /controls/bucket/{id} [delete]
+// @router /buckets/{id} [delete]
 // @param id path string true "Bucket ID"
 func (h BucketHandler) Delete(ctx *gin.Context) {
 	id := ctx.Param(ID)
@@ -136,8 +138,14 @@ func (h BucketHandler) Delete(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
-//
-// GetContent streams file file content.
+// GetContent godoc
+// @summary Get bucket content by ID and path.
+// @description Get bucket content by ID and path.
+// @tags get
+// @produce json
+// @success 200 {object}
+// @router /bucket/{id}/content/* [get]
+// @param id path string true "Bucket ID"
 func (h BucketHandler) GetContent(ctx *gin.Context) {
 	rPath := ctx.Param(Wildcard)
 	m := &model.Bucket{}
@@ -158,7 +166,7 @@ func (h BucketHandler) GetContent(ctx *gin.Context) {
 // @tags get
 // @produce json
 // @success 200 {object} []Bucket
-// @router /application-inventory/application/{id}/bucket [get]
+// @router /application-inventory/application/{id}/buckets [get]
 // @param id path int true "Application ID"
 func (h BucketHandler) AppList(ctx *gin.Context) {
 	var list []model.Bucket
@@ -189,6 +197,7 @@ func (h BucketHandler) AppList(ctx *gin.Context) {
 // @success 200 {object} Bucket
 // @router /application-inventory/application/{id}/buckets/{name} [get]
 // @param id path int true "Application ID"
+// @param name path string true "Bucket Name"
 func (h BucketHandler) AppGet(ctx *gin.Context) {
 	m := &model.Bucket{}
 	appId := ctx.Param(ID)
@@ -214,6 +223,7 @@ func (h BucketHandler) AppGet(ctx *gin.Context) {
 // @success 201 {object} Bucket
 // @router /application-inventory/application/{id}/buckets/{name} [post]
 // @param id path int true "Application ID"
+// @param name path string true "Bucket Name"
 // @param bucket body Bucket true "Bucket data"
 func (h BucketHandler) AppCreate(ctx *gin.Context) {
 	appID := ctx.Param(ID)
@@ -234,6 +244,31 @@ func (h BucketHandler) AppCreate(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, r)
+}
+
+// AppContent godoc
+// @summary Get bucket content by application ID, bucket name and path.
+// @description Get bucket content by application ID, bucket name and path.
+// @tags get
+// @produce json
+// @success 200 {object}
+// @router /application-inventory/application/{id}/buckets/{name}/content/* [get]
+// @param id path string true "Bucket ID"
+// @param name path string true "Bucket Name"
+func (h BucketHandler) AppContent(ctx *gin.Context) {
+	rPath := ctx.Param(Wildcard)
+	appID := ctx.Param(ID)
+	name := ctx.Param(Name)
+	m := &model.Bucket{}
+	db := h.DB.Where("applicationID", appID).Where("name", name)
+	result := db.First(m)
+	if result.Error != nil {
+		h.getFailed(ctx, result.Error)
+		return
+	}
+	ctx.File(pathlib.Join(
+		m.Path,
+		rPath))
 }
 
 //
