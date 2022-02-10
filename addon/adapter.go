@@ -66,8 +66,12 @@ func (h *Adapter) Run(addon func() error) {
 	var err error
 	defer func() {
 		r := recover()
-		if pErr, cast := r.(error); cast {
-			err = pErr
+		if r != nil {
+			if pErr, cast := r.(error); cast {
+				err = pErr
+			} else {
+				panic(r)
+			}
 		}
 		if err != nil {
 			Log.Error(err, "Addon failed.")
