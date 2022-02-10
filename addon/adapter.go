@@ -64,6 +64,8 @@ type Adapter struct {
 //  - Failed (when addon returns error).
 func (h *Adapter) Run(addon func() error) {
 	var err error
+	//
+	// Error handling.
 	defer func() {
 		r := recover()
 		if r != nil {
@@ -77,12 +79,20 @@ func (h *Adapter) Run(addon func() error) {
 			Log.Error(err, "Addon failed.")
 			h.Failed(err.Error())
 			os.Exit(1)
-		} else {
-			h.Succeeded()
 		}
 	}()
+	//
+	// Report addon started.
 	h.Started()
+	//
+	// Run addon.
 	err = addon()
+	if err != nil {
+		return
+	}
+	//
+	// Report addon succeeded.
+	h.Succeeded()
 }
 
 //
