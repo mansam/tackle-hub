@@ -45,6 +45,7 @@ func (h TaskHandler) AddRoutes(e *gin.Engine) {
 	e.POST(TaskReportRoot, h.CreateReport)
 	e.PUT(TaskReportRoot, h.UpdateReport)
 	e.POST(AddonTasksRoot, h.AddonCreate)
+	e.GET(AddonTasksRoot, h.AddonList)
 	e.DELETE(TaskRoot, h.Delete)
 }
 
@@ -122,50 +123,6 @@ func (h TaskHandler) Create(ctx *gin.Context) {
 	m := task.Model()
 	m.Reset()
 	result := h.DB.Create(&m)
-	if result.Error != nil {
-		h.createFailed(ctx, result.Error)
-		return
-	}
-	task.With(m)
-
-	ctx.JSON(http.StatusCreated, task)
-}
-
-// AddonCreate godoc
-// @summary Create an addon task.
-// @description Create an addon task.
-// @tags create
-// @accept json
-// @produce json
-// @success 201 {object} api.Task
-// @router /addons/:name/tasks [post]
-// @param task body api.Task true "Task data"
-func (h TaskHandler) AddonCreate(ctx *gin.Context) {
-	name := ctx.Param(Name)
-	addon := &crd.Addon{}
-	err := h.Client.Get(
-		context.TODO(),
-		client.ObjectKey{
-			Namespace: Settings.Hub.Namespace,
-			Name:      name,
-		},
-		addon)
-	if err != nil {
-		if errors.IsNotFound(err) {
-			ctx.Status(http.StatusNotFound)
-			return
-		}
-	}
-	task := Task{}
-	task.Name = addon.Name
-	task.Addon = addon.Name
-	task.Image = addon.Spec.Image
-	err = ctx.BindJSON(&task.Data)
-	if err != nil {
-		return
-	}
-	m := task.Model()
-	result := h.DB.Create(m)
 	if result.Error != nil {
 		h.createFailed(ctx, result.Error)
 		return
@@ -301,6 +258,83 @@ func (h TaskHandler) UpdateReport(ctx *gin.Context) {
 	report.With(m)
 
 	ctx.JSON(http.StatusOK, report)
+}
+
+// AddonCreate godoc
+// @summary Create an addon task.
+// @description Create an addon task.
+// @tags create
+// @accept json
+// @produce json
+// @success 201 {object} api.Task
+// @router /addons/:name/tasks [post]
+// @param task body api.Task true "Task data"
+func (h TaskHandler) AddonCreate(ctx *gin.Context) {
+	name := ctx.Param(Name)
+	addon := &crd.Addon{}
+	err := h.Client.Get(
+		context.TODO(),
+		client.ObjectKey{
+			Namespace: Settings.Hub.Namespace,
+			Name:      name,
+		},
+		addon)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			ctx.Status(http.StatusNotFound)
+			return
+		}
+	}
+	task := Task{}
+	task.Name = addon.Name
+	task.Addon = addon.Name
+	task.Image = addon.Spec.Image
+	err = ctx.BindJSON(&task.Data)
+	if err != nil {
+		return
+	}
+	m := task.Model()
+	result := h.DB.Create(m)
+	if result.Error != nil {
+		h.createFailed(ctx, result.Error)
+		return
+	}
+	task.With(m)
+
+	ctx.JSON(http.StatusCreated, task)
+}
+
+// AddonList godoc
+// @summary List all tasks associated to an addon.
+// @description List all tasks associated to an addon.
+// @tags get
+// @produce json
+// @success 200 {object} []api.Task
+// @router /addons/{name}/tasks [get]
+func (h TaskHandler) AddonList(ctx *gin.Context) {
+	var list []model.Task
+	pagination := NewPagination(ctx)
+	db := pagination.apply(h.DB)
+	name := ctx.Param(Name)
+	db = db.Where("addon", name)
+	locator := ctx.Query(LocatorParam)
+	if locator != "" {
+		db = db.Where("locator", locator)
+	}
+	db = db.Preload("Report")
+	result := db.Find(&list)
+	if result.Error != nil {
+		h.listFailed(ctx, result.Error)
+		return
+	}
+	resources := []Task{}
+	for i := range list {
+		r := Task{}
+		r.With(&list[i])
+		resources = append(resources, r)
+	}
+
+	ctx.JSON(http.StatusOK, resources)
 }
 
 //
