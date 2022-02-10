@@ -36,19 +36,19 @@ func (h *Task) DataWith(object interface{}) (err error) {
 
 //
 // Started report addon started.
-func (h *Task) Started() (err error) {
+func (h *Task) Started() {
 	h.report.Status = task.Running
-	err = h.pushReport()
+	h.pushReport()
 	Log.Info("Addon reported started.")
 	return
 }
 
 //
 // Succeeded report addon succeeded.
-func (h *Task) Succeeded() (err error) {
+func (h *Task) Succeeded() {
 	h.report.Status = task.Succeeded
 	h.report.Activity = ""
-	err = h.pushReport()
+	h.pushReport()
 	Log.Info("Addon reported: succeeded.")
 	return
 }
@@ -56,10 +56,10 @@ func (h *Task) Succeeded() (err error) {
 //
 // Failed report addon failed.
 // The reason can be a printf style format.
-func (h *Task) Failed(reason string, x ...interface{}) (err error) {
+func (h *Task) Failed(reason string, x ...interface{}) {
 	h.report.Status = task.Failed
 	h.report.Error = fmt.Sprintf(reason, x...)
-	err = h.pushReport()
+	h.pushReport()
 	Log.Info(
 		"Addon reported: failed.",
 		"error",
@@ -70,9 +70,9 @@ func (h *Task) Failed(reason string, x ...interface{}) (err error) {
 //
 // Activity report addon activity.
 // The description can be a printf style format.
-func (h *Task) Activity(description string, x ...interface{}) (err error) {
+func (h *Task) Activity(description string, x ...interface{}) {
 	h.report.Activity = fmt.Sprintf(description, x...)
-	err = h.pushReport()
+	h.pushReport()
 	Log.Info(
 		"Addon reported: activity.",
 		"activity",
@@ -82,9 +82,9 @@ func (h *Task) Activity(description string, x ...interface{}) (err error) {
 
 //
 // Total report addon total items.
-func (h *Task) Total(n int) (err error) {
+func (h *Task) Total(n int) {
 	h.report.Total = n
-	err = h.pushReport()
+	h.pushReport()
 	Log.Info(
 		"Addon updated: total.",
 		"total",
@@ -94,9 +94,9 @@ func (h *Task) Total(n int) (err error) {
 
 //
 // Increment report addon completed (+1) items.
-func (h *Task) Increment() (err error) {
+func (h *Task) Increment() {
 	h.report.Completed++
-	err = h.pushReport()
+	h.pushReport()
 	Log.Info(
 		"Addon updated: total.",
 		"total",
@@ -106,23 +106,26 @@ func (h *Task) Increment() (err error) {
 
 //
 // Completed report addon completed (N) items.
-func (h *Task) Completed(n int) (err error) {
+func (h *Task) Completed(n int) {
 	h.report.Completed = n
-	err = h.pushReport()
+	h.pushReport()
 	Log.Info("Addon reported: completed.")
 	return
 }
 
 //
 // pushReport create/update the task report.
-func (h *Task) pushReport() (err error) {
+func (h *Task) pushReport() {
 	params := Params{
 		api.ID: h.secret.Hub.Task,
 	}
 	path := params.inject(api.TaskReportRoot)
-	err = h.client.Post(path, &h.report)
+	err := h.client.Post(path, &h.report)
 	if errors.Is(err, &Conflict{}) {
 		err = h.client.Put(path, &h.report)
+	}
+	if err != nil {
+		panic(err)
 	}
 	return
 }

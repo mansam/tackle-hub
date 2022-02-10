@@ -20,36 +20,24 @@ import (
 )
 
 var (
-	// addon adapter.
+	// hub integration.
 	addon = hub.Addon
-	log   = hub.Log
+	Log   = hub.Log
 )
 
 //
 // main
 func main() {
-	var err error
-	//
-	// Error handler.
-	defer func() {
-		if err != nil {
-			log.Error(err, "Addon failed.")
-			_ = addon.Failed(err.Error())
-			os.Exit(1)
-		}
-	}()
+	addon.Run(adapter)
+}
+
+//
+// adapter main.
+func adapter() (err error) {
 	//
 	// Get the addon data associated with the task.
 	d := &Data{}
 	_ = addon.DataWith(d)
-	if err != nil {
-		return
-	}
-	//
-	// Task update: The addon has started.
-	// This MUST be called before reporting any
-	// other progress.
-	err = addon.Started()
 	if err != nil {
 		return
 	}
@@ -62,9 +50,8 @@ func main() {
 	if err != nil {
 		return
 	}
-	//
-	// Task update: The addon has succeeded.
-	_ = addon.Succeeded()
+
+	return
 }
 
 //
@@ -73,10 +60,9 @@ func ensureBucket(d *Data, paths []string) (err error) {
 	//
 	// Task update: Update the task with total number of
 	// items to be processed by the addon.
-	err = addon.Total(len(paths))
-	if err != nil {
-		return
-	}
+	addon.Total(len(paths))
+	//
+	// Ensure the bucket.
 	bucket, err := addon.Bucket.Ensure(d.Application, "Listing")
 	if err != nil {
 		return
@@ -108,10 +94,7 @@ func ensureBucket(d *Data, paths []string) (err error) {
 		target := pathlib.Join(
 			bucket.Path,
 			pathlib.Base(p))
-		err = addon.Activity("writing: %s", target)
-		if err != nil {
-			return
-		}
+		addon.Activity("writing: %s", target)
 		//
 		// Write file.
 		err = os.WriteFile(
@@ -125,10 +108,7 @@ func ensureBucket(d *Data, paths []string) (err error) {
 		//
 		// Task update: Increment the number of completed
 		// items processed by the addon.
-		err = addon.Increment()
-		if err != nil {
-			return
-		}
+		addon.Increment()
 	}
 	//
 	// Build the index.
@@ -138,14 +118,14 @@ func ensureBucket(d *Data, paths []string) (err error) {
 	}
 	//
 	// Task update: update the current addon activity.
-	err = addon.Activity("done")
+	addon.Activity("done")
 	return
 }
 
 //
 // Build index.html
 func buildIndex(bucket *api.Bucket) (err error) {
-	err = addon.Activity("Building index.")
+	addon.Activity("Building index.")
 	time.Sleep(time.Second)
 	dir := bucket.Path
 	path := pathlib.Join(dir, "index.html")
@@ -177,7 +157,7 @@ func buildIndex(bucket *api.Bucket) (err error) {
 //
 // find files.
 func find(path string, max int) (paths []string, err error) {
-	log.Info("Listing.", "path", path)
+	Log.Info("Listing.", "path", path)
 	cmd := exec.Command(
 		"find",
 		path,
@@ -192,7 +172,7 @@ func find(path string, max int) (paths []string, err error) {
 	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
-		log.Info(stderr.String())
+		Log.Info(stderr.String())
 		return
 	}
 
@@ -201,7 +181,7 @@ func find(path string, max int) (paths []string, err error) {
 		paths = paths[:max]
 	}
 
-	log.Info("List found.", "paths", paths)
+	Log.Info("List found.", "paths", paths)
 
 	return
 }

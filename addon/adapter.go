@@ -57,6 +57,31 @@ type Adapter struct {
 }
 
 //
+// Run addon.
+// Reports:
+//  - Started
+//  - Succeeded
+//  - Failed (when addon returns error).
+func (h *Adapter) Run(addon func() error) {
+	var err error
+	defer func() {
+		r := recover()
+		if pErr, cast := r.(error); cast {
+			err = pErr
+		}
+		if err != nil {
+			Log.Error(err, "Addon failed.")
+			h.Failed(err.Error())
+			os.Exit(1)
+		} else {
+			h.Succeeded()
+		}
+	}()
+	h.Started()
+	err = addon()
+}
+
+//
 // Client provides the REST client.
 func (h *Adapter) Client() *Client {
 	return h.client
