@@ -44,7 +44,7 @@ func (r *Hub) Load() (err error) {
 	}
 	r.DB.SeedPath, found = os.LookupEnv(EnvDbSeedPath)
 	if !found {
-		r.DB.SeedPath = "/seed"
+		r.DB.SeedPath = "/tmp/seed"
 	}
 	r.Bucket.Path, found = os.LookupEnv(EnvBucketPath)
 	if !found {
