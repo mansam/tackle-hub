@@ -383,6 +383,7 @@ type TaskReport struct {
 // With updates the resource with the model.
 func (r *TaskReport) With(m *model.TaskReport) {
 	r.Resource.With(&m.Model)
+	r.Status = m.Status
 	r.Error = m.Error
 	r.Total = m.Total
 	r.Completed = m.Completed
@@ -394,6 +395,7 @@ func (r *TaskReport) With(m *model.TaskReport) {
 // Model builds a model.
 func (r *TaskReport) Model() (m *model.TaskReport) {
 	m = &model.TaskReport{
+		Status:    r.Status,
 		Error:     r.Error,
 		Total:     r.Total,
 		Completed: r.Completed,

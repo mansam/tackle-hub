@@ -47,6 +47,7 @@ func (h *Task) Started() (err error) {
 // Succeeded report addon succeeded.
 func (h *Task) Succeeded() (err error) {
 	h.report.Status = task.Succeeded
+	h.report.Activity = ""
 	err = h.pushReport()
 	Log.Info("Addon reported: succeeded.")
 	return
