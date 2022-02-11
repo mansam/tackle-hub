@@ -69,10 +69,11 @@ func (h *Task) Failed(reason string, x ...interface{}) {
 //
 // Activity report addon activity.
 // The description can be a printf style format.
-func (h *Task) Activity(description string, x ...interface{}) {
+func (h *Task) Activity(entry string, x ...interface{}) {
+	entry = fmt.Sprintf(entry, x...)
 	h.report.Activity = append(
 		h.report.Activity,
-		fmt.Sprintf(description, x...))
+		entry)
 	h.pushReport()
 	Log.Info(
 		"Addon reported: activity.",

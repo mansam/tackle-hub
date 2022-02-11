@@ -405,12 +405,12 @@ func (r *Task) Model() (m *model.Task) {
 // TaskReport REST resource.
 type TaskReport struct {
 	Resource
-	Status    string `json:"status"`
-	Error     string `json:"error"`
-	Total     int    `json:"total"`
-	Completed int    `json:"completed"`
+	Status    string   `json:"status"`
+	Error     string   `json:"error"`
+	Total     int      `json:"total"`
+	Completed int      `json:"completed"`
 	Activity  []string `json:"activity"`
-	TaskID    uint   `json:"task"`
+	TaskID    uint     `json:"task"`
 }
 
 //
