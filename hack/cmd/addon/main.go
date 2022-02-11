@@ -58,8 +58,11 @@ func ensureBucket(d *Data, paths []string) (err error) {
 	addon.Total(len(paths))
 	//
 	// Ensure the bucket.
+	addon.Activity("Ensuring bucket.")
 	bucket, err := addon.Bucket.Ensure(d.Application, "Listing")
-	if err != nil {
+	if err == nil {
+		addon.Activity("Using bucket: id=%d", bucket.ID)
+	} else {
 		return
 	}
 	defer func() {
@@ -67,6 +70,7 @@ func ensureBucket(d *Data, paths []string) (err error) {
 			_ = addon.Bucket.Delete(bucket)
 		}
 	}()
+	addon.Activity("Purging bucket.")
 	err = addon.Bucket.Purge(bucket)
 	if err != nil {
 		return
@@ -89,7 +93,7 @@ func ensureBucket(d *Data, paths []string) (err error) {
 		target := pathlib.Join(
 			bucket.Path,
 			pathlib.Base(p))
-		addon.Activity("writing: %s", target)
+		addon.Activity("writing: %s", p)
 		//
 		// Write file.
 		err = os.WriteFile(

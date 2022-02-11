@@ -10,7 +10,7 @@ type TaskReport struct {
 	Error     string
 	Total     int
 	Completed int
-	Activity  string
+	Activity  JSON
 	TaskID    uint `gorm:"uniqueIndex"`
 	Task      *Task
 }

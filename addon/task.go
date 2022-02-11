@@ -47,7 +47,6 @@ func (h *Task) Started() {
 // Succeeded report addon succeeded.
 func (h *Task) Succeeded() {
 	h.report.Status = task.Succeeded
-	h.report.Activity = ""
 	h.pushReport()
 	Log.Info("Addon reported: succeeded.")
 	return
@@ -71,7 +70,9 @@ func (h *Task) Failed(reason string, x ...interface{}) {
 // Activity report addon activity.
 // The description can be a printf style format.
 func (h *Task) Activity(description string, x ...interface{}) {
-	h.report.Activity = fmt.Sprintf(description, x...)
+	h.report.Activity = append(
+		h.report.Activity,
+		fmt.Sprintf(description, x...))
 	h.pushReport()
 	Log.Info(
 		"Addon reported: activity.",

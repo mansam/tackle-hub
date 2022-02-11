@@ -409,7 +409,7 @@ type TaskReport struct {
 	Error     string `json:"error"`
 	Total     int    `json:"total"`
 	Completed int    `json:"completed"`
-	Activity  string `json:"activity"`
+	Activity  []string `json:"activity"`
 	TaskID    uint   `json:"task"`
 }
 
@@ -421,8 +421,8 @@ func (r *TaskReport) With(m *model.TaskReport) {
 	r.Error = m.Error
 	r.Total = m.Total
 	r.Completed = m.Completed
-	r.Activity = m.Activity
 	r.TaskID = m.TaskID
+	_ = json.Unmarshal(m.Activity, &r.Activity)
 }
 
 //
@@ -433,9 +433,13 @@ func (r *TaskReport) Model() (m *model.TaskReport) {
 		Error:     r.Error,
 		Total:     r.Total,
 		Completed: r.Completed,
-		Activity:  r.Activity,
 		TaskID:    r.TaskID,
 	}
+	if r.Activity == nil {
+		r.Activity = []string{}
+	}
+	_ = json.Unmarshal(m.Activity, &r.Activity)
+	m.Activity, _ = json.Marshal(r.Activity)
 	m.ID = r.ID
 
 	return
