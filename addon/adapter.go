@@ -107,7 +107,7 @@ func newAdapter() (adapter *Adapter) {
 	//
 	// Load secret.
 	secret := &task.Secret{}
-	b, err := os.ReadFile(Settings.Addon.Secret.Path)
+	b, err := os.ReadFile(Settings.Addon.Path.Secret)
 	if err != nil {
 		panic(err)
 	}

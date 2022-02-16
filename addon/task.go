@@ -119,16 +119,20 @@ func (h *Task) Completed(n int) {
 //
 // pushReport create/update the task report.
 func (h *Task) pushReport() {
+	var err error
+	defer func() {
+		if err != nil {
+			panic(err)
+		}
+	}()
 	params := Params{
 		api.ID: h.secret.Hub.Task,
 	}
 	path := params.inject(api.TaskReportRoot)
-	err := h.client.Post(path, &h.report)
+	err = h.client.Post(path, &h.report)
 	if errors.Is(err, &Conflict{}) {
 		err = h.client.Put(path, &h.report)
 	}
-	if err != nil {
-		panic(err)
-	}
+
 	return
 }

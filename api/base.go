@@ -86,7 +86,8 @@ func (h *BaseHandler) createFailed(ctx *gin.Context, err error) {
 
 	if errors.As(err, sqliteErr) {
 		switch sqliteErr.ExtendedCode {
-		case sqlite3.ErrConstraintUnique:
+		case sqlite3.ErrConstraintUnique,
+			sqlite3.ErrConstraintPrimaryKey:
 			status = http.StatusConflict
 		}
 	}

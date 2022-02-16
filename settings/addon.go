@@ -7,6 +7,7 @@ import (
 
 const (
 	EnvAddonSecretPath = "ADDON_SECRET_PATH"
+	EnvWorkingDirPath  = "ADDON_WORKINGDIR_PATH"
 	EnvHubBaseURL      = "HUB_BASE_URL"
 )
 
@@ -18,10 +19,12 @@ type Addon struct {
 		// URL for the hub API.
 		URL string
 	}
-	// Shared Secret settings.
-	Secret struct {
-		// Path to the mounted secret.
-		Path string
+	// Path.
+	Path struct {
+		// Working directory path.
+		WorkingDir string
+		// Secret path.
+		Secret string
 	}
 }
 
@@ -35,9 +38,13 @@ func (r *Addon) Load() (err error) {
 	if err != nil {
 		panic(err)
 	}
-	r.Secret.Path, found = os.LookupEnv(EnvAddonSecretPath)
+	r.Path.Secret, found = os.LookupEnv(EnvAddonSecretPath)
 	if !found {
-		r.Secret.Path = "/tmp/secret.json"
+		r.Path.Secret = "/tmp/secret.json"
+	}
+	r.Path.WorkingDir, found = os.LookupEnv(EnvWorkingDirPath)
+	if !found {
+		r.Path.WorkingDir = "/tmp"
 	}
 
 	return

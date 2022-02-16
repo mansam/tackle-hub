@@ -260,11 +260,17 @@ func (r *Task) job(secret *core.Secret) (job batch.Job) {
 func (r *Task) template(secret *core.Secret) (template core.PodTemplateSpec) {
 	template = core.PodTemplateSpec{
 		Spec: core.PodSpec{
-			RestartPolicy: core.RestartPolicyOnFailure,
+			RestartPolicy: core.RestartPolicyNever,
 			Containers: []core.Container{
 				r.container(),
 			},
 			Volumes: []core.Volume{
+				{
+					Name: "working",
+					VolumeSource: core.VolumeSource{
+						EmptyDir: &core.EmptyDirVolumeSource{},
+					},
+				},
 				{
 					Name: "secret",
 					VolumeSource: core.VolumeSource{
@@ -305,26 +311,35 @@ func (r *Task) template(secret *core.Secret) (template core.PodTemplateSpec) {
 // container builds the job container.
 func (r *Task) container() (container core.Container) {
 	container = core.Container{
-		Name:  "main",
-		Image: r.Image,
+		Name:       "main",
+		Image:      r.Image,
+		WorkingDir: Settings.Addon.Path.WorkingDir,
 		Env: []core.EnvVar{
+			{
+				Name:  settings.EnvBucketPath,
+				Value: Settings.Hub.Bucket.Path,
+			},
 			{
 				Name:  settings.EnvHubBaseURL,
 				Value: Settings.Addon.Hub.URL,
 			},
 			{
 				Name:  settings.EnvAddonSecretPath,
-				Value: Settings.Addon.Secret.Path,
+				Value: Settings.Addon.Path.Secret,
 			},
 			{
-				Name:  settings.EnvBucketPath,
-				Value: Settings.Hub.Bucket.Path,
+				Name:  settings.EnvWorkingDirPath,
+				Value: Settings.Addon.Path.WorkingDir,
 			},
 		},
 		VolumeMounts: []core.VolumeMount{
 			{
+				Name:      "working",
+				MountPath: Settings.Addon.Path.WorkingDir,
+			},
+			{
 				Name:      "secret",
-				MountPath: path.Dir(Settings.Addon.Secret.Path),
+				MountPath: path.Dir(Settings.Addon.Path.Secret),
 			},
 			{
 				Name:      "bucket",
@@ -351,7 +366,7 @@ func (r *Task) secret() (secret core.Secret) {
 			Labels:       r.labels(),
 		},
 		Data: map[string][]byte{
-			path.Base(Settings.Addon.Secret.Path): encoded,
+			path.Base(Settings.Addon.Path.Secret): encoded,
 		},
 	}
 
