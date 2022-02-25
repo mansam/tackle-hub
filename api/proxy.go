@@ -59,9 +59,8 @@ func (h ProxyHandler) Get(ctx *gin.Context) {
 // @router /proxies [get]
 func (h ProxyHandler) List(ctx *gin.Context) {
 	var list []model.Proxy
-	pagination := NewPagination(ctx)
-	db := pagination.apply(h.DB)
 	kind := ctx.Query("kind")
+	db := h.DB
 	if kind != "" {
 		db = db.Where("kind", kind)
 	}
@@ -164,10 +163,10 @@ func (h ProxyHandler) Update(ctx *gin.Context) {
 // Proxy REST resource.
 type Proxy struct {
 	Resource
-	Kind       string `json:"kind" binding:"oneof=http https"`
-	Host       string `json:"host" binding:"required"`
-	Port       int    `json:"port" binding:"gt=0"`
-	IdentityID uint   `json:"identity"`
+	Kind     string `json:"kind" binding:"oneof=http https"`
+	Host     string `json:"host" binding:"required"`
+	Port     int    `json:"port" binding:"gt=0"`
+	Identity Ref    `json:"identity"`
 }
 
 //
@@ -177,7 +176,7 @@ func (r *Proxy) With(m *model.Proxy) {
 	r.Kind = m.Kind
 	r.Host = m.Host
 	r.Port = m.Port
-	r.IdentityID = m.IdentityID
+	r.Identity.ID = m.IdentityID
 }
 
 //
@@ -187,7 +186,7 @@ func (r *Proxy) Model() (m *model.Proxy) {
 		Kind:       r.Kind,
 		Host:       r.Host,
 		Port:       r.Port,
-		IdentityID: r.IdentityID,
+		IdentityID: r.Identity.ID,
 	}
 	m.ID = r.ID
 
