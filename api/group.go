@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/konveyor/tackle2-hub/auth"
 	"github.com/konveyor/tackle2-hub/model"
 	"net/http"
 	"strconv"
@@ -29,12 +30,14 @@ type StakeholderGroupHandler struct {
 //
 // AddRoutes adds routes.
 func (h StakeholderGroupHandler) AddRoutes(e *gin.Engine) {
-	e.GET(StakeholderGroupsRoot, h.List)
-	e.GET(StakeholderGroupsRoot+"/", h.List)
-	e.POST(StakeholderGroupsRoot, h.Create)
-	e.GET(StakeholderGroupRoot, h.Get)
-	e.PUT(StakeholderGroupRoot, h.Update)
-	e.DELETE(StakeholderGroupRoot, h.Delete)
+	routeGroup := e.Group("/")
+	routeGroup.Use(auth.AuthorizationRequired(h.AuthProvider, "stakeholdergroups"))
+	routeGroup.GET(StakeholderGroupsRoot, h.List)
+	routeGroup.GET(StakeholderGroupsRoot+"/", h.List)
+	routeGroup.POST(StakeholderGroupsRoot, h.Create)
+	routeGroup.GET(StakeholderGroupRoot, h.Get)
+	routeGroup.PUT(StakeholderGroupRoot, h.Update)
+	routeGroup.DELETE(StakeholderGroupRoot, h.Delete)
 }
 
 // Get godoc
